@@ -49,9 +49,6 @@ const sampleResults = [
 const SearchResults = () => {
     return (
         <div style={{ flex: '1', padding: '0px 30px 0px 20px', boxSizing: 'border-box'}}>
-            <Typography variant="h5" mb={2} sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '36px' }}>
-                Search Results
-            </Typography>
             <Grid container spacing={2}>
                 {sampleResults.map((result, index) => (
                     <Grid item xs={12} key={index}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Box } from '@mui/material';
-import UserProfileHeader from '../../Compoents/ProfilePage/UserProfileHeader';
-import UserProfileTabs from '../../Compoents/ProfilePage/UserProfileTabs';
+import UserProfileHeader from '../../Compoents/UserProfilePage/UserProfileHeader';
+import UserProfileTabs from '../../Compoents/UserProfilePage/UserProfileTabs';
 
 const user = {
     name: 'xia1202',
