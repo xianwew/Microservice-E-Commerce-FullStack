@@ -16,7 +16,6 @@ import jakarta.validation.constraints.Pattern;
 public class UserController {
 
     private final UserService userService;
-
     private final Environment environment;
 
     @Autowired

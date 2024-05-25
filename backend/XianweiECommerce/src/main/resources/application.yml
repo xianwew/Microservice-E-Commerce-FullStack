@@ -20,3 +20,11 @@ spring:
   sql:
     init:
       mode: always
+
+keycloak:
+  auth-server-url: http://localhost:7080
+  realm: master
+  client-id: xianwei-ecommerce-monolith-client
+  client-secret: kHn11XuL8pytqXTW2eQiK6l6VlT8DYlc
+  admin-username: admin
+  admin-password: admins

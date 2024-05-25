@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.example.XianweiECommerce.service.KeycloakService;
 
 @Service
 public class UserService {
@@ -21,15 +22,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final RatingRepository ratingRepository;
+    private final KeycloakService keycloakService;
 
     @Autowired
-    public UserService(UserRepository userRepository, AddressRepository addressRepository, RatingRepository ratingRepository) {
+    public UserService(UserRepository userRepository, AddressRepository addressRepository, RatingRepository ratingRepository, KeycloakService keycloakService) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.ratingRepository = ratingRepository;
+        this.keycloakService = keycloakService;
     }
 
-    public void createUser(UserDTO userDTO) {
+    public String createUser(UserDTO userDTO) {
         User user = UserMapper.toEntity(userDTO);
         Optional<User> optionalUser = userRepository.findByEmail(userDTO.getEmail());
         if (optionalUser.isPresent()) {
@@ -42,6 +45,13 @@ public class UserService {
             ratingRepository.save(user.getRating());
         }
         userRepository.save(user);
+
+        // Register user in Keycloak
+        String adminToken = keycloakService.getAdminToken();
+        keycloakService.createUserInKeycloak(adminToken, userDTO);
+
+        // Get user token
+        return keycloakService.getUserToken(userDTO.getUsername(), userDTO.getPassword());
     }
 
     public UserDTO getUserByEmail(String email) {

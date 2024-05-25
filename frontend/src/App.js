@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from './App/Compoents/Header/Header';
@@ -14,7 +14,7 @@ import CartPage from './App/Pages/CartPage/CartPage';
 import UserReceiptPage from './App/Pages/UserReceiptPage/UserReceiptPage';
 import EditItemPage from './App/Pages/EditItemPage/EditItemPage';
 import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
-import { initKeycloak, getKeycloakInstance } from './App/keycloak/keycloak';
+import { initializeKeycloak, doLogin, doLogout, isLoggedIn } from './App/keycloak/keycloak'
 import { setAuthenticated } from './App/redux/slice/authSlice';
 import { showSnackbar } from './App/redux/slice/snackbarSlice';
 import axios from 'axios';;
@@ -23,20 +23,10 @@ export default function App() {
   const isWide = useSelector(state => state.windowSize.isWide);
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   const dispatch = useDispatch();
+  const [keycloakInitialized, setKeycloakInitialized] = useState(false);
 
   useEffect(() => {
-    const onAuthenticated = () => {
-      const keycloakInstance = getKeycloakInstance();
-      dispatch(setAuthenticated({ isAuthenticated: true, token: keycloakInstance.token }));
-      dispatch(showSnackbar({ message: 'Login successful', severity: 'success' }));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${keycloakInstance.token}`;
-    };
-
-    initKeycloak(onAuthenticated);
-
-    return () => {
-      axios.defaults.headers.common['Authorization'] = '';
-    };
+    initializeKeycloak();
   }, [dispatch]);
 
   return (
