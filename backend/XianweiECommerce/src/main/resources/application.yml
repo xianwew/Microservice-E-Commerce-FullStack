@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: "XianweiECommerce"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:7080/realms/master/protocol/openid-connect/certs
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce
+    username: root
+    password: wxwwxw123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+  sql:
+    init:
+      mode: always
+

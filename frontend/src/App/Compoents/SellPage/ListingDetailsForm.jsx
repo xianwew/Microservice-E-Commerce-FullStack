@@ -57,7 +57,7 @@ const ListingDetailsForm = () => {
                 ))}
             </TextField>
             <Button variant="contained" color="primary" size="large" sx={{ mt: 2, float: 'right' }}>
-                Submit Listing
+                Submit
             </Button>
         </Box>
     );

@@ -1,43 +1,76 @@
 import React from 'react';
-import { Box, Grid, Card, CardMedia, CardContent, Typography, Button } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, Grid, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const sampleItems = [
     {
         id: 1,
         title: 'Item 1',
-        image: 'https://via.placeholder.com/150',
+        description: 'Description for item 1',
         price: '$100',
+        image: 'https://via.placeholder.com/250',
+        dateListed: '2023-05-01',
     },
     {
         id: 2,
         title: 'Item 2',
-        image: 'https://via.placeholder.com/150',
+        description: 'Description for item 2',
         price: '$200',
+        image: 'https://via.placeholder.com/250',
+        dateListed: '2023-04-20',
     },
-    // Add more items as needed
+    {
+        id: 3,
+        title: 'Item 3',
+        description: 'Description for item 3',
+        price: '$300',
+        image: 'https://via.placeholder.com/250',
+        dateListed: '2023-03-15',
+    },
+    {
+        id: 4,
+        title: 'Item 4',
+        description: 'Description for item 4',
+        price: '$400',
+        image: 'https://via.placeholder.com/250',
+        dateListed: '2023-02-01',
+    },
 ];
 
 const SellerItems = () => {
+    const navigate = useNavigate();
+
     return (
-        <Box >
-            <Typography variant="h6" mb={2}>Items for Sale</Typography>
+        <Box>
             <Grid container spacing={2}>
                 {sampleItems.map((item) => (
-                    <Grid item xs={12} sm={6} md={3} key={item.id}>
-                        <Card sx={{width: '200px'}}>
-                            <Box sx={{ width: '200px', height: '200px', overflow: 'hidden' }}>
-                                <CardMedia
-                                    component="img"
-                                    alt={item.title}
-                                    image={item.image}
-                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }} // Ensures the image fits within the box
-                                />
-                            </Box>
-                            <CardContent>
-                                <Typography variant="h6">{item.title}</Typography>
-                                <Typography variant="body2" color="textSecondary">{item.price}</Typography>
-                                <Button variant="contained" color="primary" size="small" sx={{ mt: 2 }}>View Details</Button>
-                            </CardContent>
+                    <Grid item xs={12} key={item.id}>
+                        <Card>
+                            <Grid container>
+                                <Grid item>
+                                    <CardMedia
+                                        component="img"
+                                        alt={item.title}
+                                        image={item.image}
+                                        sx={{
+                                            width: '230px',
+                                            height: '230px',
+                                            objectFit: 'cover',
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs container direction="column" justifyContent="space-between" paddingBottom={1}>
+                                    <CardContent>
+                                        <Typography variant="h6">{item.title}</Typography>
+                                        <Typography variant="body2" color="textSecondary">{item.description}</Typography>
+                                        <Typography variant="h6" color="primary">{item.price}</Typography>
+                                        <Typography variant="body2" color="textSecondary">Listed on: {new Date(item.dateListed).toLocaleDateString()}</Typography>
+                                    </CardContent>
+                                    <Box padding={1}>
+                                        <Button variant="contained" color="primary" size="small" onClick={() => navigate(`/item/${item.id}`)}>View Details</Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
                         </Card>
                     </Grid>
                 ))}
