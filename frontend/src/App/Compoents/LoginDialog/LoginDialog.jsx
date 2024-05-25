@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Tabs, Tab, Box } from '@mui/material';
 import { doLogin } from '../../keycloak/keycloak';
 import keycloakInstance from '../../keycloak/keycloak';
+import axios from 'axios';
 
 const LoginDialog = ({ open, onClose }) => {
     const [tabIndex, setTabIndex] = useState(0);
@@ -10,6 +11,7 @@ const LoginDialog = ({ open, onClose }) => {
     const [signupEmail, setSignupEmail] = useState('');
     const [signupPassword, setSignupPassword] = useState('');
     const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+    const [signupUsername, setSignupUsername] = useState('');
 
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
@@ -31,25 +33,21 @@ const LoginDialog = ({ open, onClose }) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/user`, {
-                method: 'POST',
+            const response = await axios.post(`http://localhost:8080/api/user`, {
+                email: signupEmail,
+                password: signupPassword,
+                username: signupUsername
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: signupEmail,
-                    password: signupPassword,
-                    username: signupEmail.split('@')[0] 
-                }),
+                }
             });
 
-            if (response.ok) {
-                const data = await response.json();
+            if (response.status === 201) {
                 alert("Sign up successful! You can now log in.");
-                setTabIndex(0); 
+                setTabIndex(0); // Switch to login tab
             } else {
-                const errorData = await response.json();
-                alert(`Sign up failed: ${errorData.message}`);
+                alert(`Sign up failed: ${response.data.message}`);
             }
         } catch (error) {
             console.error('Error signing up:', error);
@@ -94,6 +92,15 @@ const LoginDialog = ({ open, onClose }) => {
                     <Box>
                         <TextField
                             autoFocus
+                            margin="dense"
+                            id="signup-username"
+                            label="Username"
+                            type="text"
+                            fullWidth
+                            value={signupUsername}
+                            onChange={(e) => setSignupUsername(e.target.value)}
+                        />
+                        <TextField
                             margin="dense"
                             id="signup-email"
                             label="Email Address"

@@ -26,10 +26,11 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<ResponseDto> createUser(@Valid @RequestBody UserDTO userDTO) {
-        userService.createUser(userDTO);
+        String userToken = userService.createUser(userDTO);
+        ResponseDto response = new ResponseDto("201", "User created successfully", userToken);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ResponseDto("201", "User created successfully"));
+                .body(response);
     }
 
     @GetMapping("/{id}")
@@ -44,11 +45,11 @@ public class UserController {
         if (isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto("200", "User updated successfully"));
+                    .body(new ResponseDto("200", "User updated successfully", ""));
         } else {
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto("417", "Failed to update user"));
+                    .body(new ResponseDto("417", "Failed to update user", ""));
         }
     }
 
@@ -58,11 +59,11 @@ public class UserController {
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto("200", "User deleted successfully"));
+                    .body(new ResponseDto("200", "User deleted successfully", ""));
         } else {
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto("417", "Failed to delete user"));
+                    .body(new ResponseDto("417", "Failed to delete user", ""));
         }
     }
 

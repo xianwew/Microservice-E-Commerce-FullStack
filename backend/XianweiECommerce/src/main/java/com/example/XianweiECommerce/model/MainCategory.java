@@ -4,6 +4,7 @@ import lombok.Data;
 import jakarta.persistence.*;
 @Data
 @Entity
+@Table(name = "maincategories")
 public class MainCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

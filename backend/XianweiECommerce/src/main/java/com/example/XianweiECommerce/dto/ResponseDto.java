@@ -3,11 +3,16 @@ package com.example.XianweiECommerce.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data @AllArgsConstructor
 public class ResponseDto {
-
     private String statusCode;
+    private String message;
+    private String token;
 
-    private String statusMsg;
-    
+    public ResponseDto(String statusCode, String message, String token) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.token = token;
+    }
+
+    // Getters and setters
 }
