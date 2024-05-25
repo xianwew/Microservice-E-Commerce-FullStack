@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, ButtonBase } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import LoginDialog from '../LoginDialog/LoginDialog';
+import CustomizedSnackbars from '../SnackBars/CustomizedSnackbars/CustomizedSnackbars';
+import { closeSnackbar } from '../../redux/slice/snackbarSlice';
 
 const Header = () => {
     const [loginOpen, setLoginOpen] = useState(false);
+    const snackbar = useSelector(state => state.snackbar);
+    const dispatch = useDispatch();
 
     const handleLoginOpen = () => {
         setLoginOpen(true);
@@ -19,7 +24,14 @@ const Header = () => {
 
     return (
         <AppBar sx={{ backgroundColor: '#5696fc', width: '100vw', padding: '0px' }}>
-            <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
+            <CustomizedSnackbars
+                open={snackbar.open}
+                autoHideDuration={snackbar.autoHideDuration}
+                onClose={() => dispatch(closeSnackbar())}
+                message={snackbar.message}
+                severity={snackbar.severity}
+            />
+            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <ButtonBase onClick={() => navigate('/')} sx={{ flexGrow: 1, textAlign: 'left', maxWidth: '250px' }}>
                     <Typography variant="h6">
                         Xianwei's Ecommerce Site
@@ -43,5 +55,4 @@ const Header = () => {
 };
 
 export default Header;
-
 

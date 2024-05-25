@@ -11,7 +11,7 @@ export const snackbarSlice = createSlice({
     autoHideDuration: 6000,
   },
   reducers: {
-    setSnackbarOpen: (state, action) => {
+    showSnackbar: (state, action) => {
       state.open = action.payload.open;
       state.message = action.payload.message;
       state.severity = action.payload.severity;
@@ -25,6 +25,6 @@ export const snackbarSlice = createSlice({
   },
 });
 
-export const { setSnackbarOpen, closeSnackbar } = snackbarSlice.actions;
+export const { showSnackbar, closeSnackbar } = snackbarSlice.actions;
 
 export default snackbarSlice.reducer;

@@ -1,7 +1,7 @@
 import './App.css';
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import Header from './App/Compoents/Header/Header';
 import HomePage from './App/Pages/HomePage/HomePage';
 import Footer from './App/Compoents/Footer/Footer';
@@ -14,26 +14,46 @@ import CartPage from './App/Pages/CartPage/CartPage';
 import UserReceiptPage from './App/Pages/UserReceiptPage/UserReceiptPage';
 import EditItemPage from './App/Pages/EditItemPage/EditItemPage';
 import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
+import { initKeycloak, getKeycloakInstance } from './App/keycloak/keycloak';
+import { setAuthenticated } from './App/redux/slice/authSlice';
+import { showSnackbar } from './App/redux/slice/snackbarSlice';
+import axios from 'axios';;
 
 export default function App() {
   const isWide = useSelector(state => state.windowSize.isWide);
-  const [user, setUser] = useState(null);
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const onAuthenticated = () => {
+      const keycloakInstance = getKeycloakInstance();
+      dispatch(setAuthenticated({ isAuthenticated: true, token: keycloakInstance.token }));
+      dispatch(showSnackbar({ message: 'Login successful', severity: 'success' }));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${keycloakInstance.token}`;
+    };
+
+    initKeycloak(onAuthenticated);
+
+    return () => {
+      axios.defaults.headers.common['Authorization'] = '';
+    };
+  }, [dispatch]);
 
   return (
     <Router>
       <Header />
-      <div className="app-container">
+      <div className={`app-container`}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/browse" element={<BrowsePage />} />
           <Route path="/item/:id" element={<ItemDetailsPage />} />
           <Route path="/user/:userId/item/:itemId/edit" element={<EditItemPage />} />
           <Route path="/user/:userId/receipt/:receiptId" element={<UserReceiptPage />} />
-          <Route path="/user/:userId" element={<UserProfilePage  />} />
+          <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/sell" element={<SellPage />} />
           <Route path="/seller-profile/:id" element={<SellerProfilePage />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} /> 
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </div>
       <Footer />

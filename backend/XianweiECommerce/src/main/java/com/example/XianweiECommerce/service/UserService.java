@@ -51,6 +51,13 @@ public class UserService {
         return UserMapper.toDTO(user);
     }
 
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", id.toString())
+        );
+        return UserMapper.toDTO(user);
+    }
+
     public boolean updateUser(Long id, UserDTO userDTO) {
         boolean isUpdated = false;
         User existingUser = userRepository.findById(id).orElseThrow(
@@ -68,9 +75,9 @@ public class UserService {
         return isUpdated;
     }
 
-    public boolean deleteUser(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User", "email", email)
+    public boolean deleteUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", id.toString())
         );
         userRepository.deleteById(user.getId());
         return true;
@@ -82,6 +89,5 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 }
-
 
 

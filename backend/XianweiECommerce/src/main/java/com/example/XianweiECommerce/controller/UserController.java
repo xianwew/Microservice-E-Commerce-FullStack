@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 @RestController
-@RequestMapping(path="/api/users", produces = "application/json")
+@RequestMapping(path="/api/user", produces = "application/json")
 @Validated
 public class UserController {
 
@@ -25,7 +25,7 @@ public class UserController {
         this.environment = environment;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ResponseDto> createUser(@Valid @RequestBody UserDTO userDTO) {
         userService.createUser(userDTO);
         return ResponseEntity
@@ -33,17 +33,15 @@ public class UserController {
                 .body(new ResponseDto("201", "User created successfully"));
     }
 
-    @GetMapping("/fetch")
-    public ResponseEntity<UserDTO> fetchUserByEmail(@RequestParam
-                                                    @Pattern(regexp=".+@.+\\..+", message = "Email should be valid")
-                                                    String email) {
-        UserDTO userDTO = userService.getUserByEmail(email);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> fetchUserById(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updateUser(@Valid @RequestBody UserDTO userDTO) {
-        boolean isUpdated = userService.updateUser(userDTO.getId(), userDTO);
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        boolean isUpdated = userService.updateUser(id, userDTO);
         if (isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -55,11 +53,9 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<ResponseDto> deleteUser(@RequestParam
-                                                  @Pattern(regexp=".+@.+\\..+", message = "Email should be valid")
-                                                  String email) {
-        boolean isDeleted = userService.deleteUser(email);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDto> deleteUser(@PathVariable Long id) {
+        boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -78,4 +74,3 @@ public class UserController {
                 .body(environment.getProperty("JAVA_HOME"));
     }
 }
-
