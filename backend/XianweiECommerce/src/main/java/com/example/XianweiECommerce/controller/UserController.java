@@ -10,6 +10,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping(path="/api/user", produces = "application/json")
 @Validated
@@ -25,12 +29,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDto> createUser(@Valid @RequestBody UserDTO userDTO) {
-        String userToken = userService.createUser(userDTO);
-        ResponseDto response = new ResponseDto("201", "User created successfully", userToken);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+    public ResponseEntity<Map<String, String>> createUser(@Valid @RequestBody UserDTO userDTO) {
+        String token = userService.createUser(userDTO);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User created successfully");
+        response.put("token", token);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")

@@ -31,29 +31,31 @@ const LoginDialog = ({ open, onClose }) => {
             alert("Passwords do not match!");
             return;
         }
-
+    
         try {
             const response = await axios.post(`http://localhost:8080/api/user`, {
                 email: signupEmail,
                 password: signupPassword,
-                username: signupUsername
+                username: signupEmail // Use email as username
             }, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-
+    
             if (response.status === 201) {
                 alert("Sign up successful! You can now log in.");
-                setTabIndex(0); // Switch to login tab
-            } else {
+                setTabIndex(0); 
+            } 
+            else {
                 alert(`Sign up failed: ${response.data.message}`);
             }
         } catch (error) {
-            console.error('Error signing up:', error);
-            alert("Sign up failed. Please try again.");
+            console.error('Error signing up:', error.response);
+            alert(`Sign up failed: ${error.response ? error.response.data.message : 'Please try again.'}`);
         }
     };
+    
 
     return (
         <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>

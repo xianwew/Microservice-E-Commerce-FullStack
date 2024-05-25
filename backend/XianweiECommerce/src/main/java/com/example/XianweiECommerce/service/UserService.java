@@ -8,6 +8,7 @@ import com.example.XianweiECommerce.repository.AddressRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import com.example.XianweiECommerce.service.KeycloakService;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -36,21 +38,18 @@ public class UserService {
         User user = UserMapper.toEntity(userDTO);
         Optional<User> optionalUser = userRepository.findByEmail(userDTO.getEmail());
         if (optionalUser.isPresent()) {
+            log.info("User already registered with given email!");
             throw new UserAlreadyExistsException("User already registered with given email: " + userDTO.getEmail());
-        }
-        if (user.getAddress() != null) {
-            addressRepository.save(user.getAddress());
-        }
-        if (user.getRating() != null) {
-            ratingRepository.save(user.getRating());
         }
 
         // Register user in Keycloak
         String adminToken = keycloakService.getAdminToken();
+
         keycloakService.createUserInKeycloak(adminToken, userDTO);
+        System.out.println("adminToken" + adminToken);
         String token = keycloakService.getUserToken(userDTO.getUsername(), userDTO.getPassword());
         userRepository.save(user);
-
+        log.info("successfully created a user!", user);
         return token;
     }
 

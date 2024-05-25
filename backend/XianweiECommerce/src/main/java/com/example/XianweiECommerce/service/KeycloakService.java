@@ -1,15 +1,20 @@
 package com.example.XianweiECommerce.service;
 import com.example.XianweiECommerce.dto.UserDTO;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
+import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class KeycloakService {
+
+    private static final Logger log = LoggerFactory.getLogger(KeycloakService.class);
 
     @Value("${keycloak.auth-server-url}")
     private String keycloakUrl;
@@ -41,17 +46,29 @@ public class KeycloakService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("username", adminUsername);
-        body.put("password", adminPassword);
-        body.put("grant_type", "password");
-        body.put("client_id", clientId);
-        body.put("client_secret", clientSecret);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("username", adminUsername);
+        body.add("password", adminPassword);
+        body.add("grant_type", "password");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
 
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
-        return (String) response.getBody().get("access_token");
+        try {
+            log.info("Requesting admin token from Keycloak. URL: {}, Body: {}", url, body);
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                log.info("Successfully retrieved admin token.");
+                return (String) response.getBody().get("access_token");
+            } else {
+                log.error("Failed to retrieve admin token. Status: {}, Response: {}", response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Failed to retrieve admin token from Keycloak.");
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred while retrieving admin token from Keycloak.", e);
+            throw new RuntimeException("Exception occurred while retrieving admin token from Keycloak.", e);
+        }
     }
 
     public void createUserInKeycloak(String token, UserDTO userDTO) {
@@ -61,14 +78,27 @@ public class KeycloakService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
 
+        Map<String, Object> credentials = new HashMap<>();
+        credentials.put("type", "password");
+        credentials.put("value", userDTO.getPassword());
+        credentials.put("temporary", false);
+
         Map<String, Object> body = new HashMap<>();
-        body.put("username", userDTO.getUsername());
+        body.put("username", userDTO.getEmail());
         body.put("email", userDTO.getEmail());
         body.put("enabled", true);
+        body.put("credentials", new Map[] {credentials});
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
-        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        try {
+            log.info("Creating user in Keycloak. URL: {}, Body: {}", url, body);
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            log.info("User created in Keycloak successfully.");
+        } catch (Exception e) {
+            log.error("Exception occurred while creating user in Keycloak.", e);
+            throw new RuntimeException("Exception occurred while creating user in Keycloak.", e);
+        }
     }
 
     public String getUserToken(String username, String password) {
@@ -77,16 +107,28 @@ public class KeycloakService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("username", username);
-        body.put("password", password);
-        body.put("grant_type", "password");
-        body.put("client_id", clientId);
-        body.put("client_secret", clientSecret);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("username", username);
+        body.add("password", password);
+        body.add("grant_type", "password");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
 
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
-        return (String) response.getBody().get("access_token");
+        try {
+            log.info("Requesting user token from Keycloak. URL: {}, Body: {}", url, body);
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                log.info("Successfully retrieved user token.");
+                return (String) response.getBody().get("access_token");
+            } else {
+                log.error("Failed to retrieve user token. Status: {}, Response: {}", response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Failed to retrieve user token from Keycloak.");
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred while retrieving user token from Keycloak.", e);
+            throw new RuntimeException("Exception occurred while retrieving user token from Keycloak.", e);
+        }
     }
 }
