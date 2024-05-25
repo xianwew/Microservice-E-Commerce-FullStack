@@ -44,14 +44,14 @@ public class UserService {
         if (user.getRating() != null) {
             ratingRepository.save(user.getRating());
         }
-        userRepository.save(user);
 
         // Register user in Keycloak
         String adminToken = keycloakService.getAdminToken();
         keycloakService.createUserInKeycloak(adminToken, userDTO);
+        String token = keycloakService.getUserToken(userDTO.getUsername(), userDTO.getPassword());
+        userRepository.save(user);
 
-        // Get user token
-        return keycloakService.getUserToken(userDTO.getUsername(), userDTO.getPassword());
+        return token;
     }
 
     public UserDTO getUserByEmail(String email) {

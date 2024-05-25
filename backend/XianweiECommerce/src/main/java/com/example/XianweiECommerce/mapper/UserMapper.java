@@ -30,7 +30,6 @@ public class UserMapper {
         user.setId(userDTO.getId());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -51,11 +50,8 @@ public class UserMapper {
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
         user.setRating(RatingMapper.toEntity(userDTO.getRating()));
-
-        if (userDTO.getPassword() != null) {
-            user.setPassword(userDTO.getPassword());
-        }
     }
 }
+
 
 
