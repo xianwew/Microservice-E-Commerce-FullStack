@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 setLoading(false);
                 dispatch(setAuthenticated({ isAuthenticated: true, token }));
-            } 
+            }
             else {
                 try {
                     const authenticated = await keycloakInstance.init({
@@ -110,58 +110,50 @@ export const AuthProvider = ({ children }) => {
     }, [dispatch, token, refreshToken]);
 
     const login = async (username, password) => {
-        try {
-            const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, new URLSearchParams({
-                client_id: KEYCLOAK_CLIENT_ID,
-                client_secret: KEYCLOAK_CLIENT_SECRET,
-                username,
-                password,
-                grant_type: 'password'
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
-
-            if (response.status === 200) {
-                const token = response.data.access_token;
-                const refreshToken = response.data.refresh_token;
-                setToken(token);
-                setRefreshToken(refreshToken);
-                localStorage.setItem('token', token);
-                localStorage.setItem('refreshToken', refreshToken);
-                setIsAuthenticated(true);
-                dispatch(setAuthenticated({ isAuthenticated: true, token }));
-            } else {
-                console.error('Login failed', response.data);
+        const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, new URLSearchParams({
+            client_id: KEYCLOAK_CLIENT_ID,
+            client_secret: KEYCLOAK_CLIENT_SECRET,
+            username,
+            password,
+            grant_type: 'password'
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
-        } catch (error) {
-            console.error('Login failed', error);
+        });
+
+        if (response.status === 200) {
+            const token = response.data.access_token;
+            const refreshToken = response.data.refresh_token;
+            setToken(token);
+            setRefreshToken(refreshToken);
+            localStorage.setItem('token', token);
+            localStorage.setItem('refreshToken', refreshToken);
+            setIsAuthenticated(true);
+            dispatch(setAuthenticated({ isAuthenticated: true, token }));
+        } else {
+            console.error('Login failed', response.data);
         }
     };
 
     const logout = async () => {
-        try {
-            await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/logout`, new URLSearchParams({
-                client_id: KEYCLOAK_CLIENT_ID,
-                client_secret: KEYCLOAK_CLIENT_SECRET,
-                refresh_token: refreshToken
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
+        await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/logout`, new URLSearchParams({
+            client_id: KEYCLOAK_CLIENT_ID,
+            client_secret: KEYCLOAK_CLIENT_SECRET,
+            refresh_token: refreshToken
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
 
-            setIsAuthenticated(false);
-            setToken(null);
-            setRefreshToken(null);
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
-            dispatch(reduxLogout());
-            window.location.reload(); // Trigger a page reload after logout
-        } catch (error) {
-            console.error('Logout failed', error);
-        }
+        setIsAuthenticated(false);
+        setToken(null);
+        setRefreshToken(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        dispatch(reduxLogout());
+        window.location.reload(); // Trigger a page reload after logout
     };
 
     return (

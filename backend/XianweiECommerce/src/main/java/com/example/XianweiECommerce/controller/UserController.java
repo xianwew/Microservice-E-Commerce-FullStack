@@ -1,7 +1,9 @@
 package com.example.XianweiECommerce.controller;
 import com.example.XianweiECommerce.dto.ResponseDto;
 import com.example.XianweiECommerce.dto.UserDTO;
+import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
 import com.example.XianweiECommerce.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@Slf4j
 @RequestMapping(path="/api/user", produces = "application/json")
 @Validated
 public class UserController {
@@ -26,6 +29,14 @@ public class UserController {
     public UserController(UserService userService, Environment environment) {
         this.userService = userService;
         this.environment = environment;
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        log.info("User already registered with given email!");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @PostMapping

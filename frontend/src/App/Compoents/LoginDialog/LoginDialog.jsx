@@ -44,9 +44,11 @@ const LoginDialog = ({ open, onClose }) => {
             });
 
             if (response.status === 201) {
-                dispatch(showSnackbar({ open: true, message: 'Sign up successful! You can now log in.', severity: 'success' }));
-                onClose();
+                dispatch(showSnackbar({ open: true, message: 'Sign up successful! Logging you in...', severity: 'success' }));
+                await login(values.email, values.password);
+                onClose(); 
             } else {
+                console.log(response);
                 dispatch(showSnackbar({ open: true, message: `Sign up failed: ${response.data.message}`, severity: 'error' }));
             }
         } catch (error) {
