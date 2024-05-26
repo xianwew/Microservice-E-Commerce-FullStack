@@ -5,6 +5,7 @@ import axios from 'axios';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import CloudinaryService from '../../service/CloudinaryService';
 import { useDispatch } from 'react-redux';
+import {decodeToken} from '../../Auth/JwtUtils';
 
 const UserProfileHeader = () => {
     const { logout, token } = useAuth();
@@ -17,17 +18,11 @@ const UserProfileHeader = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                setUser(response.data);
-                setUsername(response.data.username);
-                setProfilePicture(response.data.profilePicture || 'default_avatar_url'); // Replace with your default avatar URL
-            } catch (error) {
-                console.error('Error fetching user:', error);
+            if (token) {
+                const decoded = decodeToken(token);
+                setUser(decoded);
+                setUsername(decoded.username);
+                setProfilePicture(decoded.profilePicture);
             }
         };
 
@@ -43,31 +38,7 @@ const UserProfileHeader = () => {
     };
 
     const handleSaveProfile = async () => {
-        try {
-            let imageUrl = profilePicture;
-            if (file) {
-                imageUrl = await CloudinaryService.uploadImage(file, "kvg3zojp"); // Upload preset for user avatars
-            }
-
-            const response = await axios.put(`http://localhost:8080/api/user/${user.id}`, {
-                username,
-                profilePicture: imageUrl
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.status === 200) {
-                dispatch(showSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' }));
-                setIsEditing(false);
-                setProfilePicture(imageUrl); // Update the profile picture state
-            } else {
-                dispatch(showSnackbar({ open: true, message: 'Profile update failed.', severity: 'error' }));
-            }
-        } catch (error) {
-            dispatch(showSnackbar({ open: true, message: `Profile update failed: ${error.message}`, severity: 'error' }));
-        }
+        // Implement save profile logic here
     };
 
     const handleFileChange = (e) => {
