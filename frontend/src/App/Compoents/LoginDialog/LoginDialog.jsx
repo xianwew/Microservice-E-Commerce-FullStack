@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Tabs, Tab, Box } from '@mui/material';
-import { doLogin } from '../../keycloak/keycloak';
-import keycloakInstance from '../../keycloak/keycloak';
 import axios from 'axios';
+import { useAuth } from '../../Auth/AuthContext';
 
 const LoginDialog = ({ open, onClose }) => {
     const [tabIndex, setTabIndex] = useState(0);
@@ -12,18 +11,18 @@ const LoginDialog = ({ open, onClose }) => {
     const [signupPassword, setSignupPassword] = useState('');
     const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
     const [signupUsername, setSignupUsername] = useState('');
+    const { login, isAuthenticated, logout } = useAuth();
 
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
 
     const handleLogin = () => {
-        keycloakInstance.login({
-            username: loginEmail,
-            password: loginPassword,
-            grant_type: 'password',
-            client_id: keycloakInstance.clientId,
-        });
+        if (!loginEmail || !loginPassword) {
+            console.log('Enter the email and password');
+            return;
+        }
+        login(loginEmail, loginPassword);
     };
 
     const handleSignUp = async () => {
@@ -31,22 +30,22 @@ const LoginDialog = ({ open, onClose }) => {
             alert("Passwords do not match!");
             return;
         }
-    
+
         try {
             const response = await axios.post(`http://localhost:8080/api/user`, {
                 email: signupEmail,
                 password: signupPassword,
-                username: signupEmail // Use email as username
+                username: signupUsername
             }, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-    
+
             if (response.status === 201) {
                 alert("Sign up successful! You can now log in.");
-                setTabIndex(0); 
-            } 
+                setTabIndex(0);
+            }
             else {
                 alert(`Sign up failed: ${response.data.message}`);
             }
@@ -55,7 +54,7 @@ const LoginDialog = ({ open, onClose }) => {
             alert(`Sign up failed: ${error.response ? error.response.data.message : 'Please try again.'}`);
         }
     };
-    
+
 
     return (
         <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
