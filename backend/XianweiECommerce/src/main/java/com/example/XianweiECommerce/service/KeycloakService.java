@@ -28,6 +28,12 @@ public class KeycloakService {
     @Value("${keycloak.client-secret}")
     private String clientSecret;
 
+    @Value("${keycloak.master-id}")
+    private String masterId;
+
+    @Value("${keycloak.master-secret}")
+    private String masterSecret;
+
     @Value("${keycloak.admin-username}")
     private String adminUsername;
 
@@ -41,7 +47,7 @@ public class KeycloakService {
     }
 
     public String getAdminToken() {
-        String url = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+        String url = keycloakUrl + "/realms/master/protocol/openid-connect/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -50,8 +56,8 @@ public class KeycloakService {
         body.add("username", adminUsername);
         body.add("password", adminPassword);
         body.add("grant_type", "password");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
+        body.add("client_id", masterId);
+        body.add("client_secret", masterSecret);
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
 

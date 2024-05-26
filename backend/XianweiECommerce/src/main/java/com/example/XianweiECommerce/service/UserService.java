@@ -47,7 +47,7 @@ public class UserService {
 
         keycloakService.createUserInKeycloak(adminToken, userDTO);
         System.out.println("adminToken" + adminToken);
-        String token = keycloakService.getUserToken(userDTO.getUsername(), userDTO.getPassword());
+        String token = keycloakService.getUserToken(userDTO.getEmail(), userDTO.getPassword());
         userRepository.save(user);
         log.info("successfully created a user!", user);
         return token;

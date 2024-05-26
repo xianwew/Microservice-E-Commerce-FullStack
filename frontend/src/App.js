@@ -18,8 +18,7 @@ import EditItemPage from './App/Pages/EditItemPage/EditItemPage';
 import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
 import { setAuthenticated } from './App/redux/slice/authSlice';
 import { showSnackbar } from './App/redux/slice/snackbarSlice';
-import axios from 'axios';;
-
+import SnackbarComponent from './App/Compoents/SnackBars/SnackbarComponent';
 
 export default function App() {
   const isWide = useSelector(state => state.windowSize.isWide);
@@ -46,6 +45,7 @@ export default function App() {
           </Routes>
         </div>
         <Footer />
+        <SnackbarComponent />
       </Router>
     </AuthProvider>
   );

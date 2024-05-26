@@ -1,41 +1,42 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Tabs, Tab, Box } from '@mui/material';
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAuth } from '../../Auth/AuthContext';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
+import axios from 'axios';
 
 const LoginDialog = ({ open, onClose }) => {
     const [tabIndex, setTabIndex] = useState(0);
-    const [loginEmail, setLoginEmail] = useState('');
-    const [loginPassword, setLoginPassword] = useState('');
-    const [signupEmail, setSignupEmail] = useState('');
-    const [signupPassword, setSignupPassword] = useState('');
-    const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
-    const [signupUsername, setSignupUsername] = useState('');
-    const { login, isAuthenticated, logout } = useAuth();
+    const { login } = useAuth();
+    const dispatch = useDispatch();
 
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
 
-    const handleLogin = () => {
-        if (!loginEmail || !loginPassword) {
-            console.log('Enter the email and password');
-            return;
+    const handleLogin = async (values) => {
+        try {
+            await login(values.email, values.password);
+            dispatch(showSnackbar({ open: true, message: 'Login successful!', severity: 'success' }));
+            onClose();
+        } catch (error) {
+            dispatch(showSnackbar({ open: true, message: 'Login failed. Please check your credentials.', severity: 'error' }));
         }
-        login(loginEmail, loginPassword);
     };
 
-    const handleSignUp = async () => {
-        if (signupPassword !== signupConfirmPassword) {
-            alert("Passwords do not match!");
+    const handleSignUp = async (values) => {
+        if (values.password !== values.confirmPassword) {
+            dispatch(showSnackbar({ open: true, message: "Passwords do not match!", severity: 'error' }));
             return;
         }
 
         try {
             const response = await axios.post(`http://localhost:8080/api/user`, {
-                email: signupEmail,
-                password: signupPassword,
-                username: signupUsername
+                email: values.email,
+                password: values.password,
+                username: values.username
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,18 +44,45 @@ const LoginDialog = ({ open, onClose }) => {
             });
 
             if (response.status === 201) {
-                alert("Sign up successful! You can now log in.");
+                dispatch(showSnackbar({ open: true, message: 'Sign up successful! You can now log in.', severity: 'success' }));
                 setTabIndex(0);
-            }
-            else {
-                alert(`Sign up failed: ${response.data.message}`);
+            } else {
+                dispatch(showSnackbar({ open: true, message: `Sign up failed: ${response.data.message}`, severity: 'error' }));
             }
         } catch (error) {
-            console.error('Error signing up:', error.response);
-            alert(`Sign up failed: ${error.response ? error.response.data.message : 'Please try again.'}`);
+            dispatch(showSnackbar({ open: true, message: `Sign up failed: ${error.response ? error.response.data.message : 'Please try again.'}`, severity: 'error' }));
         }
     };
 
+    const formikLogin = useFormik({
+        initialValues: {
+            email: '',
+            password: ''
+        },
+        validationSchema: Yup.object({
+            email: Yup.string().email('Invalid email address').required('Required'),
+            password: Yup.string().required('Required')
+        }),
+        onSubmit: handleLogin
+    });
+
+    const formikSignUp = useFormik({
+        initialValues: {
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: ''
+        },
+        validationSchema: Yup.object({
+            username: Yup.string().required('Required'),
+            email: Yup.string().email('Invalid email address').required('Required'),
+            password: Yup.string().required('Required'),
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref('password'), null], 'Passwords must match')
+                .required('Required')
+        }),
+        onSubmit: handleSignUp
+    });
 
     return (
         <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
@@ -67,7 +95,7 @@ const LoginDialog = ({ open, onClose }) => {
             </Box>
             <DialogContent sx={{ minWidth: 400 }}>
                 {tabIndex === 0 && (
-                    <Box>
+                    <Box component="form" onSubmit={formikLogin.handleSubmit}>
                         <TextField
                             autoFocus
                             margin="dense"
@@ -75,8 +103,9 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Email Address"
                             type="email"
                             fullWidth
-                            value={loginEmail}
-                            onChange={(e) => setLoginEmail(e.target.value)}
+                            {...formikLogin.getFieldProps('email')}
+                            error={formikLogin.touched.email && Boolean(formikLogin.errors.email)}
+                            helperText={formikLogin.touched.email && formikLogin.errors.email}
                         />
                         <TextField
                             margin="dense"
@@ -84,13 +113,14 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Password"
                             type="password"
                             fullWidth
-                            value={loginPassword}
-                            onChange={(e) => setLoginPassword(e.target.value)}
+                            {...formikLogin.getFieldProps('password')}
+                            error={formikLogin.touched.password && Boolean(formikLogin.errors.password)}
+                            helperText={formikLogin.touched.password && formikLogin.errors.password}
                         />
                     </Box>
                 )}
                 {tabIndex === 1 && (
-                    <Box>
+                    <Box component="form" onSubmit={formikSignUp.handleSubmit}>
                         <TextField
                             autoFocus
                             margin="dense"
@@ -98,8 +128,9 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Username"
                             type="text"
                             fullWidth
-                            value={signupUsername}
-                            onChange={(e) => setSignupUsername(e.target.value)}
+                            {...formikSignUp.getFieldProps('username')}
+                            error={formikSignUp.touched.username && Boolean(formikSignUp.errors.username)}
+                            helperText={formikSignUp.touched.username && formikSignUp.errors.username}
                         />
                         <TextField
                             margin="dense"
@@ -107,8 +138,9 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Email Address"
                             type="email"
                             fullWidth
-                            value={signupEmail}
-                            onChange={(e) => setSignupEmail(e.target.value)}
+                            {...formikSignUp.getFieldProps('email')}
+                            error={formikSignUp.touched.email && Boolean(formikSignUp.errors.email)}
+                            helperText={formikSignUp.touched.email && formikSignUp.errors.email}
                         />
                         <TextField
                             margin="dense"
@@ -116,8 +148,9 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Password"
                             type="password"
                             fullWidth
-                            value={signupPassword}
-                            onChange={(e) => setSignupPassword(e.target.value)}
+                            {...formikSignUp.getFieldProps('password')}
+                            error={formikSignUp.touched.password && Boolean(formikSignUp.errors.password)}
+                            helperText={formikSignUp.touched.password && formikSignUp.errors.password}
                         />
                         <TextField
                             margin="dense"
@@ -125,8 +158,9 @@ const LoginDialog = ({ open, onClose }) => {
                             label="Confirm Password"
                             type="password"
                             fullWidth
-                            value={signupConfirmPassword}
-                            onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                            {...formikSignUp.getFieldProps('confirmPassword')}
+                            error={formikSignUp.touched.confirmPassword && Boolean(formikSignUp.errors.confirmPassword)}
+                            helperText={formikSignUp.touched.confirmPassword && formikSignUp.errors.confirmPassword}
                         />
                     </Box>
                 )}
@@ -135,7 +169,7 @@ const LoginDialog = ({ open, onClose }) => {
                 <Button onClick={onClose} color="primary">
                     Cancel
                 </Button>
-                <Button onClick={tabIndex === 0 ? handleLogin : handleSignUp} color="primary">
+                <Button onClick={tabIndex === 0 ? formikLogin.handleSubmit : formikSignUp.handleSubmit} color="primary">
                     {tabIndex === 0 ? 'Login' : 'Sign Up'}
                 </Button>
             </DialogActions>
