@@ -19,10 +19,28 @@ import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
 import { setAuthenticated } from './App/redux/slice/authSlice';
 import { showSnackbar } from './App/redux/slice/snackbarSlice';
 import SnackbarComponent from './App/Compoents/SnackBars/SnackbarComponent';
+import { fetchUser } from './App/service/UserService';
+import { setUser } from './App/redux/slice/authSlice';
 
 export default function App() {
   const isWide = useSelector(state => state.windowSize.isWide);
+  const token = useSelector(state => state.auth.token);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (token) {
+        try {
+          const userData = await fetchUser();
+          dispatch(setUser({ user: userData }));
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [token, dispatch]);
 
   return (
     <AuthProvider>
@@ -49,4 +67,4 @@ export default function App() {
       </Router>
     </AuthProvider>
   );
-}      
+} 

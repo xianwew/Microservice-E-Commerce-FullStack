@@ -19,6 +19,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
   sql:
     init:
       mode: always
@@ -33,10 +34,11 @@ keycloak:
   admin-username: admin
   admin-password: admin
 
-jwt:
-  secret-key:
-    your_secret_key
-  expiration:
-    3600000
+cloudinary:
+  cloud-name: dl7atizzb
+  api-key: 145491984531442
+  api-secret: 1iZYfLLIkyl9QGDTreYx3r-5Mcc
+  upload-folder: XianweiECommerce/UserAvatar
+
 
 

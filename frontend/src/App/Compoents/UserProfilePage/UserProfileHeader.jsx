@@ -6,6 +6,7 @@ import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import CloudinaryService from '../../service/CloudinaryService';
 import { useDispatch } from 'react-redux';
 import {decodeToken} from '../../Auth/JwtUtils';
+import axiosInstance from '../../service/AxiosConfig';
 
 const UserProfileHeader = () => {
     const { logout, token } = useAuth();
@@ -16,13 +17,27 @@ const UserProfileHeader = () => {
     const [profilePicture, setProfilePicture] = useState('');
     const [file, setFile] = useState(null);
 
+    const defaultProfilePictureUrl = 'https://via.placeholder.com/100'; 
+
     useEffect(() => {
         const fetchUser = async () => {
             if (token) {
                 const decoded = decodeToken(token);
-                setUser(decoded);
-                setUsername(decoded.username);
-                setProfilePicture(decoded.profilePicture);
+                const userId = decoded.sub; 
+                console.log(userId);
+                try {
+                    const response = await axiosInstance.get(`/api/user/${userId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    const userData = response.data;
+                    setUser(userData);
+                    setUsername(userData.username);
+                    setProfilePicture(userData.profilePictureUrl || defaultProfilePictureUrl);
+                } catch (error) {
+                    console.error('Failed to fetch user:', error);
+                }
             }
         };
 
@@ -38,7 +53,27 @@ const UserProfileHeader = () => {
     };
 
     const handleSaveProfile = async () => {
-        // Implement save profile logic here
+        const formData = new FormData();
+        formData.append('username', username);
+        if (file) {
+            formData.append('profilePicture', file);
+        }
+
+        try {
+            const response = await axiosInstance.put(`/api/user/${user.id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            setUser(response.data);
+            setProfilePicture(response.data.profilePictureUrl || defaultProfilePictureUrl);
+            setIsEditing(false);
+            console.log('Successfully saved profile');
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+        }
     };
 
     const handleFileChange = (e) => {

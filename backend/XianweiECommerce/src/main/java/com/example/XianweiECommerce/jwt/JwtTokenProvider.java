@@ -96,4 +96,10 @@ public class JwtTokenProvider {
         Claims claims = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
         return claims.get("role", String.class);
     }
+
+    public String extractUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
+        log.info("Token claims: {}", claims);
+        return claims.getSubject(); // Typically, the 'sub' claim is used as the user ID
+    }
 }

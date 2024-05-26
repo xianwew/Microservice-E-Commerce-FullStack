@@ -12,7 +12,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,27 +51,37 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> fetchUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> fetchUserById(@PathVariable String id) {
         UserDTO userDTO = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
-        boolean isUpdated = userService.updateUser(id, userDTO);
-        if (isUpdated) {
+    public ResponseEntity<ResponseDto> updateUser(@PathVariable String id,
+                                                  @Valid @RequestBody UserDTO userDTO,
+                                                  @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+        try {
+
+            boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
+            if (isUpdated) {
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(new ResponseDto("200", "User updated successfully", ""));
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.EXPECTATION_FAILED)
+                        .body(new ResponseDto("417", "Failed to update user", ""));
+            }
+        } catch (IOException e) {
+            log.error("Error updating user profile picture", e);
             return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new ResponseDto("200", "User updated successfully", ""));
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto("417", "Failed to update user", ""));
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto("500", "Error updating user profile picture", e.getMessage()));
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseDto> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ResponseDto> deleteUser(@PathVariable String id) {
         boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
             return ResponseEntity

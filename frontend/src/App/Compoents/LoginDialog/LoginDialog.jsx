@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../Auth/AuthContext';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
-import axios from 'axios';
+import axiosInstance from '../../service/AxiosConfig';
 
 const LoginDialog = ({ open, onClose }) => {
     const [tabIndex, setTabIndex] = useState(0);
@@ -33,7 +33,7 @@ const LoginDialog = ({ open, onClose }) => {
         }
 
         try {
-            const response = await axios.post(`http://localhost:8080/api/user`, {
+            const response = await axiosInstance.post(`/api/user`, {
                 email: values.email,
                 password: values.password,
                 username: values.username
@@ -48,7 +48,6 @@ const LoginDialog = ({ open, onClose }) => {
                 await login(values.email, values.password);
                 onClose(); 
             } else {
-                console.log(response);
                 dispatch(showSnackbar({ open: true, message: `Sign up failed: ${response.data.message}`, severity: 'error' }));
             }
         } catch (error) {
