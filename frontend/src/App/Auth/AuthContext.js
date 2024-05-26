@@ -52,31 +52,25 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (username, password) => {
-        try {
-            const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, new URLSearchParams({
-                client_id: KEYCLOAK_CLIENT_ID,
-                client_secret: KEYCLOAK_CLIENT_SECRET,
-                username,
-                password,
-                grant_type: 'password'
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
-
-            if (response.status === 200) {
-                console.log('Login successful', response.data);
-                setToken(response.data.access_token);
-                setIsAuthenticated(true);
-                localStorage.setItem('token', response.data.access_token);
-            } else {
-                console.error('Login failed', response.data);
-                alert(`Login failed: ${response.data.error_description}`);
+        const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, new URLSearchParams({
+            client_id: KEYCLOAK_CLIENT_ID,
+            client_secret: KEYCLOAK_CLIENT_SECRET,
+            username,
+            password,
+            grant_type: 'password'
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
-        } catch (error) {
-            console.error('Error during login', error.response ? error.response.data : error);
-            alert(`Login failed: ${error.response ? error.response.data.error_description : 'Please try again.'}`);
+        });
+
+        if (response.status === 200) {
+            console.log('Login successful', response.data);
+            setToken(response.data.access_token);
+            setIsAuthenticated(true);
+            dispatch(setAuthenticated({ isAuthenticated: true, token: response.data.access_token }));
+        } else {
+            console.error('Login failed', response.data);
         }
     };
 
@@ -85,7 +79,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         setToken(null);
         dispatch(reduxLogout());
-        localStorage.removeItem('token');
     };
 
     return (

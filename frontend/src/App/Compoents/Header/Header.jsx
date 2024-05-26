@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, ButtonBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, ButtonBase, Avatar  } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import LoginDialog from '../LoginDialog/LoginDialog';
+const sampleAvatarUrl = "https://via.placeholder.com/150"; // Placeholder avatar URL
 
 const Header = () => {
     const [loginOpen, setLoginOpen] = useState(false);
-    const snackbar = useSelector(state => state.snackbar);
+    const { isAuthenticated, user } = useSelector(state => state.auth); // Assuming auth state contains isAuthenticated and user info
     const dispatch = useDispatch();
 
     const handleLoginOpen = () => {
@@ -29,15 +30,24 @@ const Header = () => {
                     </Typography>
                 </ButtonBase>
                 <div>
-                    <Button color="inherit" onClick={handleLoginOpen}>
-                        Login
-                    </Button>
-                    <Button color="inherit" onClick={() => navigate('/sell')}>
-                        Sell
-                    </Button>
-                    <IconButton color="inherit">
-                        <ShoppingCartIcon />
-                    </IconButton>
+                    {!isAuthenticated && (
+                        <Button color="inherit" onClick={handleLoginOpen}>
+                            Login
+                        </Button>
+                    )}
+                    {isAuthenticated && (
+                        <>
+                            <Button color="inherit" onClick={() => navigate('/sell')}>
+                                Sell
+                            </Button>
+                            <IconButton color="inherit" onClick={() => navigate('/cart')}>
+                                <ShoppingCartIcon />
+                            </IconButton>
+                            <IconButton color="inherit" onClick={() => navigate('/profile')}>
+                                <Avatar src={sampleAvatarUrl} alt="User Avatar" />
+                            </IconButton>
+                        </>
+                    )}
                 </div>
             </Toolbar>
             <LoginDialog open={loginOpen} onClose={handleLoginClose} />

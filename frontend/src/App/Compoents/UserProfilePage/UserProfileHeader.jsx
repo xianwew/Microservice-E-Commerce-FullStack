@@ -1,7 +1,14 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { useAuth } from '../../Auth/AuthContext';
 
 const UserProfileHeader = ({ user }) => {
+    const { logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+    };
+
     return (
         <Box display="flex" alignItems="center" mb={4}>
             <Box
@@ -16,6 +23,19 @@ const UserProfileHeader = ({ user }) => {
             </Box>
             <Box ml="auto">
                 <Button variant="outlined">Edit Profile</Button>
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#e81010',
+                        marginLeft: '10px',
+                        '&:hover': {
+                            backgroundColor: '#c30d0d'
+                        }
+                    }}
+                    onClick={handleLogout}
+                >
+                    Log Out
+                </Button>
             </Box>
         </Box>
     );

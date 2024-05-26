@@ -34,9 +34,9 @@ export default function App() {
             <Route path="/browse" element={<BrowsePage />} />
             <Route path="/item/:id" element={<ItemDetailsPage />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/user/:userId/item/:itemId/edit" element={<EditItemPage />} />
-              <Route path="/user/:userId/receipt/:receiptId" element={<UserReceiptPage />} />
-              <Route path="/user/:userId" element={<UserProfilePage />} />
+              <Route path="/item/:itemId/edit" element={<EditItemPage />} />
+              <Route path="/receipt/:receiptId" element={<UserReceiptPage />} />
+              <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/sell" element={<SellPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />

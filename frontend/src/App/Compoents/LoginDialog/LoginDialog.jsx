@@ -45,7 +45,7 @@ const LoginDialog = ({ open, onClose }) => {
 
             if (response.status === 201) {
                 dispatch(showSnackbar({ open: true, message: 'Sign up successful! You can now log in.', severity: 'success' }));
-                setTabIndex(0);
+                onClose();
             } else {
                 dispatch(showSnackbar({ open: true, message: `Sign up failed: ${response.data.message}`, severity: 'error' }));
             }
@@ -84,8 +84,21 @@ const LoginDialog = ({ open, onClose }) => {
         onSubmit: handleSignUp
     });
 
+    const handleDialogClose = (event, reason) => {
+        if (reason !== "backdropClick") {
+            onClose();
+        }
+    };
+
     return (
-        <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
+        <Dialog
+            open={open}
+            onClose={handleDialogClose}
+            aria-labelledby="form-dialog-title"
+            maxWidth="sm"
+            fullWidth
+            disableEscapeKeyDown
+        >
             <DialogTitle id="form-dialog-title" sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '36px' }}>Welcome</DialogTitle>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={tabIndex} onChange={handleTabChange} aria-label="login and sign up tabs">
