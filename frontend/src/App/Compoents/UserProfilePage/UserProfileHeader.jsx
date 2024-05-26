@@ -7,6 +7,7 @@ import CloudinaryService from '../../service/CloudinaryService';
 import { useDispatch } from 'react-redux';
 import {decodeToken} from '../../Auth/JwtUtils';
 import axiosInstance from '../../service/AxiosConfig';
+import { saveUserProfile } from '../../service/UserService';
 
 const UserProfileHeader = () => {
     const { logout, token } = useAuth();
@@ -17,8 +18,7 @@ const UserProfileHeader = () => {
     const [profilePicture, setProfilePicture] = useState('');
     const [file, setFile] = useState(null);
 
-    const defaultProfilePictureUrl = 'https://via.placeholder.com/100'; 
-
+    const defaultProfileImageURL = "https://via.placeholder.com/100";
     useEffect(() => {
         const fetchUser = async () => {
             if (token) {
@@ -34,7 +34,8 @@ const UserProfileHeader = () => {
                     const userData = response.data;
                     setUser(userData);
                     setUsername(userData.username);
-                    setProfilePicture(userData.profilePictureUrl || defaultProfilePictureUrl);
+                    setProfilePicture(userData.profilePictureUrl || defaultProfileImageURL);
+                    console.log(userData);
                 } catch (error) {
                     console.error('Failed to fetch user:', error);
                 }
@@ -53,22 +54,10 @@ const UserProfileHeader = () => {
     };
 
     const handleSaveProfile = async () => {
-        const formData = new FormData();
-        formData.append('username', username);
-        if (file) {
-            formData.append('profilePicture', file);
-        }
-
         try {
-            const response = await axiosInstance.put(`/api/user/${user.id}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            setUser(response.data);
-            setProfilePicture(response.data.profilePictureUrl || defaultProfilePictureUrl);
+            const updatedUser = await saveUserProfile(user, username, file);
+            setUser(updatedUser);
+            setProfilePicture(updatedUser.profilePictureUrl || defaultProfileImageURL);
             setIsEditing(false);
             console.log('Successfully saved profile');
         } catch (error) {

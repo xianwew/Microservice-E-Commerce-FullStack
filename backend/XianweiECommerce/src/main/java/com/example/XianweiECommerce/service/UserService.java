@@ -10,6 +10,7 @@ import com.example.XianweiECommerce.repository.UserRepository;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class UserService {
     private final CloudinaryService cloudinaryService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Value("${cloudinary.upload-folder}")
+    private String imageFolder;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -68,6 +71,7 @@ public class UserService {
         user.setId(keycloakUserId); // Ensure the ID is set correctly
 
         userRepository.save(user);
+        log.info("ProfilePictureUrl: ", user.getProfilePictureUrl());
         log.info("Successfully created a user with ID: {}", user.getId());
         return token;
     }
@@ -92,10 +96,20 @@ public class UserService {
         );
         UserMapper.updateEntityFromDTO(userDTO, existingUser);
         log.info("start saving user!");
+
         if (profilePicture != null && !profilePicture.isEmpty()) {
-            Map<String, Object> uploadResult = cloudinaryService.uploadFile(profilePicture.getBytes(), "XianweiECommerce/UserAvatar");
+            // Delete the old avatar if it exists
+            if (existingUser.getProfilePictureUrl() != null && !existingUser.getProfilePictureUrl().isEmpty()) {
+                log.info("Current profile picture URL: {}", existingUser.getProfilePictureUrl());
+                String publicId = cloudinaryService.extractPublicIdFromUrl(existingUser.getProfilePictureUrl());
+                log.info("Deleting old avatar with public ID: {}", publicId);
+                cloudinaryService.deleteFile(publicId, imageFolder);
+            }
+            // Upload the new avatar
+            Map<String, Object> uploadResult = cloudinaryService.uploadFile(profilePicture.getBytes(), imageFolder);
             existingUser.setProfilePictureUrl((String) uploadResult.get("url"));
         }
+
         log.info("saving user! " + existingUser);
         userRepository.save(existingUser);
         return true;

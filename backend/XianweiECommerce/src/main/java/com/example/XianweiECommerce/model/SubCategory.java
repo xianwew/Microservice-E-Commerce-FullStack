@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "subcategories")
+@Table(name = "sub_categories")
 public class SubCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

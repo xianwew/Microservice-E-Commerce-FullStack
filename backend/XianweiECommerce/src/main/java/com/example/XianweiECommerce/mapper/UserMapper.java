@@ -16,6 +16,7 @@ public class UserMapper {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setProfilePictureUrl(user.getProfilePictureUrl());
         userDTO.setAddress(AddressMapper.toDTO(user.getAddress()));
         userDTO.setRating(RatingMapper.toDTO(user.getRating()));
         return userDTO;
@@ -33,6 +34,7 @@ public class UserMapper {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
         user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
         user.setRating(RatingMapper.toEntity(userDTO.getRating()));
         return user;
@@ -48,6 +50,7 @@ public class UserMapper {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
         user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
         user.setRating(RatingMapper.toEntity(userDTO.getRating()));
     }

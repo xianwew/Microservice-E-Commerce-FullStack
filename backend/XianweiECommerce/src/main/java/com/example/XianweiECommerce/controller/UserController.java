@@ -58,10 +58,9 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto> updateUser(@PathVariable String id,
-                                                  @Valid @RequestBody UserDTO userDTO,
-                                                  @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+                                                  @Valid @RequestPart("user") UserDTO userDTO,
+                                                  @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
-
             boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
             if (isUpdated) {
                 return ResponseEntity

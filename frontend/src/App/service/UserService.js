@@ -27,3 +27,34 @@ export const fetchUser = async () => {
         throw error;
     }
 };
+
+export const saveUserProfile = async (user, username, file) => {
+    const formData = new FormData();
+    formData.append('user', new Blob([JSON.stringify({
+        id: user.id,
+        username: username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        profilePictureUrl: user.profilePictureUrl
+    })], {
+        type: "application/json"
+    }));
+
+    if (file) {
+        formData.append('profilePicture', file);
+    }
+
+    const state = store.getState();
+    const token = state.auth.token;
+    const response = await axiosInstance.put(`/api/user/${user.id}`, formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    store.dispatch(setUser({ user: response.data }));
+    return response.data;
+};
