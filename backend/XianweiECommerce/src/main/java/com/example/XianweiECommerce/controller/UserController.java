@@ -3,6 +3,7 @@ import com.example.XianweiECommerce.dto.ResponseDto;
 import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
 import com.example.XianweiECommerce.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -58,9 +59,10 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto> updateUser(@PathVariable String id,
-                                                  @Valid @RequestPart("user") UserDTO userDTO,
+                                                  @Valid @RequestPart("user") String userJson,
                                                   @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
+            UserDTO userDTO = new ObjectMapper().readValue(userJson, UserDTO.class);
             boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
             if (isUpdated) {
                 return ResponseEntity

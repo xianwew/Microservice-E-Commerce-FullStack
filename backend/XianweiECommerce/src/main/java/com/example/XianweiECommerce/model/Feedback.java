@@ -1,8 +1,11 @@
 package com.example.XianweiECommerce.model;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Feedback extends BaseEntity {
     @Id

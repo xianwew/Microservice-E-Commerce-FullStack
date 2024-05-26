@@ -8,42 +8,20 @@ import { useDispatch } from 'react-redux';
 import {decodeToken} from '../../Auth/JwtUtils';
 import axiosInstance from '../../service/AxiosConfig';
 import { saveUserProfile } from '../../service/UserService';
+import { useSelector } from 'react-redux';
+import { setUser } from '../../redux/slice/authSlice';
 
 const UserProfileHeader = () => {
-    const { logout, token } = useAuth();
-    const dispatch = useDispatch();
-    const [isEditing, setIsEditing] = useState(false);
-    const [user, setUser] = useState(null);
-    const [username, setUsername] = useState('');
-    const [profilePicture, setProfilePicture] = useState('');
-    const [file, setFile] = useState(null);
-
     const defaultProfileImageURL = "https://via.placeholder.com/100";
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (token) {
-                const decoded = decodeToken(token);
-                const userId = decoded.sub; 
-                console.log(userId);
-                try {
-                    const response = await axiosInstance.get(`/api/user/${userId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    const userData = response.data;
-                    setUser(userData);
-                    setUsername(userData.username);
-                    setProfilePicture(userData.profilePictureUrl || defaultProfileImageURL);
-                    console.log(userData);
-                } catch (error) {
-                    console.error('Failed to fetch user:', error);
-                }
-            }
-        };
 
-        fetchUser();
-    }, [token]);
+    const { logout } = useAuth();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.auth.user);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [username, setUsername] = useState(user?.username || '');
+    const [profilePicture, setProfilePicture] = useState(user?.profilePictureUrl || defaultProfileImageURL);
+    const [file, setFile] = useState(null);
 
     const handleLogout = () => {
         logout();
@@ -54,14 +32,19 @@ const UserProfileHeader = () => {
     };
 
     const handleSaveProfile = async () => {
+        setIsUploading(true);
+        dispatch(showSnackbar({ open: true, message: 'Uploading...', severity: 'info' }));
         try {
             const updatedUser = await saveUserProfile(user, username, file);
-            setUser(updatedUser);
+            dispatch(setUser({ user: updatedUser }));
             setProfilePicture(updatedUser.profilePictureUrl || defaultProfileImageURL);
             setIsEditing(false);
-            console.log('Successfully saved profile');
+            dispatch(showSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' }));
+            window.location.reload(); 
         } catch (error) {
             console.error('Failed to update profile:', error);
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -140,12 +123,12 @@ const UserProfileHeader = () => {
                             onChange={handleFileChange}
                         />
                         <label htmlFor="profile-picture">
-                            <Button variant="contained" color="primary" component="span">
+                            <Button variant="contained" color="primary" component="span" disabled={isUploading}>
                                 Upload Profile Picture
                             </Button>
                         </label>
                         <Box mt={2} display="flex" justifyContent="flex-end">
-                            <Button variant="contained" color="primary" onClick={handleSaveProfile}>
+                            <Button variant="contained" color="primary" onClick={handleSaveProfile} disabled={isUploading}>
                                 Save
                             </Button>
                         </Box>

@@ -2,7 +2,11 @@ package com.example.XianweiECommerce.model;
 import jakarta.persistence.Entity;
 import lombok.Data;
 import jakarta.persistence.*;
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "main_categories")
 public class MainCategory extends BaseEntity {

@@ -3,6 +3,7 @@ import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
 import com.example.XianweiECommerce.mapper.UserMapper;
+import com.example.XianweiECommerce.model.Address;
 import com.example.XianweiECommerce.model.User;
 import com.example.XianweiECommerce.repository.AddressRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
@@ -71,7 +72,6 @@ public class UserService {
         user.setId(keycloakUserId); // Ensure the ID is set correctly
 
         userRepository.save(user);
-        log.info("ProfilePictureUrl: ", user.getProfilePictureUrl());
         log.info("Successfully created a user with ID: {}", user.getId());
         return token;
     }
@@ -94,8 +94,37 @@ public class UserService {
         User existingUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", id)
         );
+
+        log.info("Updating user with ID: {}", id);
+        log.info("Existing user: {}", existingUser);
+        log.info("New user data: {}", userDTO);
+
+        boolean emailChanged = !existingUser.getEmail().equals(userDTO.getEmail());
+        boolean usernameChanged = !existingUser.getUsername().equals(userDTO.getUsername());
+
+        // Check if the new email is already used by another user
+        if (emailChanged) {
+            Optional<User> userWithEmail = userRepository.findByEmail(userDTO.getEmail());
+            if (userWithEmail.isPresent() && !userWithEmail.get().getId().equals(id)) {
+                throw new UserAlreadyExistsException("Email is already in use by another user.");
+            }
+        }
+
         UserMapper.updateEntityFromDTO(userDTO, existingUser);
-        log.info("start saving user!");
+        log.info("Updated user entity: {}", existingUser);
+
+        if (userDTO.getAddress() != null) {
+            Address address = existingUser.getAddress() != null ? existingUser.getAddress() : new Address();
+            address.setUser(existingUser);
+            address.setStreet(userDTO.getAddress().getStreet());
+            address.setCity(userDTO.getAddress().getCity());
+            address.setState(userDTO.getAddress().getState());
+            address.setPostalCode(userDTO.getAddress().getPostalCode());
+            address.setCountry(userDTO.getAddress().getCountry());
+            log.info("Saving address: {}", address);
+            addressRepository.save(address);
+            existingUser.setAddress(address);
+        }
 
         if (profilePicture != null && !profilePicture.isEmpty()) {
             // Delete the old avatar if it exists
@@ -110,8 +139,14 @@ public class UserService {
             existingUser.setProfilePictureUrl((String) uploadResult.get("url"));
         }
 
-        log.info("saving user! " + existingUser);
+        log.info("Saving user: {}", existingUser);
         userRepository.save(existingUser);
+
+        if (emailChanged || usernameChanged) {
+            String adminToken = keycloakService.getAdminToken();
+            keycloakService.updateUserInKeycloak(adminToken, id, userDTO);
+        }
+
         return true;
     }
 

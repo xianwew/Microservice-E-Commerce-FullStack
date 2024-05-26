@@ -137,4 +137,26 @@ public class KeycloakService {
             throw new RuntimeException("Exception occurred while retrieving user token from Keycloak.", e);
         }
     }
+
+    public void updateUserInKeycloak(String adminToken, String userId, UserDTO userDTO) {
+        String keycloakUrl = this.keycloakUrl + "/admin/realms/" + realm + "/users/" + userId;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(adminToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("username", userDTO.getUsername());
+        body.put("email", userDTO.getEmail());
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.exchange(keycloakUrl, HttpMethod.PUT, entity, String.class);
+            log.info("Successfully updated user in Keycloak");
+        } catch (Exception e) {
+            log.error("Failed to update user in Keycloak", e);
+            throw new RuntimeException("Failed to update user in Keycloak", e);
+        }
+    }
 }
