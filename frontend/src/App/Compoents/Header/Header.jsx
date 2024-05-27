@@ -4,9 +4,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import LoginDialog from '../LoginDialog/LoginDialog';
-const sampleAvatarUrl = "https://via.placeholder.com/150"; // Placeholder avatar URL
 
 const Header = () => {
+    const sampleAvatarUrl = "https://via.placeholder.com/150";
     const [loginOpen, setLoginOpen] = useState(false);
     const { isAuthenticated, user } = useSelector(state => state.auth); // Assuming auth state contains isAuthenticated and user info
     const dispatch = useDispatch();
@@ -44,7 +44,7 @@ const Header = () => {
                                 <ShoppingCartIcon />
                             </IconButton>
                             <IconButton color="inherit" onClick={() => navigate('/profile')}>
-                                <Avatar src={sampleAvatarUrl} alt="User Avatar" />
+                                <Avatar src={user?.profilePictureUrl || sampleAvatarUrl} alt="User Avatar" />
                             </IconButton>
                         </>
                     )}

@@ -108,7 +108,7 @@ public class UserService {
 
         log.info("Updating user with ID: {}", id);
         log.info("Existing user: {}", existingUser);
-        log.info("New user data: {}", userDTO);
+        log.info("New user's ProfilePictureUrl", userDTO.getProfilePictureUrl());
 
         boolean emailChanged = !existingUser.getEmail().equals(userDTO.getEmail());
         boolean usernameChanged = !existingUser.getUsername().equals(userDTO.getUsername());
@@ -122,7 +122,7 @@ public class UserService {
         }
 
         UserMapper.updateEntityFromDTO(userDTO, existingUser);
-        log.info("Updated user entity: {}", existingUser);
+        log.info("Updated user entity: {}", existingUser.getProfilePictureUrl());
 
         if (userDTO.getAddress() != null) {
             Address address = existingUser.getAddress() != null ? existingUser.getAddress() : new Address();
@@ -176,9 +176,11 @@ public class UserService {
     }
 
     public CardDTO createCard(String userId, CardDTO cardDTO) {
+        log.info("creating card! User id: " + userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Card card = CardMapper.toEntity(cardDTO);
         card.setUser(user);
+        log.info("saving card!");
         Card savedCard = cardRepository.save(card);
         return CardMapper.toDTO(savedCard);
     }

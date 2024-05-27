@@ -37,7 +37,17 @@ const UserProfileHeader = () => {
         setIsUploading(true);
         dispatch(showSnackbar({ open: true, message: 'Uploading...', severity: 'info' }));
         try {
-            const updatedUser = await saveUserProfile(user, user.email, user.phoneNumber, user.firstName, user.lastName, user.address, file);
+            const newUser = {
+                id: user.id,
+                username: username,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+                address: user.address,
+                profilePictureUrl: user.profilePictureUrl
+            }
+            const updatedUser = await saveUserProfile({user: newUser, file});
             dispatch(setUser({ user: updatedUser }));
             setProfilePicture(updatedUser.profilePictureUrl || defaultProfileImageURL);
             setIsEditing(false);

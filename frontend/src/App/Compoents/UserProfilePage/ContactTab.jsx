@@ -42,16 +42,21 @@ const ContactTab = () => {
     const handleSaveChanges = async (event) => {
         event.preventDefault();
         try {
-            const updatedUser = await saveUserProfile(
-                user,
-                email,
-                phoneNumber,
-                firstName,
-                lastName,
-                { street, city, state, postalCode, country },
-                token
-            );
+            const newAddress = {
+                street, city, state, postalCode, country
+            };
+            const newUser = {
+                id: user.id,
+                username: user.username,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                phoneNumber: phoneNumber,
+                address: newAddress,
+                profilePictureUrl: user.profilePictureUrl
+            }
 
+            const updatedUser = await saveUserProfile({user: newUser});
             dispatch(showSnackbar({ open: true, message: 'Contact information updated successfully!', severity: 'success' }));
         } catch (error) {
             console.error('Failed to update contact information:', error);

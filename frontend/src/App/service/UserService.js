@@ -29,16 +29,16 @@ export const fetchUser = async () => {
     }
 };
 
-export const saveUserProfile = async (user, email, phoneNumber, firstName, lastName, address, file) => {
+export const saveUserProfile = async ({ user, file }) => {
     const formData = new FormData();
     formData.append('user', new Blob([JSON.stringify({
         id: user.id,
         username: user.username,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
-        address: address,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
         profilePictureUrl: user.profilePictureUrl
     })], {
         type: "application/json"
@@ -89,7 +89,7 @@ export const fetchUserCards = async (userId) => {
 export const createUserCard = async (userId, cardData) => {
     const state = store.getState();
     const token = state.auth.token;
-    console.log(cardData);
+    console.log("card data " + cardData);
     try {
         const response = await axiosInstance.post(`/api/user/${userId}/card`, cardData, {
             headers: {
@@ -106,7 +106,7 @@ export const createUserCard = async (userId, cardData) => {
 export const updateUserCard = async (userId, cardId, cardData) => {
     const state = store.getState();
     const token = state.auth.token;
-
+    console.log("updating card!");
     try {
         const response = await axiosInstance.put(`/api/user/${userId}/card/${cardId}`, cardData, {
             headers: {

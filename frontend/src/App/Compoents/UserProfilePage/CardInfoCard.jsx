@@ -56,9 +56,9 @@ const CardInfoCard = ({ card, onEdit, onAdd, onDelete }) => {
     };
 
     const renderError = (message) => (
-        <div style={{ color: 'red', minHeight: '1.5em', userSelect: 'none' }}>
+        <span style={{ fontSize: '12px', color: 'red', height: '1.5em', userSelect: 'none' }}>
             {message || ' '}
-        </div>
+        </span>
     );
 
     return (
@@ -74,7 +74,7 @@ const CardInfoCard = ({ card, onEdit, onAdd, onDelete }) => {
                 <IconButton color="primary" onClick={handleEditOpen}>
                     <EditIcon />
                 </IconButton>
-                <IconButton color="secondary" onClick={() => onDelete(card.id)}>
+                <IconButton color="secondary" onClick={() => onDelete(card.id, card.tempId)}>
                     <DeleteIcon />
                 </IconButton>
             </Box>
@@ -152,7 +152,9 @@ const CardInfoCard = ({ card, onEdit, onAdd, onDelete }) => {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                    <ErrorMessage name="type" render={renderError} />
+                                    <span style={{marginLeft: '12px'}}>
+                                        <ErrorMessage name="type" render={renderError} />
+                                    </span>
                                 </FormControl>
                                 <DialogActions>
                                     <Button onClick={handleEditClose} color="primary">
