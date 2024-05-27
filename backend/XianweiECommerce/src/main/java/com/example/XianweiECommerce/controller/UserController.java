@@ -59,25 +59,27 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto> updateUser(@PathVariable String id,
-                                                  @Valid @RequestPart("user") String userJson,
+                                                  @RequestPart("user") String userJson,
                                                   @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
-            UserDTO userDTO = new ObjectMapper().readValue(userJson, UserDTO.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            UserDTO userDTO = objectMapper.readValue(userJson, UserDTO.class);
             boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
             if (isUpdated) {
+                UserDTO updatedUser = userService.getUserById(id); // Fetch the updated user
                 return ResponseEntity
                         .status(HttpStatus.OK)
-                        .body(new ResponseDto("200", "User updated successfully", ""));
+                        .body(new ResponseDto("200", "User updated successfully", null, updatedUser)); // Include updated user in response
             } else {
                 return ResponseEntity
                         .status(HttpStatus.EXPECTATION_FAILED)
-                        .body(new ResponseDto("417", "Failed to update user", ""));
+                        .body(new ResponseDto("417", "Failed to update user", null, null));
             }
         } catch (IOException e) {
             log.error("Error updating user profile picture", e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto("500", "Error updating user profile picture", e.getMessage()));
+                    .body(new ResponseDto("500", "Error updating user profile picture", e.getMessage(), null));
         }
     }
 
@@ -87,11 +89,11 @@ public class UserController {
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDto("200", "User deleted successfully", ""));
+                    .body(new ResponseDto("200", "User deleted successfully", "", null));
         } else {
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
-                    .body(new ResponseDto("417", "Failed to delete user", ""));
+                    .body(new ResponseDto("417", "Failed to delete user", "", null));
         }
     }
 
