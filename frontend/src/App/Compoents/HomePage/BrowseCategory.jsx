@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@mui/material';
-import { Box, Container } from '@mui/material';
-import SubCategoryList from './SubCategoryList';
+import { Box } from '@mui/material';
 import { fetchSubCategories } from '../../service/CategoryService';
 import CategoryItemCard from './CategoryItemCard';
 

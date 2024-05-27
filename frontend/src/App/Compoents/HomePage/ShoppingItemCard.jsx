@@ -18,18 +18,18 @@ const ShoppingItemCard = ({ image, title, price }) => {
         image={image}
         title={title}
       />
-      <IconButton
+      {/* <IconButton
         aria-label="add to favorites"
         style={{ position: 'absolute', top: 10, right: 10 }}
       >
         <FavoriteIcon />
-      </IconButton>
+      </IconButton> */}
       <CardContent>
-        <Typography variant="h6" component="div">
+        <Typography component="div" sx={{fontSize: '16px'}}>
           {title}
         </Typography>
       </CardContent>
-      <CardActions style={{ justifyContent: 'space-between' }}>
+      <CardActions style={{ justifyContent: 'space-between', padding: '0 15px 10px 15px' }}>
         <Typography variant="body1" color="textSecondary">
           ${price}
         </Typography>
