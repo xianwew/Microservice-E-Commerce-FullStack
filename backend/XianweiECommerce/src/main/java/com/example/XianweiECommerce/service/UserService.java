@@ -49,7 +49,7 @@ public class UserService {
 
     private final SubCategoryRepository subCategoryRepository;
 
-    @Value("${cloudinary.upload-folder}")
+    @Value("${cloudinary.avatar-upload-folder}")
     private String imageFolder;
 
     @Autowired

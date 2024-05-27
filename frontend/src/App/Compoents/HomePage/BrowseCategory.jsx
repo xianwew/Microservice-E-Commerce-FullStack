@@ -1,27 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Grid } from '@mui/material';
 import { Box, Container } from '@mui/material';
 import SubCategoryList from './SubCategoryList';
+import { fetchSubCategories } from '../../service/CategoryService';
+import CategoryItemCard from './CategoryItemCard';
 
-const popularItems = [
-    { image: 'https://via.placeholder.com/140', title: 'Item 1', subtitle: 'Great Value' },
-    { image: 'https://via.placeholder.com/140', title: 'Item 2', subtitle: 'Hot Deal' },
-    { image: 'https://via.placeholder.com/140', title: 'Item 3', subtitle: 'Top Pick' },
-    { image: 'https://via.placeholder.com/140', title: 'Item 4', subtitle: 'Best Seller' },
-];
+const BrowseCategory = ({ mainCategoryId }) => {
+    const [subCategories, setSubCategories] = useState([]);
 
-const exclusiveItems = [
-    { image: 'https://via.placeholder.com/140', title: 'Item A', subtitle: 'Exclusive' },
-    { image: 'https://via.placeholder.com/140', title: 'Item B', subtitle: 'Limited Offer' },
-    { image: 'https://via.placeholder.com/140', title: 'Item C', subtitle: 'New Arrival' },
-    { image: 'https://via.placeholder.com/140', title: 'Item D', subtitle: 'Just for You' },
-];
+    useEffect(() => {
+        if (mainCategoryId) {
+            const loadSubCategories = async () => {
+                const subCats = await fetchSubCategories(mainCategoryId);
+                setSubCategories(subCats);
+            };
 
-const BrowseCategory = () => {
+            loadSubCategories();
+        }
+    }, [mainCategoryId]);
+
+    if (!mainCategoryId) {
+        return null;
+    }
+
     return (
-        <div style={{ borderRadius: '25px', width: '100%', boxSizing: 'border-box'}}>
-            <SubCategoryList title="Popular for the Week" items={popularItems} />
-            <SubCategoryList title="Exclusive for You" items={exclusiveItems} />
-        </div>
+        <Box
+            sx={{
+                borderRadius: '25px',
+                width: '100%',
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '16px',
+                padding: '16px'
+            }}
+        >
+            {subCategories.map((subCategory) => (
+                <Box key={subCategory.id} sx={{ maxWidth: 'calc(33.333% - 16px)' }}>
+                    <CategoryItemCard item={{ image: subCategory.imageUrl, title: subCategory.name, subtitle: '' }} />
+                </Box>
+            ))}
+        </Box>
     );
 };
 

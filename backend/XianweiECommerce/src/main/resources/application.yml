@@ -38,5 +38,5 @@ cloudinary:
   cloud-name: dl7atizzb
   api-key: 145491984531442
   api-secret: 1iZYfLLIkyl9QGDTreYx3r-5Mcc
-  upload-folder: XianweiECommerce/UserAvatar
-
+  avatar-upload-folder: XianweiECommerce/UserAvatar
+  category-upload-folder: XianweiECommerce/Category
