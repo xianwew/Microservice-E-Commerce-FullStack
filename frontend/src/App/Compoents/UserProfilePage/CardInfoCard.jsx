@@ -62,7 +62,7 @@ const CardInfoCard = ({ card, onEdit, onAdd, onDelete }) => {
     );
 
     return (
-        <Box border={1} borderRadius={4} p={2} mb={2}>
+        <Box sx={{ boxShadow: 2, border: '1px solid #E2E2E2' }} borderRadius={4} p={2} mb={2}>
             <Typography variant="subtitle1">
                 {card.cardholderName ?
                     `${card.cardholderName}'s card ending ${card.cardNumber.slice(-4)}`
