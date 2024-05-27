@@ -20,17 +20,21 @@ public class Card extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false) // Adjust the column name to match the database naming convention
     private User user;
 
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
-    private String lastFourDigits;
+    @Column(nullable = false, name = "card_number")
+    private String cardNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "expiration_date")
     private LocalDate expirationDate;
 
-    // Getters and setters are inherited from BaseEntity
+    @Column(nullable = false, name = "cardholder_name")
+    private String cardholderName;
+
+    @Column(nullable = false, name = "billing_address")
+    private String billingAddress;
 }

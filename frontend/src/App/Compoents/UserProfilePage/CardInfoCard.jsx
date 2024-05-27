@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
+import { Box, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,9 +10,16 @@ const validationSchema = Yup.object({
     cardNumber: Yup.string().required('Card Number is required').matches(/^[0-9]+$/, 'Card Number must be digits').min(16, 'Card Number must be 16 digits').max(16, 'Card Number must be 16 digits'),
     expirationDate: Yup.string().required('Expiration Date is required').matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiration Date must be in MM/YY format'),
     billingAddress: Yup.string().required('Billing Address is required'),
+    type: Yup.string().required('Card Type is required'),
 });
 
-const CardInfoCard = ({ card, onEdit, onDelete }) => {
+const cardTypes = [
+    { value: 'Visa', label: 'Visa' },
+    { value: 'MasterCard', label: 'MasterCard' },
+    { value: 'AmericanExpress', label: 'American Express' },
+];
+
+const CardInfoCard = ({ card, onEdit, onAdd, onDelete }) => {
     const [editOpen, setEditOpen] = useState(false);
 
     const handleEditOpen = () => {
@@ -24,7 +31,27 @@ const CardInfoCard = ({ card, onEdit, onDelete }) => {
     };
 
     const handleSave = (values) => {
-        onEdit({ ...card, ...values });
+        if(card.id){
+            handleEditSave(values);
+        }
+        else{
+            handleAddSave(values);
+        }
+        
+    }
+
+    const handleAddSave = (values) => {
+        const [month, year] = values.expirationDate.split('/');
+        const expirationDate = `${month}/${year}`;
+        onAdd({ ...card, ...values, expirationDate });
+        handleEditClose();
+    };
+
+
+    const handleEditSave = (values) => {
+        const [month, year] = values.expirationDate.split('/');
+        const expirationDate = `${month}/${year}`;
+        onEdit({ ...card, ...values, expirationDate });
         handleEditClose();
     };
 
@@ -60,15 +87,16 @@ const CardInfoCard = ({ card, onEdit, onDelete }) => {
                     </DialogContentText>
                     <Formik
                         initialValues={{
-                            cardholderName: card.cardholderName,
-                            cardNumber: card.cardNumber,
-                            expirationDate: card.expirationDate,
-                            billingAddress: card.billingAddress,
+                            cardholderName: card.cardholderName || '',
+                            cardNumber: card.cardNumber || '',
+                            expirationDate: card.expirationDate ? card.expirationDate.substring(5, 7) + '/' + card.expirationDate.substring(2, 4) : '',
+                            billingAddress: card.billingAddress || '',
+                            type: card.type || '',
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSave}
                     >
-                        {({ isSubmitting }) => (
+                        {({ isSubmitting, setFieldValue, values }) => (
                             <Form>
                                 <Field
                                     as={TextField}
@@ -108,6 +136,24 @@ const CardInfoCard = ({ card, onEdit, onDelete }) => {
                                     helperText={<ErrorMessage name="billingAddress" render={renderError} />}
                                     error={Boolean(ErrorMessage.name === "billingAddress")}
                                 />
+                                <FormControl fullWidth margin="normal">
+                                    <InputLabel id="type-label">Card Type</InputLabel>
+                                    <Select
+                                        labelId="type-label"
+                                        id="type"
+                                        name="type"
+                                        value={values.type}
+                                        onChange={(e) => setFieldValue('type', e.target.value)}
+                                        label="Card Type"
+                                    >
+                                        {cardTypes.map((type) => (
+                                            <MenuItem key={type.value} value={type.value}>
+                                                {type.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <ErrorMessage name="type" render={renderError} />
+                                </FormControl>
                                 <DialogActions>
                                     <Button onClick={handleEditClose} color="primary">
                                         Cancel

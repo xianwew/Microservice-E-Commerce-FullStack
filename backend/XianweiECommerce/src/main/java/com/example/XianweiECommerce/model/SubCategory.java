@@ -14,11 +14,14 @@ public class SubCategory extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "mainCategoryId", nullable = false)
+    @JoinColumn(name = "main_category_id", nullable = false) // Corrected JoinColumn name to match the database
     private MainCategory mainCategory;
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl; // Added imageUrl field
 
     // Getters and setters are inherited from BaseEntity
 }

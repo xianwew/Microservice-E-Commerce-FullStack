@@ -1,11 +1,15 @@
 package com.example.XianweiECommerce.service;
 import com.example.XianweiECommerce.dto.UserDTO;
+import com.example.XianweiECommerce.dto.CardDTO;
+import com.example.XianweiECommerce.mapper.CardMapper;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
 import com.example.XianweiECommerce.mapper.UserMapper;
 import com.example.XianweiECommerce.model.Address;
+import com.example.XianweiECommerce.model.Card;
 import com.example.XianweiECommerce.model.User;
 import com.example.XianweiECommerce.repository.AddressRepository;
+import com.example.XianweiECommerce.repository.CardRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
@@ -34,6 +38,8 @@ public class UserService {
     private final CloudinaryService cloudinaryService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final CardRepository cardRepository;
+
     @Value("${cloudinary.upload-folder}")
     private String imageFolder;
 
@@ -43,13 +49,15 @@ public class UserService {
                        RatingRepository ratingRepository,
                        KeycloakService keycloakService,
                        CloudinaryService cloudinaryService,
-                       JwtTokenProvider jwtTokenProvider) {
+                       JwtTokenProvider jwtTokenProvider,
+                       CardRepository cardRepository) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.ratingRepository = ratingRepository;
         this.keycloakService = keycloakService;
         this.cloudinaryService = cloudinaryService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.cardRepository = cardRepository;
     }
 
     public String createUser(UserDTO userDTO) {
@@ -160,6 +168,36 @@ public class UserService {
         userRepository.deleteById(user.getId());
         return true;
     }
+
+    //cards related
+    public List<CardDTO> getCardsByUserId(String userId) {
+        List<Card> cards = cardRepository.findByUserId(userId);
+        return cards.stream().map(CardMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public CardDTO createCard(String userId, CardDTO cardDTO) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Card card = CardMapper.toEntity(cardDTO);
+        card.setUser(user);
+        Card savedCard = cardRepository.save(card);
+        return CardMapper.toDTO(savedCard);
+    }
+
+    public CardDTO updateCard(Long cardId, CardDTO cardDTO) {
+        Card existingCard = cardRepository.findById(cardId).orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
+        existingCard.setType(cardDTO.getType());
+        existingCard.setCardNumber(cardDTO.getCardNumber());
+        existingCard.setExpirationDate(cardDTO.getExpirationDate());
+        Card updatedCard = cardRepository.save(existingCard);
+        return CardMapper.toDTO(updatedCard);
+    }
+
+    public void deleteCard(Long cardId) {
+        Card existingCard = cardRepository.findById(cardId).orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
+        cardRepository.delete(existingCard);
+    }
+
+
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()

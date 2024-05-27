@@ -7,5 +7,6 @@ public class SubCategoryDTO {
     private Long mainCategoryId;
     private String mainCategoryName;
     private String name;
+    private String imageUrl; // Added imageUrl field
 }
 

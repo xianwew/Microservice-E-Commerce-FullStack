@@ -1,4 +1,6 @@
 package com.example.XianweiECommerce.controller;
+
+import com.example.XianweiECommerce.dto.CardDTO;
 import com.example.XianweiECommerce.dto.ResponseDto;
 import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -99,6 +102,40 @@ public class UserController {
         }
     }
 
+    //card related
+    @GetMapping("/{id}/card")
+    public ResponseEntity<List<CardDTO>> getAllCards(@PathVariable String id) {
+        List<CardDTO> cards = userService.getCardsByUserId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(cards);
+    }
+
+    @PostMapping("/{id}/card")
+    public ResponseEntity<CardDTO> createCard(@PathVariable String id, @RequestBody CardDTO cardDTO) {
+        CardDTO createdCard = userService.createCard(id, cardDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
+    }
+
+    @PutMapping("/{id}/card/{cardId}")
+    public ResponseEntity<CardDTO> updateCard(@PathVariable String id, @PathVariable Long cardId, @RequestBody CardDTO cardDTO) {
+        try {
+            CardDTO updatedCard = userService.updateCard(cardId, cardDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCard);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}/card/{cardId}")
+    public ResponseEntity<Void> deleteCard(@PathVariable String id, @PathVariable Long cardId) {
+        try {
+            userService.deleteCard(cardId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    //testing
     @GetMapping("/java-version")
     public ResponseEntity<String> getJavaVersion() {
         return ResponseEntity

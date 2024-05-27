@@ -67,3 +67,71 @@ export const saveUserProfile = async (user, email, phoneNumber, firstName, lastN
         throw error;
     }
 };
+
+export const fetchUserCards = async (userId) => {
+    const state = store.getState();
+    const token = state.auth.token;
+
+    try {
+        const response = await axiosInstance.get(`/api/user/${userId}/card`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch user cards:', error);
+        throw error;
+    }
+};
+
+export const createUserCard = async (userId, cardData) => {
+    const state = store.getState();
+    const token = state.auth.token;
+    console.log(cardData);
+    try {
+        const response = await axiosInstance.post(`/api/user/${userId}/card`, cardData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to create user card:', error);
+        throw error;
+    }
+};
+
+export const updateUserCard = async (userId, cardId, cardData) => {
+    const state = store.getState();
+    const token = state.auth.token;
+
+    try {
+        const response = await axiosInstance.put(`/api/user/${userId}/card/${cardId}`, cardData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update user card:', error);
+        throw error;
+    }
+};
+
+export const deleteUserCard = async (userId, cardId) => {
+    const state = store.getState();
+    const token = state.auth.token;
+
+    try {
+        await axiosInstance.delete(`/api/user/${userId}/card/${cardId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    } catch (error) {
+        console.error('Failed to delete user card:', error);
+        throw error;
+    }
+};
