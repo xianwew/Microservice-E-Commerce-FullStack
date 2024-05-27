@@ -12,15 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+
 @Slf4j
+@RestController
 @RequestMapping(path="/api/user", produces = "application/json")
 @Validated
 public class UserController {
@@ -52,9 +52,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> fetchUserById(@PathVariable String id) {
+    public ResponseEntity<ResponseDto> fetchUserById(@PathVariable String id) {
         UserDTO userDTO = userService.getUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseDto("200", "User fetched successfully", null, userDTO));
     }
 
     @PutMapping("/{id}")
@@ -67,7 +68,7 @@ public class UserController {
             boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
             if (isUpdated) {
                 UserDTO updatedUser = userService.getUserById(id); // Fetch the updated user
-                log.info("Update successful!");
+                log.info("Update successful!" + updatedUser);
                 return ResponseEntity
                         .status(HttpStatus.OK)
                         .body(new ResponseDto("200", "User updated successfully", null, updatedUser)); // Include updated user in response

@@ -2,7 +2,7 @@ package com.example.XianweiECommerce.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
+@Data
 public class ResponseDto {
     private String statusCode;
     private String message;

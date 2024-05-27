@@ -20,8 +20,9 @@ export const fetchUser = async () => {
             }
         });
 
-        store.dispatch(setUser({ user: response.data.user }));
-        return response.data;
+        const newUser = response.data.user;
+        store.dispatch(setUser({ user: newUser }));
+        return newUser;
     } catch (error) {
         console.error('Error fetching user data:', error);
         throw error;

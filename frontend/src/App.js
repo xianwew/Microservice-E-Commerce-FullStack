@@ -29,7 +29,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      console.log('Fetching user data!' );
+      console.log('Fetching user data!');
       if (token) {
         try {
           const userData = await fetchUser();
@@ -41,7 +41,7 @@ export default function App() {
     };
 
     fetchUserData();
-  });
+  }, [token, dispatch]);
 
   return (
     <AuthProvider>
