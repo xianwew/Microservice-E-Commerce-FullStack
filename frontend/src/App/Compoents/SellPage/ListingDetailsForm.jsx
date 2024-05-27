@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Typography, MenuItem } from '@mui/material';
 
 const deliveryAreas = [
@@ -7,9 +7,15 @@ const deliveryAreas = [
     'International'
 ];
 
-const ListingDetailsForm = () => {
+const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChange, selectedMainCategory }) => {
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+
+    useEffect(() => {
+        setSelectedSubCategory('');
+    }, [selectedMainCategory]);
+
     return (
-        <Box component="form" >
+        <Box component="form">
             <Typography variant="h6" mb={2}>Listing Details</Typography>
             <TextField
                 label="Listing Title"
@@ -45,14 +51,31 @@ const ListingDetailsForm = () => {
                 margin="normal"
             />
             <TextField
-                label="Supported Delivery Area"
+                label="Main Category"
                 select
                 fullWidth
                 margin="normal"
+                value={selectedMainCategory}
+                onChange={(e) => onMainCategoryChange(e.target.value)}
             >
-                {deliveryAreas.map((area, index) => (
-                    <MenuItem key={index} value={area}>
-                        {area}
+                {mainCategories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                    </MenuItem>
+                ))}
+            </TextField>
+            <TextField
+                label="Sub Category"
+                select
+                fullWidth
+                margin="normal"
+                value={selectedSubCategory}
+                onChange={(e) => setSelectedSubCategory(e.target.value)}
+                disabled={!selectedMainCategory}
+            >
+                {subCategories.map((subCategory) => (
+                    <MenuItem key={subCategory.id} value={subCategory.id}>
+                        {subCategory.name}
                     </MenuItem>
                 ))}
             </TextField>

@@ -23,7 +23,11 @@ public class Item extends BaseEntity {
     private String title;
 
     @Lob
-    private String description;
+    @Column(name = "short_description", nullable = false) // Changed field
+    private String shortDescription;
+
+    @Lob
+    private String longDescription; // New field
 
     @Column(nullable = false)
     private double price;
@@ -35,6 +39,12 @@ public class Item extends BaseEntity {
     private String subImageUrl2;
     private String subImageUrl3;
     private String subImageUrl4;
+
+    @Column(nullable = false)
+    private String city; // New field
+
+    @Column(nullable = false)
+    private String country; // New field
 
     @ManyToOne
     @JoinColumn(name = "mainCategoryId", nullable = false)
@@ -57,3 +67,4 @@ public class Item extends BaseEntity {
         dateListed = LocalDateTime.now();
     }
 }
+
