@@ -62,7 +62,7 @@ CREATE TABLE items (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
-    image_url VARCHAR(255),
+    image_url VARCHAR(255) NOT NULL,
     sub_image_url1 VARCHAR(255),
     sub_image_url2 VARCHAR(255),
 	sub_image_url3 VARCHAR(255),

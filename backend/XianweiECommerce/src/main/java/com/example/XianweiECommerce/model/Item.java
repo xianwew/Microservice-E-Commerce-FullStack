@@ -28,7 +28,13 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private double price;
 
+    @Column(nullable = false)
     private String imageUrl;
+
+    private String subImageUrl1;
+    private String subImageUrl2;
+    private String subImageUrl3;
+    private String subImageUrl4;
 
     @ManyToOne
     @JoinColumn(name = "mainCategoryId", nullable = false)

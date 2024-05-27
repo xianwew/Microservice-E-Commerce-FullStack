@@ -5,16 +5,20 @@ import java.time.LocalDateTime;
 @Data
 public class ItemDTO {
     private Long id;
-    private Long sellerId;
-    private String sellerName;
+    private String sellerId;
     private String title;
     private String description;
     private double price;
     private String imageUrl;
+    private String subImageUrl1;
+    private String subImageUrl2;
+    private String subImageUrl3;
+    private String subImageUrl4;
     private Long mainCategoryId;
-    private String mainCategoryName;
     private Long subCategoryId;
-    private String subCategoryName;
-    private RatingDTO rating;
+    private Long ratingId;
     private LocalDateTime dateListed;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    // Getters and setters...
 }
