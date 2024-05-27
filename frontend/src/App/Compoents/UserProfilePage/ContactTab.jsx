@@ -39,7 +39,8 @@ const ContactTab = () => {
         }
     }, [user]);
 
-    const handleSaveChanges = async () => {
+    const handleSaveChanges = async (event) => {
+        event.preventDefault();
         try {
             const updatedUser = await saveUserProfile(
                 user,
@@ -50,8 +51,7 @@ const ContactTab = () => {
                 { street, city, state, postalCode, country },
                 token
             );
-            console.log('Updated user:', updatedUser); // Check if the function is called
-            dispatch(setUser({ user: updatedUser }));
+
             dispatch(showSnackbar({ open: true, message: 'Contact information updated successfully!', severity: 'success' }));
         } catch (error) {
             console.error('Failed to update contact information:', error);
@@ -66,7 +66,7 @@ const ContactTab = () => {
     return (
         <Box mt={2}>
             <Typography variant="h6" mb={2}>Contact Information</Typography>
-            <Box component="form" display="flex" gap={4}>
+            <Box display="flex" gap={4}>
                 <Box flex={1}>
                     <TextField
                         label="Email Address"
@@ -148,7 +148,6 @@ const ContactTab = () => {
                 variant="contained"
                 color="primary"
                 sx={{ mt: 2, marginTop: '30px', float: 'right' }}
-                type="submit"
                 onClick={handleSaveChanges}
             >
                 Save Changes

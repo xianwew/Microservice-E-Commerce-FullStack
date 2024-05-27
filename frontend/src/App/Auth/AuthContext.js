@@ -172,8 +172,33 @@ export const AuthProvider = ({ children }) => {
         handleLogout(true); // Trigger a page reload after logout
     };
 
+
+    const verifyToken = async (token) => {
+        try {
+            const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token/introspect`, new URLSearchParams({
+                client_id: KEYCLOAK_CLIENT_ID,
+                client_secret: KEYCLOAK_CLIENT_SECRET,
+                token: token,
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+    
+            // The response will contain an "active" field that indicates if the token is valid
+            if (response.status === 200 && response.data.active) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            return false;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, token, login, logout, loading }}>
+        <AuthContext.Provider value={{ isAuthenticated, token, login, logout, loading, verifyToken }}>
             {children}
         </AuthContext.Provider>
     );

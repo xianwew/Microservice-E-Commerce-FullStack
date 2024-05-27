@@ -67,6 +67,7 @@ public class UserController {
             boolean isUpdated = userService.updateUser(id, userDTO, profilePicture);
             if (isUpdated) {
                 UserDTO updatedUser = userService.getUserById(id); // Fetch the updated user
+                log.info("Update successful!");
                 return ResponseEntity
                         .status(HttpStatus.OK)
                         .body(new ResponseDto("200", "User updated successfully", null, updatedUser)); // Include updated user in response

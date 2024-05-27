@@ -13,9 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,6 +93,10 @@ public class UserService {
         User existingUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", id)
         );
+
+        if(Objects.equals(userDTO.getEmail(), "")){
+            throw new RuntimeException("Email is not valid.");
+        }
 
         log.info("Updating user with ID: {}", id);
         log.info("Existing user: {}", existingUser);

@@ -19,7 +19,8 @@ export const fetchUser = async () => {
                 Authorization: `Bearer ${token}`
             }
         });
-        store.dispatch(setUser({ user: response.data }));
+
+        store.dispatch(setUser({ user: response.data.user }));
         return response.data;
     } catch (error) {
         console.error('Error fetching user data:', error);
@@ -56,8 +57,9 @@ export const saveUserProfile = async (user, email, phoneNumber, firstName, lastN
                 'Content-Type': 'multipart/form-data',
             },
         });
-
-        store.dispatch(setUser({ user: response.data }));
+        console.log(response);
+        const updatedUser = response.data.data;
+        store.dispatch(setUser({ user: updatedUser }));
         return response.data;
     } catch (error) {
         console.error('Failed to update user profile:', error);
