@@ -59,9 +59,9 @@ export const saveUserProfile = async (user, email, phoneNumber, firstName, lastN
             },
         });
         console.log(response);
-        const updatedUser = response.data.data;
+        const updatedUser = response.data.user;
         store.dispatch(setUser({ user: updatedUser }));
-        return response.data;
+        return updatedUser;
     } catch (error) {
         console.error('Failed to update user profile:', error);
         throw error;
