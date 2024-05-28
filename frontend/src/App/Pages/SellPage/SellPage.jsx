@@ -57,14 +57,16 @@ const SellPage = () => {
         <div className='app-content' style={{ justifyContent: 'center' }}>
             <div style={{ padding: '50px 80px 80px 80px', backgroundColor: '#fafafa' }}>
                 <Typography variant="h4" fontWeight="bold" mb={1} textAlign='center'>Create a New Listing</Typography>
-                <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <div style={{width: '25%', minWidth: '380px'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ width: '25%', minWidth: '380px' }}>
                         <ImageUpload
+                            initialCoverImage={coverImage}
+                            initialAdditionalImages={additionalImages}
                             onCoverImageUpload={handleCoverImageUpload}
                             onAdditionalImagesUpload={handleAdditionalImagesUpload}
                         />
                     </div>
-                    <div style={{flex: '1'}}>
+                    <div style={{ flex: '1' }}>
                         <ListingDetailsForm
                             mainCategories={mainCategories}
                             subCategories={subCategories}

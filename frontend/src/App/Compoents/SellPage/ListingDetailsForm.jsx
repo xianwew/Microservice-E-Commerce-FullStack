@@ -1,19 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Typography, MenuItem } from '@mui/material';
 
-const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChange, selectedMainCategory, onSubmit }) => {
-    const [title, setTitle] = useState('');
-    const [shortDescription, setShortDescription] = useState('');
-    const [longDescription, setLongDescription] = useState('');
-    const [price, setPrice] = useState('');
-    const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChange, selectedMainCategory, onSubmit, initialData }) => {
+    const [title, setTitle] = useState(initialData?.title || '');
+    const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
+    const [longDescription, setLongDescription] = useState(initialData?.longDescription || '');
+    const [price, setPrice] = useState(initialData?.price || '');
+    const [city, setCity] = useState(initialData?.city || '');
+    const [country, setCountry] = useState(initialData?.country || '');
+    const [quantity, setQuantity] = useState(initialData?.quantity || '');
+    const [selectedSubCategory, setSelectedSubCategory] = useState(initialData?.subCategoryId || '');
 
     useEffect(() => {
-        setSelectedSubCategory('');
-    }, [selectedMainCategory]);
+        if (initialData) {
+            setTitle(initialData.title);
+            setShortDescription(initialData.shortDescription);
+            setLongDescription(initialData.longDescription);
+            setPrice(initialData.price);
+            setCity(initialData.city);
+            setCountry(initialData.country);
+            setQuantity(initialData.quantity);
+            setSelectedSubCategory(initialData.subCategoryId);
+        }
+    }, [initialData]);
+
+    useEffect(() => {
+        // Only reset selected subcategory if the selected main category changes and it's not the initial load
+        if (!initialData || selectedMainCategory !== initialData.mainCategoryId) {
+            setSelectedSubCategory('');
+        }
+    }, [selectedMainCategory, initialData]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -116,17 +132,17 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                     onChange={(e) => setSelectedSubCategory(e.target.value)}
                     disabled={!selectedMainCategory}
                 >
-                    {subCategories.map((subCategory) => (
+                    {Array.isArray(subCategories) ? subCategories.map((subCategory) => (
                         <MenuItem key={subCategory.id} value={subCategory.id}>
                             {subCategory.name}
                         </MenuItem>
-                    ))}
+                    )) : null}
                 </TextField>
             </div>
             <Button variant="contained" color="primary" size="large" sx={{ mt: 2, float: 'right' }} type="submit">
                 Submit
             </Button>
-        </Box >
+        </Box>
     );
 };
 

@@ -57,11 +57,11 @@ public class ItemMapper {
         item.setShortDescription(itemDTO.getShortDescription()); // Changed field
         item.setLongDescription(itemDTO.getLongDescription()); // New field
         item.setPrice(itemDTO.getPrice());
-        item.setImageUrl(itemDTO.getImageUrl());
-        item.setSubImageUrl1(itemDTO.getSubImageUrl1());
-        item.setSubImageUrl2(itemDTO.getSubImageUrl2());
-        item.setSubImageUrl3(itemDTO.getSubImageUrl3());
-        item.setSubImageUrl4(itemDTO.getSubImageUrl4());
+//        item.setImageUrl(itemDTO.getImageUrl());
+//        item.setSubImageUrl1(itemDTO.getSubImageUrl1());
+//        item.setSubImageUrl2(itemDTO.getSubImageUrl2());
+//        item.setSubImageUrl3(itemDTO.getSubImageUrl3());
+//        item.setSubImageUrl4(itemDTO.getSubImageUrl4());
         item.setCity(itemDTO.getCity()); // New field
         item.setCountry(itemDTO.getCountry()); // New field
         item.setMainCategory(mainCategory);

@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const MAX_IMAGES = 5;
 
-const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
-    const [coverImage, setCoverImage] = useState(null);
-    const [additionalImages, setAdditionalImages] = useState([]);
+const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageUpload, onAdditionalImagesUpload }) => {
+    const [coverImage, setCoverImage] = useState(initialCoverImage || null);
+    const [additionalImages, setAdditionalImages] = useState(initialAdditionalImages || []);
+
+    useEffect(() => {
+        setCoverImage(initialCoverImage);
+    }, [initialCoverImage]);
+
+    useEffect(() => {
+        setAdditionalImages(initialAdditionalImages);
+    }, [initialAdditionalImages]);
 
     const handleCoverImageChange = (event) => {
         const file = event.target.files[0];
@@ -37,9 +45,9 @@ const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
 
     return (
         <Box>
-            <Typography variant="h5" mb={2} sx={{marginTop: '15px', fontWeight:"bold"}}>Upload Images</Typography>
+            <Typography variant="h5" mb={2} sx={{ marginTop: '15px', fontWeight: "bold" }}>Upload Images</Typography>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1} sx={{fontWeight:"bold"}}>Cover Image</Typography>
+                <Typography variant="subtitle1" mb={1} sx={{ fontWeight: "bold" }}>Cover Image</Typography>
                 <Box
                     component="label"
                     display="flex"
@@ -55,7 +63,7 @@ const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
                     {coverImage ? (
                         <>
                             <img
-                                src={URL.createObjectURL(coverImage)}
+                                src={typeof coverImage === 'string' ? coverImage : URL.createObjectURL(coverImage)}
                                 alt="cover"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
@@ -81,7 +89,7 @@ const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
                 </Box>
             </Box>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1} sx={{fontWeight:"bold"}}>Additional Images</Typography>
+                <Typography variant="subtitle1" mb={1} sx={{ fontWeight: "bold" }}>Additional Images</Typography>
                 <Box display="flex" flexWrap="wrap" gap="30px">
                     {additionalImages.map((image, index) => (
                         <Box
@@ -94,7 +102,7 @@ const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
                             sx={{ cursor: 'pointer', marginRight: index < additionalImages.length - 1 ? '0' : '0' }}
                         >
                             <img
-                                src={URL.createObjectURL(image)}
+                                src={typeof image === 'string' ? image : URL.createObjectURL(image)}
                                 alt={`upload ${index}`}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
@@ -136,5 +144,3 @@ const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
 };
 
 export default ImageUpload;
-
-

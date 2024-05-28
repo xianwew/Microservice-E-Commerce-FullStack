@@ -49,7 +49,7 @@ public class ItemController {
 
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestPart("item") String itemJson,
-                                              @RequestPart("imageFile") MultipartFile imageFile,
+                                              @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
                                               @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
