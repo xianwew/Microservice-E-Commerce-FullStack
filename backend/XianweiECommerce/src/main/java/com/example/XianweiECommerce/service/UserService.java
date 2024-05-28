@@ -1,32 +1,22 @@
 package com.example.XianweiECommerce.service;
-import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.dto.CardDTO;
 import com.example.XianweiECommerce.mapper.CardMapper;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
-import com.example.XianweiECommerce.mapper.ItemMapper;
 import com.example.XianweiECommerce.mapper.UserMapper;
 import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.repository.AddressRepository;
 import com.example.XianweiECommerce.repository.CardRepository;
-import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
-import com.example.XianweiECommerce.repository.ItemRepository;
-import com.example.XianweiECommerce.repository.MainCategoryRepository;
-import com.example.XianweiECommerce.repository.SubCategoryRepository;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Optional;
 
@@ -52,23 +42,16 @@ public class UserService {
     @Autowired
     public UserService(UserRepository userRepository,
                        AddressRepository addressRepository,
-//                       RatingRepository ratingRepository,
                        KeycloakService keycloakService,
                        CloudinaryService cloudinaryService,
                        JwtTokenProvider jwtTokenProvider,
-                       CardRepository cardRepository
-//                       MainCategoryRepository mainCategoryRepository,
-//                       SubCategoryRepository subCategoryRepository
-                        ) {
+                       CardRepository cardRepository) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
-//        this.ratingRepository = ratingRepository;
         this.keycloakService = keycloakService;
         this.cloudinaryService = cloudinaryService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.cardRepository = cardRepository;
-//        this.mainCategoryRepository = mainCategoryRepository;
-//        this.subCategoryRepository = subCategoryRepository;
     }
 
     public String createUser(UserDTO userDTO) {
@@ -209,53 +192,6 @@ public class UserService {
         Card existingCard = cardRepository.findById(cardId).orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
         cardRepository.delete(existingCard);
     }
-
-    // Listings related methods
-//    public List<ItemDTO> getAllListingsByUserId(String userId) {
-//        List<Item> items = itemRepository.findBySellerId(userId);
-//        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
-//    }
-//
-//    public ItemDTO getListingById(String userId, Long listingId) {
-//        Item item = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-//        return ItemMapper.toDTO(item);
-//    }
-//
-//    public ItemDTO createListing(String userId, ItemDTO itemDTO) {
-//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-//        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
-//                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
-//        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
-//                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
-//        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
-//
-//        Item item = ItemMapper.toEntity(itemDTO, user, mainCategory, subCategory, rating);
-//        Item savedItem = itemRepository.save(item);
-//        return ItemMapper.toDTO(savedItem);
-//    }
-//
-//    public ItemDTO updateListing(String userId, Long listingId, ItemDTO itemDTO) {
-//        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-//        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
-//                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
-//        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
-//                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
-//        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
-//
-//        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory, rating);
-//        Item updatedItem = itemRepository.save(existingItem);
-//        return ItemMapper.toDTO(updatedItem);
-//    }
-//
-//    public void deleteListing(String userId, Long listingId) {
-//        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-//        itemRepository.delete(existingItem);
-//    }
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()

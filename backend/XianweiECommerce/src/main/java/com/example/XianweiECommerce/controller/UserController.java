@@ -1,7 +1,6 @@
 package com.example.XianweiECommerce.controller;
 
 import com.example.XianweiECommerce.dto.CardDTO;
-import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.dto.ResponseDto;
 import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
@@ -135,37 +134,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
-
-//    // Listings related
-//    @GetMapping("/{id}/listings")
-//    public ResponseEntity<List<ItemDTO>> getAllListings(@PathVariable String id) {
-//        List<ItemDTO> listings = userService.getAllListingsByUserId(id);
-//        return ResponseEntity.status(HttpStatus.OK).body(listings);
-//    }
-//
-//    @GetMapping("/{id}/listings/{listingId}")
-//    public ResponseEntity<ItemDTO> getOneListing(@PathVariable String id, @PathVariable Long listingId) {
-//        ItemDTO listing = userService.getListingById(id, listingId);
-//        return ResponseEntity.status(HttpStatus.OK).body(listing);
-//    }
-//
-//    @PostMapping("/{id}/listings")
-//    public ResponseEntity<ItemDTO> createListing(@PathVariable String id, @RequestBody ItemDTO itemDTO) {
-//        ItemDTO createdListing = userService.createListing(id, itemDTO);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(createdListing);
-//    }
-//
-//    @PutMapping("/{id}/listings/{listingId}")
-//    public ResponseEntity<ItemDTO> updateListing(@PathVariable String id, @PathVariable Long listingId, @RequestBody ItemDTO itemDTO) {
-//        ItemDTO updatedListing = userService.updateListing(id, listingId, itemDTO);
-//        return ResponseEntity.status(HttpStatus.OK).body(updatedListing);
-//    }
-//
-//    @DeleteMapping("/{id}/listings/{listingId}")
-//    public ResponseEntity<Void> deleteListing(@PathVariable String id, @PathVariable Long listingId) {
-//        userService.deleteListing(id, listingId);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//    }
 
     //testing
     @GetMapping("/java-version")
