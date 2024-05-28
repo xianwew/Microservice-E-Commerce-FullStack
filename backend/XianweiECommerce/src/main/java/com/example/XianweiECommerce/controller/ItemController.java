@@ -4,6 +4,7 @@ import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
 import com.example.XianweiECommerce.service.ItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Validated
 @Slf4j
 @RestController
 @RequestMapping(path = "/api/item", produces = "application/json")
-@Validated
 public class ItemController {
 
     private final ItemService itemService;
@@ -33,7 +34,7 @@ public class ItemController {
     }
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ItemDTO> createItem(@RequestPart("item") String itemJson,
+    public ResponseEntity<ItemDTO> createItem(@Valid @RequestPart("item") String itemJson,
                                               @RequestPart("imageFile") MultipartFile imageFile,
                                               @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
@@ -48,7 +49,7 @@ public class ItemController {
     }
 
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestPart("item") String itemJson,
+    public ResponseEntity<ItemDTO> updateItem(@Valid @PathVariable Long id, @RequestPart("item") String itemJson,
                                               @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
                                               @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
@@ -67,7 +68,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id, @RequestHeader("Authorization") String token) throws IOException {
         String userId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));
         ItemDTO existingItem = itemService.getItem(id);
 

@@ -6,6 +6,8 @@ import { fetchUserCards, createUserCard, updateUserCard, deleteUserCard } from '
 import store from '../../redux/store/store';
 import { decodeToken } from '../../Auth/JwtUtils';
 import { v4 as uuidv4 } from 'uuid';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
+import { useDispatch } from 'react-redux';
 
 const PaymentTab = () => {
     const [cards, setCards] = useState([]);
@@ -13,6 +15,7 @@ const PaymentTab = () => {
     const token = state.auth.token;
     const decoded = decodeToken(token);
     const userId = decoded.sub;
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const loadCards = async () => {
@@ -24,7 +27,9 @@ const PaymentTab = () => {
                 }));
                 setCards(userCards);
             } catch (error) {
-                console.error('Failed to load cards:', error);
+                console.error('Failed to load card:', error);
+                const errorMessage = error.response?.data || 'load card.';
+                dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
             }
         };
 
@@ -42,6 +47,8 @@ const PaymentTab = () => {
             setCards(cards.map(card => (card.tempId === newCard.tempId ? newCard : card)));
         } catch (error) {
             console.error('Failed to add card:', error);
+            const errorMessage = error.response?.data || 'add card.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
@@ -51,6 +58,8 @@ const PaymentTab = () => {
             setCards(cards.map(card => (card.tempId === updatedCard.tempId ? updatedCard : card)));
         } catch (error) {
             console.error('Failed to update card:', error);
+            const errorMessage = error.response?.data || 'update card.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
@@ -60,6 +69,8 @@ const PaymentTab = () => {
             setCards(cards.filter(card => card.tempId !== tempId));
         } catch (error) {
             console.error('Failed to delete card:', error);
+            const errorMessage = error.response?.data || 'delete card.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 

@@ -139,10 +139,36 @@ public class ItemService {
         return ItemMapper.toDTO(updatedItem);
     }
 
-    public void deleteItem(Long itemId) {
+    public void deleteItem(Long itemId) throws IOException {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ResourceNotFoundException("Item", "id", itemId.toString())
         );
+
+        // Delete the cover image from Cloudinary
+        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+            String publicId = cloudinaryService.extractPublicIdFromUrl(item.getImageUrl());
+            cloudinaryService.deleteFile(publicId, imageFolder);
+        }
+
+        // Delete the additional images from Cloudinary
+        if (item.getSubImageUrl1() != null && !item.getSubImageUrl1().isEmpty()) {
+            String publicId1 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl1());
+            cloudinaryService.deleteFile(publicId1, imageFolder);
+        }
+        if (item.getSubImageUrl2() != null && !item.getSubImageUrl2().isEmpty()) {
+            String publicId2 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl2());
+            cloudinaryService.deleteFile(publicId2, imageFolder);
+        }
+        if (item.getSubImageUrl3() != null && !item.getSubImageUrl3().isEmpty()) {
+            String publicId3 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl3());
+            cloudinaryService.deleteFile(publicId3, imageFolder);
+        }
+        if (item.getSubImageUrl4() != null && !item.getSubImageUrl4().isEmpty()) {
+            String publicId4 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl4());
+            cloudinaryService.deleteFile(publicId4, imageFolder);
+        }
+
+        // Delete the item from the repository
         itemRepository.delete(item);
     }
 

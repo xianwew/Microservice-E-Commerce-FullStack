@@ -60,7 +60,8 @@ const ContactTab = () => {
             dispatch(showSnackbar({ open: true, message: 'Contact information updated successfully!', severity: 'success' }));
         } catch (error) {
             console.error('Failed to update contact information:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to update contact information', severity: 'error' }));
+            const errorMessage = error.response?.data || 'contact information.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 

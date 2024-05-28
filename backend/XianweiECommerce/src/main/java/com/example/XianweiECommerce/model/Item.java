@@ -1,5 +1,7 @@
 package com.example.XianweiECommerce.model;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,7 @@ public class Item extends BaseEntity {
     private String longDescription; // New field
 
     @Column(nullable = false)
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private double price;
 
     @Column(nullable = false)
@@ -62,6 +65,7 @@ public class Item extends BaseEntity {
     private LocalDateTime dateListed;
 
     @Column(nullable = false)
+    @Min(value = 0, message = "Quantity must be at least 0")
     private int quantity; // New field
 
     // Getters and setters are inherited from BaseEntity

@@ -68,7 +68,8 @@ const EditItemPage = () => {
             navigate('/');
         } catch (error) {
             console.error('Failed to update listing:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to update listing.', severity: 'error' }));
+            const errorMessage = error.response?.data || 'Failed to update listing.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
@@ -79,7 +80,8 @@ const EditItemPage = () => {
             navigate('/user/listings');
         } catch (error) {
             console.error('Failed to delete listing:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to delete listing', severity: 'error' }));
+            const errorMessage = error.response?.data || 'Failed to delete listing.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         } finally {
             setOpenDialog(false);
         }

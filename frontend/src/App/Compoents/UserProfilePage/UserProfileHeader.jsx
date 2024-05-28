@@ -54,7 +54,8 @@ const UserProfileHeader = () => {
             dispatch(showSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' }));
         } catch (error) {
             console.error('Failed to update profile:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to update profile', severity: 'error' }));
+            const errorMessage = error.response?.data || 'Failed to update profile.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         } finally {
             setIsUploading(false);
         }

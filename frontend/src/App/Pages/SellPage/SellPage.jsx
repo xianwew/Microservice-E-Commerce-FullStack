@@ -49,7 +49,8 @@ const SellPage = () => {
             navigate('/');
         } catch (error) {
             console.error('Failed to create listing:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to create listing.', severity: 'error' }));
+            const errorMessage = error.response?.data || 'Failed to create listing.';
+            dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
