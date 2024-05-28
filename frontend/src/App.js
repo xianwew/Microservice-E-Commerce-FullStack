@@ -1,7 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import ProtectedRoute from './App/Auth/ProtectedRoute';
-import { AuthProvider, useAuth } from './App/Auth/AuthContext';
+import { AuthProvider } from './App/Auth/AuthContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Header from './App/Compoents/Header/Header';
@@ -16,11 +16,11 @@ import CartPage from './App/Pages/CartPage/CartPage';
 import UserReceiptPage from './App/Pages/UserReceiptPage/UserReceiptPage';
 import EditItemPage from './App/Pages/EditItemPage/EditItemPage';
 import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
+import { setAuthenticated } from './App/redux/slice/authSlice';
+import { showSnackbar } from './App/redux/slice/snackbarSlice';
 import SnackbarComponent from './App/Compoents/SnackBars/SnackbarComponent';
 import { fetchUser } from './App/service/UserService';
 import { setUser } from './App/redux/slice/authSlice';
-import { keycloakInstance } from './App/Auth/keycloak';
-import { setAuthenticated } from './App/redux/slice/authSlice';
 
 export default function App() {
   const isWide = useSelector(state => state.windowSize.isWide);
@@ -32,10 +32,6 @@ export default function App() {
       console.log('Fetching user data!');
       if (token) {
         try {
-          if (keycloakInstance.authenticated) {
-            dispatch(setAuthenticated({ isAuthenticated: true, token: keycloakInstance.refreshToken }));
-            console.log('token refreshed!');
-          }
           const userData = await fetchUser();
           dispatch(setUser({ user: userData }));
         } catch (error) {
@@ -72,4 +68,4 @@ export default function App() {
       </Router>
     </AuthProvider>
   );
-}
+} 

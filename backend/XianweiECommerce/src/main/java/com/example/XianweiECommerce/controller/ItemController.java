@@ -91,6 +91,8 @@ public class ItemController {
         List<ItemDTO> items = itemService.getAllItems();
         return ResponseEntity.ok(items);
     }
+
+    
 }
 
 
