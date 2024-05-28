@@ -5,6 +5,7 @@ import { fetchItems, deleteItem } from '../../service/ListingsService';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import ConfirmDeletion from '../ConfirmDialog/ConfirmDeletion';
+import emptyBox from '../../assets/images/profilePage/emptyBox.png'
 
 function ItemsOnSale() {
     const [items, setItems] = useState([]);
@@ -55,48 +56,60 @@ function ItemsOnSale() {
     };
 
     return (
-        <Grid container spacing={2} sx={{ marginTop: '5px' }}>
-            {items.map(item => (
-                <Grid item key={item.id} xs={12}>
-                    <Card>
-                        <Grid container>
-                            <Grid item>
-                                <CardMedia
-                                    component="img"
-                                    alt={item.title}
-                                    image={item.imageUrl}
-                                    sx={{
-                                        width: '230px',
-                                        height: '230px',
-                                        objectFit: 'cover',
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs container direction="column" justifyContent="space-between" paddingBottom={1}>
-                                <CardContent>
-                                    <Typography variant="h6">{item.title}</Typography>
-                                    <Typography variant="body2" color="textSecondary">{item.shortDescription}</Typography>
-                                    <Typography variant="h6" color="primary">${item.price}</Typography>
-                                    <Typography variant="body2" color="textSecondary">Listed on: {new Date(item.dateListed).toLocaleDateString()}</Typography>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size="small" color="primary" onClick={() => navigate(`/item/${item.id}`)}>View Details</Button>
-                                    <Button size="small" color="secondary" onClick={() => handleEdit(item.id)}>Edit</Button>
-                                    <Button size="small" color="error" onClick={() => handleOpenDialog(item.id)}>Delete</Button>
-                                </CardActions>
-                            </Grid>
+        <>
+            {
+                items.length > 0 ? <Grid container spacing={2} sx={{ marginTop: '5px' }}>
+                    {items.map(item => (
+                        <Grid item key={item.id} xs={12}>
+                            <Card>
+                                <Grid container>
+                                    <Grid item>
+                                        <CardMedia
+                                            component="img"
+                                            alt={item.title}
+                                            image={item.imageUrl}
+                                            sx={{
+                                                width: '230px',
+                                                height: '230px',
+                                                objectFit: 'cover',
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs container direction="column" justifyContent="space-between" paddingBottom={1}>
+                                        <CardContent>
+                                            <Typography variant="h6">{item.title}</Typography>
+                                            <Typography variant="body2" color="textSecondary">{item.shortDescription}</Typography>
+                                            <Typography variant="h6" color="primary">${item.price}</Typography>
+                                            <Typography variant="body2" color="textSecondary">Listed on: {new Date(item.dateListed).toLocaleDateString()}</Typography>
+                                        </CardContent>
+                                        <CardActions>
+                                            <Button size="small" color="primary" onClick={() => navigate(`/item/${item.id}`)}>View Details</Button>
+                                            <Button size="small" color="secondary" onClick={() => handleEdit(item.id)}>Edit</Button>
+                                            <Button size="small" color="error" onClick={() => handleOpenDialog(item.id)}>Delete</Button>
+                                        </CardActions>
+                                    </Grid>
+                                </Grid>
+                            </Card>
                         </Grid>
-                    </Card>
+                    ))}
+                    <ConfirmDeletion
+                        open={openDialog}
+                        onClose={handleCloseDialog}
+                        onConfirm={handleDelete}
+                        title="Confirm Deletion"
+                        message="Are you sure you want to delete this item? This action cannot be undone."
+                    />
                 </Grid>
-            ))}
-            <ConfirmDeletion
-                open={openDialog}
-                onClose={handleCloseDialog}
-                onConfirm={handleDelete}
-                title="Confirm Deletion"
-                message="Are you sure you want to delete this item? This action cannot be undone."
-            />
-        </Grid>
+
+                    :
+                    <div style={{display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', marginTop: '50px'}}>
+                        <img src={emptyBox} alt="" style={{width: '400px'}} />
+                        <Button variant="contained" sx={{marginTop: '50px'}} onClick={() => navigate('/sell')}>
+                            Post A Listing
+                        </Button>
+                    </div>
+            }
+        </>
     );
 }
 
