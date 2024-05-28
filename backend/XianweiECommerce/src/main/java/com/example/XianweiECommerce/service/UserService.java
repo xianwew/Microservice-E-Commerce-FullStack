@@ -36,18 +36,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final RatingRepository ratingRepository;
+//    private final RatingRepository ratingRepository;
     private final KeycloakService keycloakService;
     private final CloudinaryService cloudinaryService;
     private final JwtTokenProvider jwtTokenProvider;
-
     private final CardRepository cardRepository;
 
-    private final ItemRepository itemRepository;
+//    private final MainCategoryRepository mainCategoryRepository;
 
-    private final MainCategoryRepository mainCategoryRepository;
-
-    private final SubCategoryRepository subCategoryRepository;
+//    private final SubCategoryRepository subCategoryRepository;
 
     @Value("${cloudinary.avatar-upload-folder}")
     private String imageFolder;
@@ -55,24 +52,23 @@ public class UserService {
     @Autowired
     public UserService(UserRepository userRepository,
                        AddressRepository addressRepository,
-                       RatingRepository ratingRepository,
+//                       RatingRepository ratingRepository,
                        KeycloakService keycloakService,
                        CloudinaryService cloudinaryService,
                        JwtTokenProvider jwtTokenProvider,
-                       CardRepository cardRepository,
-                       ItemRepository itemRepository,
-                       MainCategoryRepository mainCategoryRepository,
-                       SubCategoryRepository subCategoryRepository) {
+                       CardRepository cardRepository
+//                       MainCategoryRepository mainCategoryRepository,
+//                       SubCategoryRepository subCategoryRepository
+                        ) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
-        this.ratingRepository = ratingRepository;
+//        this.ratingRepository = ratingRepository;
         this.keycloakService = keycloakService;
         this.cloudinaryService = cloudinaryService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.cardRepository = cardRepository;
-        this.itemRepository = itemRepository;
-        this.mainCategoryRepository = mainCategoryRepository;
-        this.subCategoryRepository = subCategoryRepository;
+//        this.mainCategoryRepository = mainCategoryRepository;
+//        this.subCategoryRepository = subCategoryRepository;
     }
 
     public String createUser(UserDTO userDTO) {

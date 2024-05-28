@@ -9,9 +9,7 @@ const EditItemPage = () => {
     const navigate = useNavigate();
 
     const handleDelete = () => {
-        // Add your delete logic here
         console.log(`Deleting listing with id: ${id}`);
-        // After delete logic, navigate back to a suitable page, e.g., user listings page
         navigate('/user/listings');
     };
 

@@ -7,8 +7,7 @@ import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.repository.*;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,28 +20,33 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemService {
 
-    @Autowired
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final MainCategoryRepository mainCategoryRepository;
+    private final SubCategoryRepository subCategoryRepository;
+    private final RatingRepository ratingRepository;
+    private final CloudinaryService cloudinaryService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private MainCategoryRepository mainCategoryRepository;
-
-    @Autowired
-    private SubCategoryRepository subCategoryRepository;
-
-    @Autowired
-    private RatingRepository ratingRepository;
-
-    @Autowired
-    private CloudinaryService cloudinaryService;
-
-    @Value("${cloudinary.upload-folder}")
+    @Value("${cloudinary.item-upload-folder}")
     private String imageFolder;
 
+    @Autowired
+    public ItemService(ItemRepository itemRepository,
+                       UserRepository userRepository,
+                       MainCategoryRepository mainCategoryRepository,
+                       SubCategoryRepository subCategoryRepository,
+                       RatingRepository ratingRepository,
+                       CloudinaryService cloudinaryService) {
+        this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
+        this.mainCategoryRepository = mainCategoryRepository;
+        this.subCategoryRepository = subCategoryRepository;
+        this.ratingRepository = ratingRepository;
+        this.cloudinaryService = cloudinaryService;
+    }
+
     public ItemDTO createItem(ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
+        log.info("saving new listing!");
         User seller = userRepository.findById(itemDTO.getSellerId()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", itemDTO.getSellerId())
         );
@@ -82,6 +86,7 @@ public class ItemService {
         }
 
         Item savedItem = itemRepository.save(item);
+        log.info("listing saved");
         return ItemMapper.toDTO(savedItem);
     }
 

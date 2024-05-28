@@ -23,16 +23,19 @@ import java.util.List;
 @Validated
 public class ItemController {
 
-    @Autowired
-    private ItemService itemService;
+    private final ItemService itemService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    public ItemController(ItemService itemService, JwtTokenProvider jwtTokenProvider) {
+        this.itemService = itemService;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ItemDTO> createItem(@RequestPart("item") String itemJson,
                                               @RequestPart("imageFile") MultipartFile imageFile,
-                                              @RequestPart("subImageFiles") List<MultipartFile> subImageFiles,
+                                              @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ItemDTO itemDTO = objectMapper.readValue(itemJson, ItemDTO.class);
@@ -47,7 +50,7 @@ public class ItemController {
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestPart("item") String itemJson,
                                               @RequestPart("imageFile") MultipartFile imageFile,
-                                              @RequestPart("subImageFiles") List<MultipartFile> subImageFiles,
+                                              @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ItemDTO itemDTO = objectMapper.readValue(itemJson, ItemDTO.class);
@@ -88,6 +91,7 @@ public class ItemController {
         return ResponseEntity.ok(items);
     }
 }
+
 
 
 

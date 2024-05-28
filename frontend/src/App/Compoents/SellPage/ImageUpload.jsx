@@ -5,36 +5,41 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const MAX_IMAGES = 5;
 
-const ImageUpload = () => {
+const ImageUpload = ({ onCoverImageUpload, onAdditionalImagesUpload }) => {
     const [coverImage, setCoverImage] = useState(null);
     const [additionalImages, setAdditionalImages] = useState([]);
 
-    const handleCoverImageUpload = (event) => {
+    const handleCoverImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
             setCoverImage(file);
+            onCoverImageUpload(file);
         }
     };
 
-    const handleAdditionalImagesUpload = (event) => {
+    const handleAdditionalImagesChange = (event) => {
         const files = Array.from(event.target.files);
         const newImages = files.slice(0, MAX_IMAGES - additionalImages.length - (coverImage ? 1 : 0));
         setAdditionalImages(prevImages => [...prevImages, ...newImages]);
+        onAdditionalImagesUpload([...additionalImages, ...newImages]);
     };
 
     const handleDeleteCoverImage = () => {
         setCoverImage(null);
+        onCoverImageUpload(null);
     };
 
     const handleDeleteAdditionalImage = (index) => {
-        setAdditionalImages(prevImages => prevImages.filter((_, i) => i !== index));
+        const newImages = additionalImages.filter((_, i) => i !== index);
+        setAdditionalImages(newImages);
+        onAdditionalImagesUpload(newImages);
     };
 
     return (
         <Box>
-            <Typography variant="h6" mb={2}>Upload Images</Typography>
+            <Typography variant="h5" mb={2} sx={{marginTop: '15px', fontWeight:"bold"}}>Upload Images</Typography>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1}>Cover Image</Typography>
+                <Typography variant="subtitle1" mb={1} sx={{fontWeight:"bold"}}>Cover Image</Typography>
                 <Box
                     component="label"
                     display="flex"
@@ -69,14 +74,14 @@ const ImageUpload = () => {
                                 type="file"
                                 hidden
                                 accept="image/*"
-                                onChange={handleCoverImageUpload}
+                                onChange={handleCoverImageChange}
                             />
                         </>
                     )}
                 </Box>
             </Box>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1}>Additional Images</Typography>
+                <Typography variant="subtitle1" mb={1} sx={{fontWeight:"bold"}}>Additional Images</Typography>
                 <Box display="flex" flexWrap="wrap" gap="30px">
                     {additionalImages.map((image, index) => (
                         <Box
@@ -120,7 +125,7 @@ const ImageUpload = () => {
                                 hidden
                                 accept="image/*"
                                 multiple
-                                onChange={handleAdditionalImagesUpload}
+                                onChange={handleAdditionalImagesChange}
                             />
                         </Box>
                     )}

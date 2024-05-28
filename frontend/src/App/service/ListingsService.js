@@ -1,4 +1,5 @@
 import axiosInstance from './AxiosConfig';
+import store from '../redux/store/store';
 
 export const createListing = async (itemData, coverImage, additionalImages) => {
     const formData = new FormData();
@@ -14,9 +15,13 @@ export const createListing = async (itemData, coverImage, additionalImages) => {
         formData.append('subImageFiles', file);
     });
 
+    const state = store.getState();
+    const token = state.auth.token;
+
     const response = await axiosInstance.post('/api/item', formData, {
         headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
         }
     });
 
