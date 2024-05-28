@@ -40,3 +40,4 @@ cloudinary:
   api-secret: 1iZYfLLIkyl9QGDTreYx3r-5Mcc
   avatar-upload-folder: XianweiECommerce/UserAvatar
   category-upload-folder: XianweiECommerce/Category
+  item-upload-folder: XianweiECommerce/Item

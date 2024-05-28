@@ -215,51 +215,51 @@ public class UserService {
     }
 
     // Listings related methods
-    public List<ItemDTO> getAllListingsByUserId(String userId) {
-        List<Item> items = itemRepository.findBySellerId(userId);
-        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
-    }
-
-    public ItemDTO getListingById(String userId, Long listingId) {
-        Item item = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-        return ItemMapper.toDTO(item);
-    }
-
-    public ItemDTO createListing(String userId, ItemDTO itemDTO) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
-        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
-        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
-
-        Item item = ItemMapper.toEntity(itemDTO, user, mainCategory, subCategory, rating);
-        Item savedItem = itemRepository.save(item);
-        return ItemMapper.toDTO(savedItem);
-    }
-
-    public ItemDTO updateListing(String userId, Long listingId, ItemDTO itemDTO) {
-        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
-        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
-        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
-
-        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory, rating);
-        Item updatedItem = itemRepository.save(existingItem);
-        return ItemMapper.toDTO(updatedItem);
-    }
-
-    public void deleteListing(String userId, Long listingId) {
-        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
-        itemRepository.delete(existingItem);
-    }
+//    public List<ItemDTO> getAllListingsByUserId(String userId) {
+//        List<Item> items = itemRepository.findBySellerId(userId);
+//        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+//    }
+//
+//    public ItemDTO getListingById(String userId, Long listingId) {
+//        Item item = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
+//        return ItemMapper.toDTO(item);
+//    }
+//
+//    public ItemDTO createListing(String userId, ItemDTO itemDTO) {
+//        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+//        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
+//        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
+//        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
+//
+//        Item item = ItemMapper.toEntity(itemDTO, user, mainCategory, subCategory, rating);
+//        Item savedItem = itemRepository.save(item);
+//        return ItemMapper.toDTO(savedItem);
+//    }
+//
+//    public ItemDTO updateListing(String userId, Long listingId, ItemDTO itemDTO) {
+//        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
+//        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString()));
+//        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString()));
+//        Rating rating = itemDTO.getRatingId() != null ? ratingRepository.findById(itemDTO.getRatingId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", itemDTO.getRatingId().toString())) : null;
+//
+//        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory, rating);
+//        Item updatedItem = itemRepository.save(existingItem);
+//        return ItemMapper.toDTO(updatedItem);
+//    }
+//
+//    public void deleteListing(String userId, Long listingId) {
+//        Item existingItem = (Item) itemRepository.findByIdAndSellerId(listingId, userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", listingId.toString()));
+//        itemRepository.delete(existingItem);
+//    }
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
