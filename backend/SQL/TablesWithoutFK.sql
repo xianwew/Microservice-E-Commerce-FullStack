@@ -60,22 +60,23 @@ CREATE TABLE items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     seller_id VARCHAR(36) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
+    short_description TEXT NOT NULL,
     long_description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     image_url VARCHAR(255) NOT NULL,
     sub_image_url1 VARCHAR(255),
     sub_image_url2 VARCHAR(255),
-	sub_image_url3 VARCHAR(255),
-	sub_image_url4 VARCHAR(255),
-	city VARCHAR(255) NOT NULL,
-	country VARCHAR(255) NOT NULL,
+    sub_image_url3 VARCHAR(255),
+    sub_image_url4 VARCHAR(255),
+    city VARCHAR(255) NOT NULL,
+    country VARCHAR(255) NOT NULL,
     main_category_id BIGINT NOT NULL,
     sub_category_id BIGINT NOT NULL,
     rating_id BIGINT,
     date_listed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    quantity INT NOT NULL DEFAULT 0
 );
 
 -- Create Orders table

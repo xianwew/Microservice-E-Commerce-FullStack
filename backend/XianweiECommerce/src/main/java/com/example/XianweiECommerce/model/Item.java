@@ -61,10 +61,14 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime dateListed;
 
+    @Column(nullable = false)
+    private int quantity; // New field
+
     // Getters and setters are inherited from BaseEntity
     @PrePersist
     protected void onCreate() {
         dateListed = LocalDateTime.now();
     }
 }
+
 

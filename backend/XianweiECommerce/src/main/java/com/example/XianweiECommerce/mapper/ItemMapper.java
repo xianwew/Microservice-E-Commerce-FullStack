@@ -26,6 +26,7 @@ public class ItemMapper {
         itemDTO.setDateListed(item.getDateListed());
         itemDTO.setCreatedAt(item.getCreatedAt());
         itemDTO.setUpdatedAt(item.getUpdatedAt());
+        itemDTO.setQuantity(item.getQuantity()); // New field
         return itemDTO;
     }
 
@@ -47,6 +48,7 @@ public class ItemMapper {
         item.setSubCategory(subCategory);
         item.setRating(rating);
         item.setDateListed(itemDTO.getDateListed());
+        item.setQuantity(itemDTO.getQuantity()); // New field
         return item;
     }
 
@@ -65,6 +67,7 @@ public class ItemMapper {
         item.setMainCategory(mainCategory);
         item.setSubCategory(subCategory);
         item.setRating(rating);
+        item.setQuantity(itemDTO.getQuantity()); // New field
     }
 }
 

@@ -23,6 +23,8 @@ public class ItemDTO {
     private LocalDateTime dateListed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private int quantity; // New field
     // Getters and setters...
 }
+
 
