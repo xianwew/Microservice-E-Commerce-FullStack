@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, InputAdornment, Button, Autocomplete } from '@mui/material';
+import { TextField, InputAdornment, Button, Autocomplete, Box } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
@@ -14,7 +14,8 @@ const SearchBar = ({ initialQuery = '' }) => {
             try {
                 const data = await SearchService.fetchSuggestions(query);
                 setSuggestions(data);
-            } catch (error) {
+            } 
+            catch (error) {
                 console.error('Error fetching suggestions:', error);
             }
         };
@@ -27,23 +28,31 @@ const SearchBar = ({ initialQuery = '' }) => {
     }, [inputValue]);
 
     const handleSearch = () => {
-        navigate(`/browse?query=${inputValue}`);
+        if (inputValue.trim() === '') {
+            navigate(`/browse`);
+        } 
+        else {
+            navigate(`/browse?query=${inputValue}`);
+        }
     };
 
     const handleAutocompleteChange = (event, newValue) => {
-        if (newValue) {
+        if (newValue && newValue.title) {
             setInputValue(newValue.title);
             navigate(`/browse?query=${newValue.title}`);
+        } else if (newValue && typeof newValue === 'string') {
+            setInputValue(newValue);
+            navigate(`/browse?query=${newValue}`);
         }
     };
 
     return (
-        <div style={{ width: '100%', display: 'flex', borderRadius: '25px', overflow: 'hidden', backgroundColor: '#fafafa', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+        <Box style={{ width: '100%', display: 'flex', borderRadius: '25px', overflow: 'hidden', backgroundColor: '#fafafa', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
             <Autocomplete
                 freeSolo
                 sx={{ flex: '1', marginRight: '0', borderRadius: '25px 0 0 25px' }}
                 options={suggestions}
-                getOptionLabel={(option) => option.title}
+                getOptionLabel={(option) => (typeof option === 'string' ? option : option?.title || '')}
                 inputValue={inputValue}
                 onInputChange={(event, newInputValue) => {
                     setInputValue(newInputValue);
@@ -68,8 +77,8 @@ const SearchBar = ({ initialQuery = '' }) => {
                     />
                 )}
                 renderOption={(props, option) => (
-                    <li {...props} key={option.id}>
-                        {option.title}
+                    <li {...props} key={option.id || option}>
+                        {typeof option === 'string' ? option : option.title}
                     </li>
                 )}
             />
@@ -81,9 +90,8 @@ const SearchBar = ({ initialQuery = '' }) => {
             >
                 Search
             </Button>
-        </div>
+        </Box>
     );
 };
 
 export default SearchBar;
-

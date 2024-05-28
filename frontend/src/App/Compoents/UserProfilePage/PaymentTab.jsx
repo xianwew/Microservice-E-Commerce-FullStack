@@ -87,7 +87,7 @@ const PaymentTab = () => {
                 />
             ))}
             <Button variant="contained" color="primary" onClick={handleAddNewCardComponent} startIcon={<AddIcon />} sx={{ mb: 2, float: 'right', marginTop: '10px' }}>
-                Add Another Card
+                Add A New Card
             </Button>
         </Box>
     );

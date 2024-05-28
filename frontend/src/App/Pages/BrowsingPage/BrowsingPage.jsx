@@ -25,9 +25,7 @@ const BrowsePage = () => {
             }
         };
 
-        if (searchQuery) {
-            fetchSearchResults();
-        }
+        fetchSearchResults();
     }, [searchQuery]);
 
     return (

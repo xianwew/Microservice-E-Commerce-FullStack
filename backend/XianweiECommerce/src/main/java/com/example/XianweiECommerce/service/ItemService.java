@@ -5,14 +5,11 @@ import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.ItemMapper;
 import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.repository.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -186,39 +183,101 @@ public class ItemService {
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
+    public ItemService(ItemRepository itemRepository, UserRepository userRepository, RatingRepository ratingRepository, MainCategoryRepository mainCategoryRepository, SubCategoryRepository subCategoryRepository, CloudinaryService cloudinaryService) {
+        this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
+        this.ratingRepository = ratingRepository;
+        this.mainCategoryRepository = mainCategoryRepository;
+        this.subCategoryRepository = subCategoryRepository;
+        this.cloudinaryService = cloudinaryService;
+    }
+
     public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where(null);
+        boolean hasCriteria = false;
+
+        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
 
         if (query != null && !query.isEmpty()) {
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.like(root.get("title"), "%" + query + "%"));
+            hasCriteria = true;
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) -> {
+                String pattern = "%" + query + "%";
+                return criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("title"), pattern),
+                        criteriaBuilder.like(root.get("mainCategory").get("name"), pattern),
+                        criteriaBuilder.like(root.get("subCategory").get("name"), pattern)
+                );
+            });
+            log.info("Added query criteria");
         }
         if (country != null && !country.isEmpty()) {
+            hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get("country"), country));
+            log.info("Added country criteria");
         }
         if (city != null && !city.isEmpty()) {
+            hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get("city"), city));
+            log.info("Added city criteria");
         }
         if (minPrice != null) {
+            hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                     criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+            log.info("Added minPrice criteria");
         }
         if (maxPrice != null) {
+            hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                     criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+            log.info("Added maxPrice criteria");
         }
         if (mainCategoryId != null) {
+            hasCriteria = true;
+            List<Long> subCategoryIds = subCategoryRepository.findByMainCategoryId(mainCategoryId).stream()
+                    .map(SubCategory::getId)
+                    .collect(Collectors.toList());
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("mainCategory").get("id"), mainCategoryId));
+                    criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("mainCategory").get("id"), mainCategoryId),
+                            root.get("subCategory").get("id").in(subCategoryIds)
+                    ));
+            log.info("Added mainCategoryId criteria with subcategories: {}", subCategoryIds);
         }
         if (subCategoryId != null) {
+            hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get("subCategory").get("id"), subCategoryId));
+            log.info("Added subCategoryId criteria");
+        }
+
+        if (!hasCriteria) {
+            log.info("No search criteria provided, fetching all items");
+            return itemRepository.findAll().stream().map(item -> {
+                ItemDTO itemDTO = ItemMapper.toDTO(item);
+                User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
+                if (seller != null) {
+                    itemDTO.setUsername(seller.getUsername());
+                    Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
+                            .orElse(null);
+                    if (rating != null) {
+                        itemDTO.setTotalRating(rating.getTotalRating());
+                        itemDTO.setNumRatings(rating.getNumRatings());
+                    } else {
+                        itemDTO.setTotalRating(0);
+                        itemDTO.setNumRatings(0);
+                    }
+                }
+                return itemDTO;
+            }).collect(Collectors.toList());
         }
 
         List<Item> items = itemRepository.findAll(spec);
+        log.info("Found {} items matching criteria", items.size());
+
         return items.stream().map(item -> {
             ItemDTO itemDTO = ItemMapper.toDTO(item);
             User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
