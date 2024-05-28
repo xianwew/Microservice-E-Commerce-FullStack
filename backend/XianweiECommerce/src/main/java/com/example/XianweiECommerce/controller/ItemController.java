@@ -92,7 +92,20 @@ public class ItemController {
         return ResponseEntity.ok(items);
     }
 
-    
+    @GetMapping("/search")
+    public ResponseEntity<List<ItemDTO>> searchItems(
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "country", required = false) String country,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "mainCategoryId", required = false) Long mainCategoryId,
+            @RequestParam(value = "subCategoryId", required = false) Long subCategoryId) {
+
+        List<ItemDTO> items = itemService.searchItems(query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
+        return ResponseEntity.ok(items);
+    }
+
 }
 
 

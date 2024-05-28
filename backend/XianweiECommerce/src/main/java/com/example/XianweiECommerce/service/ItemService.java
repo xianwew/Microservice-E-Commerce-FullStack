@@ -8,6 +8,8 @@ import com.example.XianweiECommerce.repository.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -183,5 +185,58 @@ public class ItemService {
         List<Item> items = itemRepository.findAll();
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
+
+    public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+        Specification<Item> spec = Specification.where(null);
+
+        if (query != null && !query.isEmpty()) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("title"), "%" + query + "%"));
+        }
+        if (country != null && !country.isEmpty()) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("country"), country));
+        }
+        if (city != null && !city.isEmpty()) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("city"), city));
+        }
+        if (minPrice != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+        }
+        if (maxPrice != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+        if (mainCategoryId != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("mainCategory").get("id"), mainCategoryId));
+        }
+        if (subCategoryId != null) {
+            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("subCategory").get("id"), subCategoryId));
+        }
+
+        List<Item> items = itemRepository.findAll(spec);
+        return items.stream().map(item -> {
+            ItemDTO itemDTO = ItemMapper.toDTO(item);
+            User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
+            if (seller != null) {
+                itemDTO.setUsername(seller.getUsername());
+                Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
+                        .orElse(null);
+                if (rating != null) {
+                    itemDTO.setTotalRating(rating.getTotalRating());
+                    itemDTO.setNumRatings(rating.getNumRatings());
+                } else {
+                    itemDTO.setTotalRating(0);
+                    itemDTO.setNumRatings(0);
+                }
+            }
+            return itemDTO;
+        }).collect(Collectors.toList());
+    }
+
 }
 

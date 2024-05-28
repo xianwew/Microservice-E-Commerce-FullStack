@@ -47,8 +47,8 @@ CREATE TABLE sub_categories (
 -- Create Ratings table
 CREATE TABLE ratings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    entity_id BIGINT NOT NULL,
-    entity_type ENUM('product', 'seller') NOT NULL,
+    entity_id VARCHAR(255) NOT NULL,
+    entity_type ENUM('PRODUCT', 'SELLER') NOT NULL,
     total_rating INT NOT NULL,
     num_ratings INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

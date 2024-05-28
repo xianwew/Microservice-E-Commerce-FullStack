@@ -8,6 +8,7 @@ import com.example.XianweiECommerce.mapper.UserMapper;
 import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.repository.AddressRepository;
 import com.example.XianweiECommerce.repository.CardRepository;
+import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final CardRepository cardRepository;
 
+    private final RatingRepository ratingRepository;
+
     @Value("${cloudinary.avatar-upload-folder}")
     private String imageFolder;
 
@@ -40,13 +43,15 @@ public class UserService {
                        KeycloakService keycloakService,
                        CloudinaryService cloudinaryService,
                        JwtTokenProvider jwtTokenProvider,
-                       CardRepository cardRepository) {
+                       CardRepository cardRepository,
+                       RatingRepository ratingRepository) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
         this.keycloakService = keycloakService;
         this.cloudinaryService = cloudinaryService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.cardRepository = cardRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     public String createUser(UserDTO userDTO) {
@@ -66,6 +71,14 @@ public class UserService {
         String keycloakUserId = jwtTokenProvider.extractUserIdFromToken(token);
         log.info("Extracted Keycloak user ID: {}", keycloakUserId);
         user.setId(keycloakUserId); // Ensure the ID is set correctly
+
+        Rating rating = new Rating();
+        rating.setEntityId(keycloakUserId);
+        rating.setEntityType(Rating.EntityType.SELLER);
+        rating.setTotalRating(0);
+        rating.setNumRatings(0);
+        ratingRepository.save(rating);
+        log.info("Created empty rating for user with ID: {}", user.getId());
 
         userRepository.save(user);
         log.info("Successfully created a user with ID: {}", user.getId());

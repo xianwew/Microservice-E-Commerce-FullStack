@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class ItemDTO {
     private Long id;
     private String sellerId;
+    private String username; // New field for the seller's username
     private String title;
     @NotBlank(message = "Short description is mandatory")
     private String shortDescription;
@@ -38,6 +39,8 @@ public class ItemDTO {
     private LocalDateTime updatedAt;
     @Min(value = 0, message = "Quantity cannot be negative")
     private int quantity;
+    private int totalRating;
+    private int numRatings;
 }
 
 

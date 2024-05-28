@@ -4,7 +4,7 @@ import lombok.Data;
 @Data
 public class RatingDTO {
     private Long id;
-    private int entityId;
+    private String entityId;
     private String entityType;
     private int totalRating;
     private int numRatings;
