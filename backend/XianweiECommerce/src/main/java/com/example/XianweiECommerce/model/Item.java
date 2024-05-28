@@ -47,6 +47,9 @@ public class Item extends BaseEntity {
     private String city; // New field
 
     @Column(nullable = false)
+    private String state; // New field
+
+    @Column(nullable = false)
     private String country; // New field
 
     @ManyToOne

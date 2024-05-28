@@ -27,6 +27,8 @@ public class ItemDTO {
     private String subImageUrl4;
     @NotBlank(message = "City is mandatory")
     private String city;
+    @NotBlank(message = "State is mandatory")
+    private String state; // New field
     @NotBlank(message = "Country is mandatory")
     private String country;
     @NotNull(message = "Main category is mandatory")

@@ -58,6 +58,10 @@ public class ItemService {
         Rating rating = itemDTO.getRatingId() != null ?
                 ratingRepository.findById(itemDTO.getRatingId()).orElse(null) : null;
 
+        if(itemDTO.getQuantity() <= 0){
+            throw new RuntimeException("Quantity should be greater than 0!");
+        }
+
         Item item = ItemMapper.toEntity(itemDTO, seller, mainCategory, subCategory, rating);
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -192,12 +196,12 @@ public class ItemService {
         this.cloudinaryService = cloudinaryService;
     }
 
-    public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+    public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where(null);
         boolean hasCriteria = false;
 
-        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
-                query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
+        log.info("Starting search with parameters: query={}, country={}, state={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                query, country, state, minPrice, maxPrice, mainCategoryId, subCategoryId);
 
         if (query != null && !query.isEmpty()) {
             hasCriteria = true;
@@ -217,11 +221,11 @@ public class ItemService {
                     criteriaBuilder.equal(root.get("country"), country));
             log.info("Added country criteria");
         }
-        if (city != null && !city.isEmpty()) {
+        if (state != null && !state.isEmpty()) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("city"), city));
-            log.info("Added city criteria");
+                    criteriaBuilder.equal(root.get("state"), state));
+            log.info("Added state criteria");
         }
         if (minPrice != null) {
             hasCriteria = true;

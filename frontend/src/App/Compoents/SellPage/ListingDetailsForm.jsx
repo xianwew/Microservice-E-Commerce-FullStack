@@ -7,6 +7,7 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
     const [longDescription, setLongDescription] = useState(initialData?.longDescription || '');
     const [price, setPrice] = useState(initialData?.price || '');
     const [city, setCity] = useState(initialData?.city || '');
+    const [state, setState] = useState(initialData?.state || '');
     const [country, setCountry] = useState(initialData?.country || '');
     const [quantity, setQuantity] = useState(initialData?.quantity || '');
     const [selectedSubCategory, setSelectedSubCategory] = useState(initialData?.subCategoryId || '');
@@ -18,6 +19,7 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
             setLongDescription(initialData.longDescription);
             setPrice(initialData.price);
             setCity(initialData.city);
+            setState(initialData.state);
             setCountry(initialData.country);
             setQuantity(initialData.quantity);
             setSelectedSubCategory(initialData.subCategoryId);
@@ -39,6 +41,7 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
             longDescription,
             price,
             city,
+            state,
             country,
             quantity,
             mainCategoryId: selectedMainCategory,
@@ -94,15 +97,23 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                     fullWidth
                     margin="normal"
                     value={city}
-                    sx={{ width: '48%', minWidth: '80px' }}
+                    sx={{ width: '30%', minWidth: '80px' }}
                     onChange={(e) => setCity(e.target.value)}
+                />
+                <TextField
+                    label="State"
+                    fullWidth
+                    margin="normal"
+                    value={state}
+                    sx={{ width: '30%', minWidth: '80px' }}
+                    onChange={(e) => setState(e.target.value)}
                 />
                 <TextField
                     label="Country"
                     fullWidth
                     margin="normal"
                     value={country}
-                    sx={{ width: '48%', minWidth: '80px' }}
+                    sx={{ width: '30%', minWidth: '80px' }}
                     onChange={(e) => setCountry(e.target.value)}
                 />
             </div>

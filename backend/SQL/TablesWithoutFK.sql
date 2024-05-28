@@ -69,6 +69,7 @@ CREATE TABLE items (
     sub_image_url3 VARCHAR(255),
     sub_image_url4 VARCHAR(255),
     city VARCHAR(255) NOT NULL,
+	state VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
     main_category_id BIGINT NOT NULL,
     sub_category_id BIGINT NOT NULL,

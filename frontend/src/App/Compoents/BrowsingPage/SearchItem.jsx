@@ -65,7 +65,7 @@ const SearchItem = ({ result }) => {
                                 <Typography variant="h6" color="primary" >${result.price}</Typography>
                             </div>
                             <div>
-                                <Typography variant="body2" color="textSecondary">{result.city}, {result.country}</Typography>
+                                <Typography variant="body2" color="textSecondary">{result.city}, {result.state}, {result.country}</Typography>
                                 <div style={{ display: 'flex', alignItems: 'center', minHeight: '30px' }} >
                                     <Button
                                         size="small"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import FilterSidebar from '../../Compoents/BrowsingPage/FilterBar';
+import FilterSidebar from '../../Compoents/BrowsingPage/FilterSideBar';
 import SearchResults from '../../Compoents/BrowsingPage/SearchResults';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
 import SearchBar from '../../Compoents/SearchBar/SearchBar';
