@@ -3,6 +3,7 @@ import axios from 'axios';
 import { keycloakInstance, KEYCLOAK_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET } from './keycloak';
 import { useDispatch } from 'react-redux';
 import { setAuthenticated, logout as reduxLogout } from '../redux/slice/authSlice';
+import { decodeToken } from './JwtUtils';
 
 const AuthContext = createContext();
 
@@ -13,26 +14,24 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
 
-    const scheduleTokenRefresh = (expiresIn) => {
-        setTimeout(async () => {
-            try {
-                await keycloakInstance.updateToken(30);
-                const newToken = keycloakInstance.token;
-                const newRefreshToken = keycloakInstance.refreshToken;
-                setToken(newToken);
-                setRefreshToken(newRefreshToken);
-                localStorage.setItem('token', newToken);
-                localStorage.setItem('refreshToken', newRefreshToken);
-                dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-                const tokenParsed = keycloakInstance.tokenParsed;
-                if (tokenParsed) {
-                    scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now() - 60000); // Schedule the next refresh
-                }
-            } catch (error) {
-                console.error('Failed to refresh token', error);
-                handleLogout(false); // Prevents page reload on token refresh failure
+    const refresh = async () => {
+        try {
+            await keycloakInstance.updateToken(30);
+            const newToken = keycloakInstance.token;
+            const newRefreshToken = keycloakInstance.refreshToken;
+            setToken(newToken);
+            setRefreshToken(newRefreshToken);
+            localStorage.setItem('token', newToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+            dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
+            const tokenParsed = keycloakInstance.tokenParsed;
+            if (tokenParsed) {
+                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now() - 60000); // Schedule the next refresh
             }
-        }, expiresIn - 60000); // Refresh the token 1 minute before it expires
+        } catch (error) {
+            console.error('Failed to refresh token', error);
+            handleLogout(false); // Prevents page reload on token refresh failure
+        }
     };
 
     useEffect(() => {
@@ -45,7 +44,7 @@ export const AuthProvider = ({ children }) => {
                 dispatch(setAuthenticated({ isAuthenticated: true, token }));
                 const tokenParsed = keycloakInstance.tokenParsed;
                 if (tokenParsed) {
-                    scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now());
+                    setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
                 }
             } else {
                 try {
@@ -61,7 +60,7 @@ export const AuthProvider = ({ children }) => {
                         dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
                         const tokenParsed = keycloakInstance.tokenParsed;
                         if (tokenParsed) {
-                            scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now());
+                            setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
                         }
                         console.log('Logged in!');
                     } else {
@@ -89,7 +88,7 @@ export const AuthProvider = ({ children }) => {
             dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
             const tokenParsed = keycloakInstance.tokenParsed;
             if (tokenParsed) {
-                scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now());
+                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
             }
         };
 
@@ -108,7 +107,7 @@ export const AuthProvider = ({ children }) => {
                     dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
                     const tokenParsed = keycloakInstance.tokenParsed;
                     if (tokenParsed) {
-                        scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now());
+                        setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
                     }
                 }
             }).catch(() => handleLogout(true));
@@ -151,7 +150,7 @@ export const AuthProvider = ({ children }) => {
             dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
             const tokenParsed = keycloakInstance.tokenParsed;
             if (tokenParsed) {
-                scheduleTokenRefresh((tokenParsed.exp * 1000) - Date.now());
+                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
             }
         } else {
             console.error('Login failed', response.data);
@@ -169,36 +168,11 @@ export const AuthProvider = ({ children }) => {
             }
         });
 
-        handleLogout(true); // Trigger a page reload after logout
-    };
-
-
-    const verifyToken = async (token) => {
-        try {
-            const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token/introspect`, new URLSearchParams({
-                client_id: KEYCLOAK_CLIENT_ID,
-                client_secret: KEYCLOAK_CLIENT_SECRET,
-                token: token,
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
-    
-            // The response will contain an "active" field that indicates if the token is valid
-            if (response.status === 200 && response.data.active) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            console.error('Error verifying token:', error);
-            return false;
-        }
+        handleLogout(true); 
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, token, login, logout, loading, verifyToken }}>
+        <AuthContext.Provider value={{ isAuthenticated, token, login, logout, loading, refresh }}>
             {children}
         </AuthContext.Provider>
     );
