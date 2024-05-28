@@ -26,15 +26,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-//    private final RatingRepository ratingRepository;
     private final KeycloakService keycloakService;
     private final CloudinaryService cloudinaryService;
     private final JwtTokenProvider jwtTokenProvider;
     private final CardRepository cardRepository;
-
-//    private final MainCategoryRepository mainCategoryRepository;
-
-//    private final SubCategoryRepository subCategoryRepository;
 
     @Value("${cloudinary.avatar-upload-folder}")
     private String imageFolder;
