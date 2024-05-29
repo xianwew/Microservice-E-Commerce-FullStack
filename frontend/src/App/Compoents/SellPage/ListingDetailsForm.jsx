@@ -50,26 +50,30 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: '1' }}>
             <div style={{marginTop: '20px'}}>
-                <Typography variant="h6">Title</Typography>
+                <Typography variant="h6" fontWeight='bold' >Title</Typography>
                 <TextField
                     label="Listing Title"
                     fullWidth
                     margin="normal"
                     value={title}
+                    multiline
+                    rows={2}
                     onChange={(e) => setTitle(e.target.value)}
                 />
             </div>
             <Box sx={{ display: 'flex', gap: 4, width: '100%' }}>
                 <div style={{ flexDirection: 'column', flex: '1' }}>
-                    <Typography variant="h6">Description</Typography>
+                    <Typography variant="h6" fontWeight='bold'>Description</Typography>
                     <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
                         <TextField
                             label="Brief Description"
                             fullWidth
                             margin="normal"
                             value={shortDescription}
+                            multiline
+                            rows={5}
                             onChange={(e) => setShortDescription(e.target.value)}
                         />
                         <TextField
@@ -77,23 +81,22 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                             fullWidth
                             margin="normal"
                             multiline
-                            rows={9}
+                            rows={20}
                             value={longDescription}
                             onChange={(e) => setLongDescription(e.target.value)}
                         />
                     </Box>
                 </div>
-                <div style={{ flexDirection: 'column', maxWidth: '550px' }}>
+                <div style={{ flexDirection: 'column', minWidth: '300px', justifyContent: 'space-between' }}>
                     <div>
-                        <Typography variant="h6">Price & Quantity</Typography>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="h6" fontWeight='bold'>Price & Quantity</Typography>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <TextField
                                 label="Price"
                                 type="number"
                                 fullWidth
                                 margin="normal"
                                 value={price}
-                                sx={{ width: '48%' }}
                                 onChange={(e) => setPrice(e.target.value)}
                             />
                             <TextField
@@ -102,21 +105,19 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                                 fullWidth
                                 margin="normal"
                                 value={quantity}
-                                sx={{ width: '48%' }}
                                 onChange={(e) => setQuantity(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
-                        <Typography variant="h6">Item Location</Typography>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '33px' }}>
+                        <Typography variant="h6" fontWeight='bold'>Item Location</Typography>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                             <TextField
                                 label="City"
                                 fullWidth
                                 margin="normal"
                                 value={city}
-                                sx={{ width: '25%', marginRight: '20px' }}
                                 onChange={(e) => setCity(e.target.value)}
                             />
                             <TextField
@@ -124,7 +125,6 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                                 fullWidth
                                 margin="normal"
                                 value={state}
-                                sx={{ width: '25%', marginRight: '20px' }}
                                 onChange={(e) => setState(e.target.value)}
                             />
                             <TextField
@@ -138,16 +138,15 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                         </div>
                     </div>
 
-                    <div style={{ marginTop: '20px' }}>
-                        <Typography variant="h6">Category</Typography>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ marginTop: '32px' }}>
+                        <Typography variant="h6" fontWeight='bold'>Category</Typography>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <TextField
                                 label="Main Category"
                                 select
                                 fullWidth
                                 margin="normal"
                                 value={selectedMainCategory}
-                                sx={{ width: '48%' }}
                                 onChange={(e) => onMainCategoryChange(e.target.value)}
                             >
                                 {mainCategories.map((category) => (
@@ -162,7 +161,6 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                                 fullWidth
                                 margin="normal"
                                 value={selectedSubCategory}
-                                sx={{ width: '48%' }}
                                 onChange={(e) => setSelectedSubCategory(e.target.value)}
                                 disabled={!selectedMainCategory}
                             >

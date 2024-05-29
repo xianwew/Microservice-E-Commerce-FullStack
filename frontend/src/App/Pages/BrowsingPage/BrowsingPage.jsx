@@ -73,12 +73,9 @@ const BrowsePage = () => {
     }, [searchQuery, countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery]);
 
     return (
-        <div className='app-content' style={{ height: '100%', marginBottom: '40px', paddingTop: '52px' }}>
-            <div style={{ backgroundColor: '#f5f5f5', borderRadius: '25px', padding: '40px 20px 20px 0px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                <Typography variant="h5" mb={2} sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '36px' }}>
-                    Search Results
-                </Typography>
-                <div style={{ padding: '20px 40px', width: '85%', minWidth: "400px" }}>
+        <div className='app-content' style={{ width: '100%', paddingTop: '52px', backgroundColor: '#F5F9FF', boxSizing: "border-box" }}>
+            <div style={{ borderRadius: '25px', padding: '0px 20px 20px 0px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box"  }}>
+                <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px" }}>
                     <SearchBar 
                         initialQuery={searchQuery} 
                         countryQuery={countryQuery}

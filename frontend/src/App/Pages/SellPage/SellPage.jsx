@@ -55,30 +55,28 @@ const SellPage = () => {
     };
 
     return (
-        <div className='app-content' style={{ justifyContent: 'center' }}>
-            <div style={{ padding: '50px 80px 80px 80px', backgroundColor: '#fafafa' }}>
+        <Box className='app-content' sx={{ paddingTop: '50px', minHeight: 'calc(100vh - 150px)', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0px 80px' }}>
+            <div style={{ width: '100%', padding: '60px 0px' }}>
                 <Typography variant="h4" fontWeight="bold" mb={1} textAlign='center'>Create a New Listing</Typography>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div style={{ width: '25%', minWidth: '380px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', gap: 4 }}>
+                    <Box sx={{ width: '15%', minWidth: '200px' }}>
                         <ImageUpload
                             initialCoverImage={coverImage}
                             initialAdditionalImages={additionalImages}
                             onCoverImageUpload={handleCoverImageUpload}
                             onAdditionalImagesUpload={handleAdditionalImagesUpload}
                         />
-                    </div>
-                    <div style={{ flex: '1' }}>
-                        <ListingDetailsForm
-                            mainCategories={mainCategories}
-                            subCategories={subCategories}
-                            onMainCategoryChange={handleMainCategoryChange}
-                            selectedMainCategory={selectedMainCategory}
-                            onSubmit={handleSubmit}
-                        />
-                    </div>
-                </div>
+                    </Box>
+                    <ListingDetailsForm
+                        mainCategories={mainCategories}
+                        subCategories={subCategories}
+                        onMainCategoryChange={handleMainCategoryChange}
+                        selectedMainCategory={selectedMainCategory}
+                        onSubmit={handleSubmit}
+                    />
+                </Box>
             </div>
-        </div>
+        </Box>
     );
 };
 

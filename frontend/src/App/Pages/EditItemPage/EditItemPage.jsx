@@ -1,4 +1,4 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Grid, Button, Box } from '@mui/material';
 import ImageUpload from '../../Compoents/SellPage/ImageUpload';
@@ -67,7 +67,7 @@ const EditItemPage = () => {
             console.log('Listing updated:', updatedListing);
             dispatch(showSnackbar({ open: true, message: 'Listing updated successfully!', severity: 'success' }));
             navigate('/');
-        } 
+        }
         catch (error) {
             console.error('Failed to update listing:', error);
             const errorMessage = error.response?.data || 'Failed to update listing.';
@@ -102,19 +102,19 @@ const EditItemPage = () => {
     }
 
     return (
-        <div className='app-content' style={{ justifyContent: 'center' }}>
-            <div style={{ padding: '50px 80px 80px 80px', backgroundColor: '#fafafa' }}>
-                <Typography variant="h4" fontWeight="bold" mb={6} textAlign='center'>Edit Listing</Typography>
-                <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <div style={{width: '25%', minWidth: '380px'}}>
+        <Box className='app-content' sx={{ paddingTop: '50px', minHeight: 'calc(100vh - 150px)', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0px 80px' }}>
+            <div style={{ width: '100%', padding: '60px 0px 0px 0px' }}>
+                <Typography variant="h4" fontWeight="bold" mb={1} textAlign='center'>Edit Listing</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', gap: 4 }}>
+                    <Box sx={{ width: '15%', minWidth: '200px', marginRight: '20px' }}>
                         <ImageUpload
                             initialCoverImage={coverImage}
                             initialAdditionalImages={additionalImages}
                             onCoverImageUpload={handleCoverImageUpload}
                             onAdditionalImagesUpload={handleAdditionalImagesUpload}
                         />
-                    </div>
-                    <div style={{flex: '1'}}>
+                    </Box>
+                    <div style={{ flex: '1' }}>
                         <ListingDetailsForm
                             mainCategories={mainCategories}
                             subCategories={subCategories}
@@ -129,7 +129,7 @@ const EditItemPage = () => {
                             </Button>
                         </Box>
                     </div>
-                </div>
+                </Box>
             </div>
             <ConfirmDeletion
                 open={openDialog}
@@ -138,7 +138,7 @@ const EditItemPage = () => {
                 title="Confirm Deletion"
                 message="Are you sure you want to delete this item? This action cannot be undone."
             />
-        </div>
+        </Box>
     );
 };
 

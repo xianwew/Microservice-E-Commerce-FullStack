@@ -44,7 +44,7 @@ const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageU
     };
 
     return (
-        <Box>
+        <Box sx={{paddingTop: '16px'}}>
             <Box mb={2}>
                 <Typography variant="h5" mb={1} sx={{ fontWeight: "bold" }}>Cover Image</Typography>
                 <Box

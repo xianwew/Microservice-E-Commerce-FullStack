@@ -42,7 +42,7 @@ export default function HomePage() {
     }, []);
 
     return (
-        <div className="app-content" style={{ paddingTop: '30px' }}>
+        <div className="app-content" style={{ paddingTop: '30px', backgroundColor: 'rgba(0, 0, 0, 0)' }}>
             <div style={{ margin: '20px 0px' }}>
                 <SearchBar />
             </div>

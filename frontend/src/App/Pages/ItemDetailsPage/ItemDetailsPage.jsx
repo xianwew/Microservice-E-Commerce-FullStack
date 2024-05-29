@@ -68,7 +68,7 @@ const ItemDetailsPage = () => {
     };
 
     return (
-        <Container className='app-content' style={{ minWidth: '100%', backgroundColor: '#fafafa' }}>
+        <Container className='app-content' style={{ minWidth: '100%' }}>
             <Box sx={{ padding: '40px 60px', width: '100%', boxSizing: 'border-box' }}>
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 6 }}>
                     <Box sx={{ flex: 1 }}>

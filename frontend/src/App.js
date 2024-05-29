@@ -52,7 +52,7 @@ export default function App() {
         <AuthProvider>
             <Router>
                 <Header />
-                <div className={`app-container`}>
+                <div className='app-container'>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/browse" element={<BrowsePage />} />
