@@ -3,24 +3,21 @@ import { Box, Button, Typography, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CardInfoCard from './CardInfoCard';
 import { fetchUserCards, createUserCard, updateUserCard, deleteUserCard } from '../../service/UserService';
-import store from '../../redux/store/store';
 import { decodeToken } from '../../Auth/JwtUtils';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const PaymentTab = () => {
     const [cards, setCards] = useState([]);
-    const state = store.getState();
-    const token = state.auth.token;
-    const decoded = decodeToken(token);
-    const userId = decoded.sub;
+    const token = useSelector((state) => state.auth.token);
     const dispatch = useDispatch();
 
     useEffect(() => {
         const loadCards = async () => {
             try {
-                let userCards = await fetchUserCards(userId);
+                let userCards = await fetchUserCards(decodeToken(token).sub);
                 userCards = userCards.map((userCard) => ({
                     ...userCard,
                     tempId: uuidv4(),
@@ -33,8 +30,10 @@ const PaymentTab = () => {
             }
         };
 
-        loadCards();
-    }, [userId]);
+        if(token){
+            loadCards();
+        }
+    }, [token]);
 
     const handleAddNewCardComponent = () => {
         const newCard = { tempId: uuidv4(), cardholderName: '', cardNumber: '', expirationDate: '', billingAddress: '', type: '' };
@@ -43,7 +42,7 @@ const PaymentTab = () => {
 
     const handleAddCard = async (newCard) => {
         try {
-            await createUserCard(userId, newCard);
+            await createUserCard(decodeToken(token).sub, newCard);
             setCards(cards.map(card => (card.tempId === newCard.tempId ? newCard : card)));
         } catch (error) {
             console.error('Failed to add card:', error);
@@ -54,7 +53,7 @@ const PaymentTab = () => {
 
     const handleEditCard = async (updatedCard) => {
         try {
-            await updateUserCard(userId, updatedCard.id, updatedCard);
+            await updateUserCard(decodeToken(token).sub, updatedCard.id, updatedCard);
             setCards(cards.map(card => (card.tempId === updatedCard.tempId ? updatedCard : card)));
         } catch (error) {
             console.error('Failed to update card:', error);
@@ -65,7 +64,7 @@ const PaymentTab = () => {
 
     const handleRemoveCard = async (id, tempId) => {
         try {
-            await deleteUserCard(userId, id);
+            await deleteUserCard(decodeToken(token).sub, id);
             setCards(cards.filter(card => card.tempId !== tempId));
         } catch (error) {
             console.error('Failed to delete card:', error);
