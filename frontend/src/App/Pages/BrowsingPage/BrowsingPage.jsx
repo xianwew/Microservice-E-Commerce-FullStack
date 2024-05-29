@@ -54,7 +54,15 @@ const BrowsePage = () => {
     useEffect(() => {
         const fetchSearchResults = async () => {
             try {
-                const data = await SearchService.searchItems(searchQuery, countryQuery, stateQuery, parseFloat(minPriceQuery), parseFloat(maxPriceQuery), mainCategoryQuery, subCategoryQuery);
+                const data = await SearchService.searchItems(
+                    searchQuery,
+                    countryQuery,
+                    stateQuery,
+                    parseFloat(minPriceQuery),
+                    parseFloat(maxPriceQuery),
+                    mainCategoryQuery,
+                    subCategoryQuery
+                );
                 setResults(data);
             } catch (error) {
                 console.error('Error fetching search results:', error);
@@ -71,7 +79,15 @@ const BrowsePage = () => {
                     Search Results
                 </Typography>
                 <div style={{ padding: '20px 40px', width: '85%', minWidth: "400px" }}>
-                    <SearchBar initialQuery={searchQuery} />
+                    <SearchBar 
+                        initialQuery={searchQuery} 
+                        countryQuery={countryQuery}
+                        stateQuery={stateQuery}
+                        minPriceQuery={minPriceQuery}
+                        maxPriceQuery={maxPriceQuery}
+                        mainCategoryQuery={mainCategoryQuery}
+                        subCategoryQuery={subCategoryQuery}
+                    />
                 </div>
                 <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%' }}>
                     <FilterSidebar

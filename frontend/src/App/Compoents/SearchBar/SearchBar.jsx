@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
 
-const SearchBar = ({ initialQuery = '' }) => {
+const SearchBar = ({ initialQuery = '', countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery }) => {
     const [inputValue, setInputValue] = useState(initialQuery);
     const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
@@ -14,8 +14,7 @@ const SearchBar = ({ initialQuery = '' }) => {
             try {
                 const data = await SearchService.fetchSuggestions(query);
                 setSuggestions(data);
-            } 
-            catch (error) {
+            } catch (error) {
                 console.error('Error fetching suggestions:', error);
             }
         };
@@ -28,21 +27,25 @@ const SearchBar = ({ initialQuery = '' }) => {
     }, [inputValue]);
 
     const handleSearch = () => {
-        if (inputValue.trim() === '') {
-            navigate(`/browse`);
-        } 
-        else {
-            navigate(`/browse?query=${inputValue}`);
-        }
+        const params = new URLSearchParams();
+        if (inputValue.trim() !== '') params.set('query', inputValue);
+        if (countryQuery) params.set('country', countryQuery);
+        if (stateQuery) params.set('state', stateQuery);
+        if (minPriceQuery) params.set('minPrice', minPriceQuery);
+        if (maxPriceQuery) params.set('maxPrice', maxPriceQuery);
+        if (mainCategoryQuery && mainCategoryQuery !== 'all') params.set('mainCategory', mainCategoryQuery);
+        if (subCategoryQuery && subCategoryQuery !== 'all') params.set('subCategory', subCategoryQuery);
+
+        navigate(`/browse?${params.toString()}`);
     };
 
     const handleAutocompleteChange = (event, newValue) => {
         if (newValue && newValue.title) {
             setInputValue(newValue.title);
-            navigate(`/browse?query=${newValue.title}`);
+            handleSearch();
         } else if (newValue && typeof newValue === 'string') {
             setInputValue(newValue);
-            navigate(`/browse?query=${newValue}`);
+            handleSearch();
         }
     };
 
