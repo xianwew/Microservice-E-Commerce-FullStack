@@ -15,14 +15,15 @@ const BrowsePage = () => {
     const query = useQuery();
     const searchQuery = query.get('query') || '';
     const [results, setResults] = useState([]);
-    const [mainCategories, setMainCategories] = useState(['All']);
-    const [subCategories, setSubCategories] = useState(['All']);
+    const [mainCategories, setMainCategories] = useState([{ id: 'all', name: 'All' }]);
+    const [subCategories, setSubCategories] = useState([]);
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const mainCategoriesData = await fetchMainCategories();
-                setMainCategories(['All', ...mainCategoriesData]);
+                setMainCategories(mainCategoriesData);
+                // setMainCategories([{ id: 'all', name: 'All' }, ...mainCategoriesData]);
             } catch (error) {
                 console.error('Error fetching main categories:', error);
             }
@@ -33,8 +34,13 @@ const BrowsePage = () => {
 
     const fetchSubCategoriesForMainCategory = async (mainCategoryId) => {
         try {
+            if (mainCategoryId === 'all') {
+                setSubCategories([{ id: 'all', name: 'All' }]);
+                return;
+            }
             const subCategoriesData = await fetchSubCategories(mainCategoryId);
-            setSubCategories(['All', ...subCategoriesData]);
+            setSubCategories(subCategoriesData);
+            // setSubCategories([{ id: 'all', name: 'All' }, ...subCategoriesData]);
         } catch (error) {
             console.error('Error fetching sub categories:', error);
         }
@@ -66,6 +72,7 @@ const BrowsePage = () => {
                     <FilterSidebar
                         mainCategories={mainCategories}
                         subCategories={subCategories}
+                        setSubCategories={setSubCategories}
                         fetchSubCategories={fetchSubCategoriesForMainCategory}
                     />
                     <SearchResults results={results} />
