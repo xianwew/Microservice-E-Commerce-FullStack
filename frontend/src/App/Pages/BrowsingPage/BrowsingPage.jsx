@@ -14,6 +14,13 @@ const useQuery = () => {
 const BrowsePage = () => {
     const query = useQuery();
     const searchQuery = query.get('query') || '';
+    const mainCategoryQuery = query.get('mainCategory') || 'all';
+    const subCategoryQuery = query.get('subCategory') || 'all';
+    const minPriceQuery = query.get('minPrice') || '';
+    const maxPriceQuery = query.get('maxPrice') || '';
+    const stateQuery = query.get('state') || '';
+    const countryQuery = query.get('country') || '';
+
     const [results, setResults] = useState([]);
     const [mainCategories, setMainCategories] = useState([{ id: 'all', name: 'All' }]);
     const [subCategories, setSubCategories] = useState([]);
@@ -22,8 +29,7 @@ const BrowsePage = () => {
         const fetchCategories = async () => {
             try {
                 const mainCategoriesData = await fetchMainCategories();
-                setMainCategories(mainCategoriesData);
-                // setMainCategories([{ id: 'all', name: 'All' }, ...mainCategoriesData]);
+                setMainCategories([{ id: 'all', name: 'All' }, ...mainCategoriesData]);
             } catch (error) {
                 console.error('Error fetching main categories:', error);
             }
@@ -39,8 +45,7 @@ const BrowsePage = () => {
                 return;
             }
             const subCategoriesData = await fetchSubCategories(mainCategoryId);
-            setSubCategories(subCategoriesData);
-            // setSubCategories([{ id: 'all', name: 'All' }, ...subCategoriesData]);
+            setSubCategories([{ id: 'all', name: 'All' }, ...subCategoriesData]);
         } catch (error) {
             console.error('Error fetching sub categories:', error);
         }
@@ -49,7 +54,7 @@ const BrowsePage = () => {
     useEffect(() => {
         const fetchSearchResults = async () => {
             try {
-                const data = await SearchService.searchItems(searchQuery);
+                const data = await SearchService.searchItems(searchQuery, countryQuery, stateQuery, parseFloat(minPriceQuery), parseFloat(maxPriceQuery), mainCategoryQuery, subCategoryQuery);
                 setResults(data);
             } catch (error) {
                 console.error('Error fetching search results:', error);
@@ -57,7 +62,7 @@ const BrowsePage = () => {
         };
 
         fetchSearchResults();
-    }, [searchQuery]);
+    }, [searchQuery, countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery]);
 
     return (
         <div className='app-content' style={{ height: '100%', marginBottom: '40px', paddingTop: '52px' }}>

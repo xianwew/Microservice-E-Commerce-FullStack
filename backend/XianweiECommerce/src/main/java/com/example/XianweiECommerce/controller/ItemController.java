@@ -117,10 +117,22 @@ public class ItemController {
             @RequestParam(value = "city", required = false) String city,
             @RequestParam(value = "minPrice", required = false) Double minPrice,
             @RequestParam(value = "maxPrice", required = false) Double maxPrice,
-            @RequestParam(value = "mainCategoryId", required = false) Long mainCategoryId,
-            @RequestParam(value = "subCategoryId", required = false) Long subCategoryId) {
+            @RequestParam(value = "mainCategoryId", required = false) String mainCategoryId,
+            @RequestParam(value = "subCategoryId", required = false) String subCategoryId) {
 
-        List<ItemDTO> items = itemService.searchItems(query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
+        log.info("Start querying!" + mainCategoryId + subCategoryId);
+        mainCategoryId = mainCategoryId != null? ((mainCategoryId.equals("all")? null: mainCategoryId)) : null;
+        subCategoryId = subCategoryId != null? ((subCategoryId.equals("all")? null: subCategoryId)) : null;
+        long mainCategoryIdLong = -1;
+        long subCategoryIdLong = -1;
+        if(mainCategoryId != null){
+            mainCategoryIdLong = Long.parseLong(mainCategoryId);
+        }
+        if(subCategoryId != null){
+            subCategoryIdLong = Long.parseLong(subCategoryId);
+        }
+
+        List<ItemDTO> items = itemService.searchItems(query, country, city, minPrice, maxPrice, mainCategoryIdLong == -1? null: mainCategoryIdLong, subCategoryIdLong == -1? null: subCategoryIdLong);
         return ResponseEntity.ok(items);
     }
 

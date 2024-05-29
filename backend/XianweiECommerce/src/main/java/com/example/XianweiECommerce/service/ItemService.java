@@ -262,43 +262,50 @@ public class ItemService {
         Specification<Item> spec = Specification.where(null);
         boolean hasCriteria = false;
 
-        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
-                query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
+        // Normalize and validate inputs
+        final String finalQuery = query != null ? query.trim() : "";
+        final String finalCountry = country != null ? country.trim() : "";
+        final String finalCity = city != null ? city.trim() : "";
+        final Double finalMinPrice = (minPrice != null && minPrice >= 0) ? minPrice : null;
+        final Double finalMaxPrice = (maxPrice != null && maxPrice >= 0) ? maxPrice : null;
 
-        if (query != null && !query.isEmpty()) {
+        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                finalQuery, finalCountry, finalCity, finalMinPrice, finalMaxPrice, mainCategoryId, subCategoryId);
+
+        if (!finalQuery.isEmpty() && !"all".equalsIgnoreCase(finalQuery)) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) -> {
-                String pattern = "%" + query + "%";
+                String pattern = "%" + finalQuery.toLowerCase() + "%";
                 return criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("title"), pattern),
-                        criteriaBuilder.like(root.get("mainCategory").get("name"), pattern),
-                        criteriaBuilder.like(root.get("subCategory").get("name"), pattern)
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("mainCategory").get("name")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("subCategory").get("name")), pattern)
                 );
             });
             log.info("Added query criteria");
         }
-        if (country != null && !country.isEmpty()) {
+        if (!finalCountry.isEmpty() && !"all".equalsIgnoreCase(finalCountry)) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("country"), country));
+                    criteriaBuilder.equal(root.get("country"), finalCountry));
             log.info("Added country criteria");
         }
-        if (city != null && !city.isEmpty()) {
+        if (!finalCity.isEmpty() && !"all".equalsIgnoreCase(finalCity)) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("city"), city));
+                    criteriaBuilder.equal(root.get("city"), finalCity));
             log.info("Added city criteria");
         }
-        if (minPrice != null) {
+        if (finalMinPrice != null) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), finalMinPrice));
             log.info("Added minPrice criteria");
         }
-        if (maxPrice != null) {
+        if (finalMaxPrice != null) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), finalMaxPrice));
             log.info("Added maxPrice criteria");
         }
         if (mainCategoryId != null) {
