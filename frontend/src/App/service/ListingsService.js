@@ -34,11 +34,6 @@ export const fetchItems = async () => {
     return response.data;
 };
 
-export const fetchItem = async (itemId) => {
-    const response = await axiosInstance.get(`/api/item/${itemId}`);
-    return response.data;
-};
-
 export const updateItem = async (itemId, itemData, coverImage, additionalImages) => {
     const formData = new FormData();
     if (coverImage) {
@@ -86,4 +81,15 @@ export const deleteItem = async (itemId) => {
     });
 
     return response.data;
+};
+
+export const fetchItem = async (itemId) => {
+    try {
+        const response = await axiosInstance.get(`/api/item/${itemId}`);
+        console.log('fetching item. id: ' + itemId);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item:', error);
+        throw error;
+    }
 };

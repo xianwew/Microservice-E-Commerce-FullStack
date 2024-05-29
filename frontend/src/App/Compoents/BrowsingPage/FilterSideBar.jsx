@@ -58,12 +58,24 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
     const handlePriceChange = (event) => {
         const { name, value } = event.target;
         setPriceRange((prevRange) => {
-            const newRange = { ...prevRange, [name]: value };
-            if (name === 'min' && newRange.max && value > newRange.max) {
-                newRange.max = value;
-            } else if (name === 'max' && newRange.min && value < newRange.min) {
-                newRange.min = value;
+            let newRange = { ...prevRange, [name]: value };
+    
+            if (name === 'min') {
+                if (!newRange.max || parseFloat(value) > parseFloat(newRange.max)) {
+                    newRange.max = value;
+                }
+                if (value === '') {
+                    newRange.max = '';
+                }
+            } else if (name === 'max') {
+                if (!newRange.min || parseFloat(value) < parseFloat(newRange.min)) {
+                    newRange.min = value;
+                }
+                if (value === '') {
+                    newRange.min = '';
+                }
             }
+    
             return newRange;
         });
     };

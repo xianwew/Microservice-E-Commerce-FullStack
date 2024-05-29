@@ -29,6 +29,16 @@ export const fetchUser = async () => {
     }
 };
 
+export const fetchSeller = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/api/user/${id}`, {});
+        return response.data.user;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+};
+
 export const saveUserProfile = async ({ user, file }) => {
     const formData = new FormData();
     formData.append('user', new Blob([JSON.stringify({

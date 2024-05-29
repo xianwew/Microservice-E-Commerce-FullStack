@@ -15,22 +15,46 @@ export const AuthProvider = ({ children }) => {
     const dispatch = useDispatch();
 
     const refresh = async () => {
+        const currentRefreshToken = localStorage.getItem('refreshToken');
+        if (!currentRefreshToken) {
+            console.error('No refresh token available');
+            return;
+        }
+
+        console.log('token refreshed!');
         try {
-            await keycloakInstance.updateToken(30);
-            const newToken = keycloakInstance.token;
-            const newRefreshToken = keycloakInstance.refreshToken;
-            setToken(newToken);
-            setRefreshToken(newRefreshToken);
-            localStorage.setItem('token', newToken);
-            localStorage.setItem('refreshToken', newRefreshToken);
-            dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-            const tokenParsed = keycloakInstance.tokenParsed;
-            if (tokenParsed) {
-                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now() - 60000); // Schedule the next refresh
+            const response = await axios.post(`${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`, new URLSearchParams({
+                client_id: KEYCLOAK_CLIENT_ID,
+                client_secret: KEYCLOAK_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token: currentRefreshToken
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            if (response.status === 200) {
+                const newToken = response.data.access_token;
+                const newRefreshToken = response.data.refresh_token;
+                setToken(newToken);
+                setRefreshToken(newRefreshToken);
+                localStorage.setItem('token', newToken);
+                localStorage.setItem('refreshToken', newRefreshToken);
+                dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
+
+                const tokenParsed = decodeToken(newToken); // Assuming you have a parseJwt function
+                if (tokenParsed) {
+                    const timeout = (tokenParsed.exp * 1000) - Date.now() - 60000;
+                    setTimeout(refresh, timeout);
+                }
+            } else {
+                console.error('Token refresh failed', response.data);
+                handleLogout(false); // Optionally handle automatic logout if refresh fails
             }
         } catch (error) {
-            console.error('Failed to refresh token', error);
-            handleLogout(false); // Prevents page reload on token refresh failure
+            console.error('Error refreshing token', error);
+            handleLogout(false); // Optionally handle automatic logout if refresh fails
         }
     };
 
@@ -42,9 +66,11 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 setLoading(false);
                 dispatch(setAuthenticated({ isAuthenticated: true, token }));
-                const tokenParsed = keycloakInstance.tokenParsed;
+
+                const tokenParsed = decodeToken(token);
                 if (tokenParsed) {
-                    setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
+                    const timeout = (tokenParsed.exp * 1000) - Date.now() - 60000; // Refresh 1 minute before expiry
+                    setTimeout(refresh, timeout);
                 }
             } else {
                 try {
@@ -58,13 +84,9 @@ export const AuthProvider = ({ children }) => {
                         localStorage.setItem('refreshToken', newRefreshToken);
                         setIsAuthenticated(true);
                         dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-                        const tokenParsed = keycloakInstance.tokenParsed;
-                        if (tokenParsed) {
-                            setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
-                        }
-                        console.log('Logged in!');
+
                     } else {
-                        handleLogout(false); // Prevents page reload if not authenticated
+                        handleLogout(false);
                     }
                     setLoading(false);
                     console.log('Keycloak initialized!');
@@ -73,46 +95,16 @@ export const AuthProvider = ({ children }) => {
                     setLoading(false);
                 }
             }
-        };
-
-        initializeKeycloak();
-
-        keycloakInstance.onAuthSuccess = () => {
-            const newToken = keycloakInstance.token;
-            const newRefreshToken = keycloakInstance.refreshToken;
-            setToken(newToken);
-            setRefreshToken(newRefreshToken);
-            localStorage.setItem('token', newToken);
-            localStorage.setItem('refreshToken', newRefreshToken);
-            setIsAuthenticated(true);
-            dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-            const tokenParsed = keycloakInstance.tokenParsed;
+            
+            const tokenParsed = decodeToken(token);
             if (tokenParsed) {
-                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
+                const timeout = (tokenParsed.exp * 1000) - Date.now() - 60000; // Refresh 1 minute before expiry
+                setTimeout(refresh, timeout);
             }
         };
 
-        keycloakInstance.onAuthError = () => handleLogout(true);
-        keycloakInstance.onAuthLogout = () => handleLogout(true);
-
-        keycloakInstance.onTokenExpired = () => {
-            keycloakInstance.updateToken(30).then(refreshed => {
-                if (refreshed) {
-                    const newToken = keycloakInstance.token;
-                    const newRefreshToken = keycloakInstance.refreshToken;
-                    setToken(newToken);
-                    setRefreshToken(newRefreshToken);
-                    localStorage.setItem('token', newToken);
-                    localStorage.setItem('refreshToken', newRefreshToken);
-                    dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-                    const tokenParsed = keycloakInstance.tokenParsed;
-                    if (tokenParsed) {
-                        setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
-                    }
-                }
-            }).catch(() => handleLogout(true));
-        };
-    }, [dispatch, token, refreshToken]);
+        initializeKeycloak();
+    }, [dispatch]);
 
     const handleLogout = (shouldReload) => {
         setIsAuthenticated(false);
@@ -122,7 +114,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('refreshToken');
         dispatch(reduxLogout());
         if (shouldReload) {
-            window.location.reload(); // Trigger a page reload after logout
+            window.location.reload();
         }
     };
 
@@ -148,9 +140,10 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('refreshToken', newRefreshToken);
             setIsAuthenticated(true);
             dispatch(setAuthenticated({ isAuthenticated: true, token: newToken }));
-            const tokenParsed = keycloakInstance.tokenParsed;
+            const tokenParsed = decodeToken(newToken);
             if (tokenParsed) {
-                setTimeout(refresh, (tokenParsed.exp * 1000) - Date.now());
+                const timeout = (tokenParsed.exp * 1000) - Date.now() - 60000; // Refresh 1 minute before expiry
+                setTimeout(refresh, timeout);
             }
         } else {
             console.error('Login failed', response.data);
@@ -168,7 +161,7 @@ export const AuthProvider = ({ children }) => {
             }
         });
 
-        handleLogout(true); 
+        handleLogout(true);
     };
 
     return (
