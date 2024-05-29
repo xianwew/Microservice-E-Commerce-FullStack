@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -49,7 +51,8 @@ public class ItemController {
     }
 
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ItemDTO> updateItem(@Valid @PathVariable Long id, @RequestPart("item") String itemJson,
+    public ResponseEntity<ItemDTO> updateItem(@Valid @PathVariable Long id,
+                                              @RequestPart("item") String itemJson,
                                               @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
                                               @RequestPart(value = "subImageFiles", required = false) List<MultipartFile> subImageFiles,
                                               @RequestHeader("Authorization") String token) throws IOException {
@@ -63,7 +66,22 @@ public class ItemController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        ItemDTO updatedItem = itemService.updateItem(id, itemDTO, imageFile, subImageFiles);
+        List<String> subImageURLs = new ArrayList<>();
+        if(itemDTO.getSubImageUrl1() != null && !itemDTO.getSubImageUrl1().isEmpty()){
+            subImageURLs.add(itemDTO.getSubImageUrl1());
+        }
+        if(itemDTO.getSubImageUrl2() != null && !itemDTO.getSubImageUrl2().isEmpty()){
+            subImageURLs.add(itemDTO.getSubImageUrl2());
+        }
+        if(itemDTO.getSubImageUrl3() != null && !itemDTO.getSubImageUrl3().isEmpty()){
+            subImageURLs.add(itemDTO.getSubImageUrl3());
+        }
+        if(itemDTO.getSubImageUrl4() != null && !itemDTO.getSubImageUrl4().isEmpty()){
+            subImageURLs.add(itemDTO.getSubImageUrl4());
+        }
+
+        log.info("ItemSubImagesDTO: " + subImageURLs.toString());
+        ItemDTO updatedItem = itemService.updateItem(id, itemDTO, imageFile, subImageFiles, subImageURLs);
         return ResponseEntity.ok(updatedItem);
     }
 

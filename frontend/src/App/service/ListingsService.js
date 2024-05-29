@@ -7,6 +7,7 @@ export const createListing = async (itemData, coverImage, additionalImages) => {
         type: 'application/json'
     }));
 
+    
     if (coverImage) {
         formData.append('imageFile', coverImage);
     }
@@ -40,18 +41,27 @@ export const fetchItem = async (itemId) => {
 
 export const updateItem = async (itemId, itemData, coverImage, additionalImages) => {
     const formData = new FormData();
-    formData.append('item', new Blob([JSON.stringify(itemData)], {
-        type: 'application/json'
-    }));
-
     if (coverImage) {
         formData.append('imageFile', coverImage);
     }
 
-    additionalImages.forEach((file) => {
+    const existingImageUrls = additionalImages.filter(img => typeof img === 'string');
+    const additionalImageObjs = additionalImages.filter(img => img instanceof File);
+    additionalImageObjs.forEach((file) => {
         formData.append('subImageFiles', file);
     });
 
+    for (let i = 0; i < 4; i++) {
+        itemData[`subImageUrl${i + 1}`] = null;
+    }
+    
+    for (let i = 0; i < existingImageUrls.length; i++) {
+        itemData[`subImageUrl${i + 1}`] = existingImageUrls[i];
+    }
+
+    formData.append('item', new Blob([JSON.stringify(itemData)], {
+        type: 'application/json'
+    }));
     const state = store.getState();
     const token = state.auth.token;
 

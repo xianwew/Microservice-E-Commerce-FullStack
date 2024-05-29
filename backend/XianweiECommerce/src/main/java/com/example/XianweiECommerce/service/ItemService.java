@@ -44,6 +44,54 @@ public class ItemService {
         this.cloudinaryService = cloudinaryService;
     }
 
+    private void uploadSubImages(Item existingItem, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
+        // Clear existing sub-image URLs
+        existingItem.setSubImageUrl1(null);
+        existingItem.setSubImageUrl2(null);
+        existingItem.setSubImageUrl3(null);
+        existingItem.setSubImageUrl4(null);
+        int index = 0;
+        for(String s: subImageFileURLs){
+            switch (index) {
+                case 0:
+                    existingItem.setSubImageUrl1(s);
+                    break;
+                case 1:
+                    existingItem.setSubImageUrl2(s);
+                    break;
+                case 2:
+                    existingItem.setSubImageUrl3(s);
+                    break;
+                case 3:
+                    existingItem.setSubImageUrl4(s);
+                    break;
+            }
+            index++;
+        }
+
+        if(subImageFiles != null){
+            for(MultipartFile o: subImageFiles){
+                Map<String, Object> uploadResult = cloudinaryService.uploadFile(o.getBytes(), imageFolder);
+                String s = (String) uploadResult.get("url");
+                switch (index) {
+                    case 0:
+                        existingItem.setSubImageUrl1(s);
+                        break;
+                    case 1:
+                        existingItem.setSubImageUrl2(s);
+                        break;
+                    case 2:
+                        existingItem.setSubImageUrl3(s);
+                        break;
+                    case 3:
+                        existingItem.setSubImageUrl4(s);
+                        break;
+                }
+                index++;
+            }
+        }
+    }
+
     public ItemDTO createItem(ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
         log.info("saving new listing!");
         User seller = userRepository.findById(itemDTO.getSellerId()).orElseThrow(
@@ -93,7 +141,7 @@ public class ItemService {
         return ItemMapper.toDTO(savedItem);
     }
 
-    public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
+    public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
         Item existingItem = itemRepository.findById(itemId).orElseThrow(
                 () -> new ResourceNotFoundException("Item", "id", itemId.toString())
         );
@@ -119,27 +167,37 @@ public class ItemService {
             throw new IllegalArgumentException("Cover image is required.");
         }
 
-        if (subImageFiles != null && !subImageFiles.isEmpty()) {
-            if (subImageFiles.size() > 0) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(0).getBytes(), imageFolder);
-                existingItem.setSubImageUrl1((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 1) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(1).getBytes(), imageFolder);
-                existingItem.setSubImageUrl2((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 2) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(2).getBytes(), imageFolder);
-                existingItem.setSubImageUrl3((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 3) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(3).getBytes(), imageFolder);
-                existingItem.setSubImageUrl4((String) uploadResult.get("url"));
-            }
-        }
-
+        uploadSubImages(existingItem, subImageFiles, subImageFileURLs);
         Item updatedItem = itemRepository.save(existingItem);
         return ItemMapper.toDTO(updatedItem);
+    }
+
+    private void deleteNonMatchingSubImages(Item existingItem, List<Object> subImageFiles) throws IOException {
+        List<String> subImageUrls = subImageFiles.stream()
+                .filter(file -> file instanceof String)
+                .map(Object::toString)
+                .toList();
+
+        if (existingItem.getSubImageUrl1() != null && !subImageUrls.contains(existingItem.getSubImageUrl1())) {
+            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl1());
+            cloudinaryService.deleteFile(publicId, imageFolder);
+            existingItem.setSubImageUrl1(null);
+        }
+        if (existingItem.getSubImageUrl2() != null && !subImageUrls.contains(existingItem.getSubImageUrl2())) {
+            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl2());
+            cloudinaryService.deleteFile(publicId, imageFolder);
+            existingItem.setSubImageUrl2(null);
+        }
+        if (existingItem.getSubImageUrl3() != null && !subImageUrls.contains(existingItem.getSubImageUrl3())) {
+            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl3());
+            cloudinaryService.deleteFile(publicId, imageFolder);
+            existingItem.setSubImageUrl3(null);
+        }
+        if (existingItem.getSubImageUrl4() != null && !subImageUrls.contains(existingItem.getSubImageUrl4())) {
+            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl4());
+            cloudinaryService.deleteFile(publicId, imageFolder);
+            existingItem.setSubImageUrl4(null);
+        }
     }
 
     public void deleteItem(Long itemId) throws IOException {
@@ -196,12 +254,12 @@ public class ItemService {
         this.cloudinaryService = cloudinaryService;
     }
 
-    public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+    public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where(null);
         boolean hasCriteria = false;
 
-        log.info("Starting search with parameters: query={}, country={}, state={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
-                query, country, state, minPrice, maxPrice, mainCategoryId, subCategoryId);
+        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                query, country, city, minPrice, maxPrice, mainCategoryId, subCategoryId);
 
         if (query != null && !query.isEmpty()) {
             hasCriteria = true;
@@ -221,11 +279,11 @@ public class ItemService {
                     criteriaBuilder.equal(root.get("country"), country));
             log.info("Added country criteria");
         }
-        if (state != null && !state.isEmpty()) {
+        if (city != null && !city.isEmpty()) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("state"), state));
-            log.info("Added state criteria");
+                    criteriaBuilder.equal(root.get("city"), city));
+            log.info("Added city criteria");
         }
         if (minPrice != null) {
             hasCriteria = true;

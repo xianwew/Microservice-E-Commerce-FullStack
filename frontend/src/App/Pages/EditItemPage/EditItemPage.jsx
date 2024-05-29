@@ -62,11 +62,13 @@ const EditItemPage = () => {
     const handleSubmit = async (updatedItemData) => {
         try {
             dispatch(showSnackbar({ open: true, message: 'Updating listing...', severity: 'info' }));
+            console.log('Additional images updated:', additionalImages);
             const updatedListing = await updateItem(itemId, updatedItemData, coverImage, additionalImages);
             console.log('Listing updated:', updatedListing);
             dispatch(showSnackbar({ open: true, message: 'Listing updated successfully!', severity: 'success' }));
             navigate('/');
-        } catch (error) {
+        } 
+        catch (error) {
             console.error('Failed to update listing:', error);
             const errorMessage = error.response?.data || 'Failed to update listing.';
             dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
