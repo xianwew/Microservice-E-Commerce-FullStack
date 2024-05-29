@@ -5,6 +5,7 @@ import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
 import SearchBar from '../../Compoents/SearchBar/SearchBar';
 import { useLocation } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
+import { fetchMainCategories, fetchSubCategories } from '../../service/CategoryService';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -14,6 +15,30 @@ const BrowsePage = () => {
     const query = useQuery();
     const searchQuery = query.get('query') || '';
     const [results, setResults] = useState([]);
+    const [mainCategories, setMainCategories] = useState(['All']);
+    const [subCategories, setSubCategories] = useState(['All']);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const mainCategoriesData = await fetchMainCategories();
+                setMainCategories(['All', ...mainCategoriesData]);
+            } catch (error) {
+                console.error('Error fetching main categories:', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    const fetchSubCategoriesForMainCategory = async (mainCategoryId) => {
+        try {
+            const subCategoriesData = await fetchSubCategories(mainCategoryId);
+            setSubCategories(['All', ...subCategoriesData]);
+        } catch (error) {
+            console.error('Error fetching sub categories:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -38,7 +63,11 @@ const BrowsePage = () => {
                     <SearchBar initialQuery={searchQuery} />
                 </div>
                 <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%' }}>
-                    <FilterSidebar />
+                    <FilterSidebar
+                        mainCategories={mainCategories}
+                        subCategories={subCategories}
+                        fetchSubCategories={fetchSubCategoriesForMainCategory}
+                    />
                     <SearchResults results={results} />
                 </div>
             </div>

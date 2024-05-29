@@ -5,6 +5,7 @@ import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.ItemMapper;
 import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.repository.*;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -92,7 +93,7 @@ public class ItemService {
         }
     }
 
-    public ItemDTO createItem(ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
+    public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
         log.info("saving new listing!");
         User seller = userRepository.findById(itemDTO.getSellerId()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "id", itemDTO.getSellerId())
@@ -108,6 +109,9 @@ public class ItemService {
 
         if(itemDTO.getQuantity() <= 0){
             throw new RuntimeException("Quantity should be greater than 0!");
+        }
+        if(itemDTO.getPrice() <= 0){
+            throw new RuntimeException("Price should be greater than 0!");
         }
 
         Item item = ItemMapper.toEntity(itemDTO, seller, mainCategory, subCategory, rating);

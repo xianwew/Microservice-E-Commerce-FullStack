@@ -1,31 +1,16 @@
 import React, { useState } from 'react';
 import { Box, Typography, FormGroup, FormControlLabel, Checkbox, Button, Select, MenuItem, TextField } from '@mui/material';
 
-const filterCategories = [
-    {
-        title: 'Screen Size',
-        options: ['13-13.9 in', '14-14.9 in', '15-15.9 in', '16-16.9 in', 'Not Specified'],
-    },
-    {
-        title: 'Processor',
-        options: ['AMD Ryzen 5', 'AMD Ryzen 7', 'AMD Ryzen 9', 'Intel Core i7 11th Gen.', 'Intel Core i7 12th Gen.', 'Intel Core i7 13th Gen.'],
-    },
-    {
-        title: 'Brand',
-        options: ['Acer', 'ASUS', 'Dell', 'GIGABYTE', 'HP', 'MSI'],
-    },
-];
-
-const FilterSidebar = () => {
-    const [mainCategories, setMainCategories] = useState(['All']);
-    const [subCategories, setSubCategories] = useState(['All']);
+const FilterSidebar = ({ mainCategories, subCategories, fetchSubCategories }) => {
     const [mainCategorySelection, setMainCategorySelection] = useState('');
     const [subCategorySelection, setSubCategorySelection] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     const [location, setLocation] = useState({ state: '', country: '' });
 
     const handleMainCategoryChange = (event) => {
-        setMainCategorySelection(event.target.value);
+        const selectedMainCategory = event.target.value;
+        setMainCategorySelection(selectedMainCategory);
+        fetchSubCategories(selectedMainCategory.id); // Assuming mainCategory is an object with an id property
     };
 
     const handleSubCategoryChange = (event) => {
@@ -50,7 +35,7 @@ const FilterSidebar = () => {
         <Box sx={{ width: "10%", minWidth: '300px', boxSizing: 'border-box', display: 'flex', justifyContent: 'center', paddingTop: '55px' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Box mb={2}>
-                    <Typography variant="h6">Main Category</Typography>
+                    <Typography variant="h6" mb={1}>Main Category</Typography>
                     <Select
                         value={mainCategorySelection}
                         onChange={handleMainCategoryChange}
@@ -59,13 +44,15 @@ const FilterSidebar = () => {
                         sx={{ mb: 1 }}
                     >
                         {mainCategories.map((category, idx) => (
-                            <MenuItem key={idx} value={category}>{category}</MenuItem>
+                            <MenuItem key={idx} value={category}>
+                                {category.name}
+                            </MenuItem>
                         ))}
                     </Select>
                 </Box>
 
                 <Box mb={2}>
-                    <Typography variant="h6">Sub Category</Typography>
+                    <Typography variant="h6" mb={1}>Sub Category</Typography>
                     <Select
                         value={subCategorySelection}
                         onChange={handleSubCategoryChange}
@@ -74,13 +61,15 @@ const FilterSidebar = () => {
                         sx={{ mb: 1 }}
                     >
                         {subCategories.map((category, idx) => (
-                            <MenuItem key={idx} value={category}>{category}</MenuItem>
+                            <MenuItem key={idx} value={category}>
+                                {category.name}
+                            </MenuItem>
                         ))}
                     </Select>
                 </Box>
 
                 <Box mb={2}>
-                    <Typography variant="h6">Price</Typography>
+                    <Typography variant="h6" mb={1}>Price</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <TextField
                             label="Min Price"
@@ -101,7 +90,7 @@ const FilterSidebar = () => {
                 </Box>
 
                 <Box mb={2}>
-                    <Typography variant="h6">Location</Typography>
+                    <Typography variant="h6" mb={1}>Location</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <TextField
                             label="State"
@@ -126,4 +115,3 @@ const FilterSidebar = () => {
 };
 
 export default FilterSidebar;
-
