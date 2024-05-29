@@ -16,54 +16,61 @@ import CartPage from './App/Pages/CartPage/CartPage';
 import UserReceiptPage from './App/Pages/UserReceiptPage/UserReceiptPage';
 import EditItemPage from './App/Pages/EditItemPage/EditItemPage';
 import CheckoutPage from './App/Pages/CheckoutPage/CheckoutPage';
-import { setAuthenticated } from './App/redux/slice/authSlice';
 import { showSnackbar } from './App/redux/slice/snackbarSlice';
 import SnackbarComponent from './App/Compoents/SnackBars/SnackbarComponent';
 import { fetchUser } from './App/service/UserService';
+import { logout as reduxLogout }from './App/redux/slice/authSlice'
 import { setUser } from './App/redux/slice/authSlice';
 
+
 export default function App() {
-  const token = useSelector(state => state.auth.token);
-  const dispatch = useDispatch();
+    const token = useSelector(state => state.auth.token);
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-      const fetchUserData = async () => {
-          if (token) {
-              try {
-                  const userData = await fetchUser();
-                  dispatch(setUser({ user: userData }));
-              } catch (error) {
-                  console.error('Error fetching user data:', error);
-              }
-          }
-      };
 
-      fetchUserData();
-  }, [token, dispatch]);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (token) {
+                try {
+                    const userData = await fetchUser();
+                    dispatch(setUser({ user: userData }));
+                } 
+                catch (error) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                    dispatch(reduxLogout());
+                    dispatch(showSnackbar({ open: true, message: "Session Expired, Please login again!", severity: 'error' }));
+                    console.error('Error fetching user data:', error);
+                }
+            }
+        };
 
-  return (
-      <AuthProvider>
-          <Router>
-              <Header />
-              <div className={`app-container`}>
-                  <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/browse" element={<BrowsePage />} />
-                      <Route path="/item/:id" element={<ItemDetailsPage />} />
-                      <Route element={<ProtectedRoute />}>
-                          <Route path="/item/:itemId/edit" element={<EditItemPage />} />
-                          <Route path="/receipt/:receiptId" element={<UserReceiptPage />} />
-                          <Route path="/profile" element={<UserProfilePage />} />
-                          <Route path="/sell" element={<SellPage />} />
-                          <Route path="/cart" element={<CartPage />} />
-                          <Route path="/checkout" element={<CheckoutPage />} />
-                      </Route>
-                      <Route path="/seller-profile/:id" element={<SellerProfilePage />} />
-                  </Routes>
-              </div>
-              <Footer />
-              <SnackbarComponent />
-          </Router>
-      </AuthProvider>
-  );
+        fetchUserData();
+    }, [token, dispatch]);
+
+    return (
+        <AuthProvider>
+            <Router>
+                <Header />
+                <div className={`app-container`}>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/browse" element={<BrowsePage />} />
+                        <Route path="/item/:id" element={<ItemDetailsPage />} />
+                        <Route element={<ProtectedRoute />}>
+                            <Route path="/item/:itemId/edit" element={<EditItemPage />} />
+                            <Route path="/receipt/:receiptId" element={<UserReceiptPage />} />
+                            <Route path="/profile" element={<UserProfilePage />} />
+                            <Route path="/sell" element={<SellPage />} />
+                            <Route path="/cart" element={<CartPage />} />
+                            <Route path="/checkout" element={<CheckoutPage />} />
+                        </Route>
+                        <Route path="/seller-profile/:id" element={<SellerProfilePage />} />
+                    </Routes>
+                </div>
+                <Footer />
+                <SnackbarComponent />
+            </Router>
+        </AuthProvider>
+    );
 }
