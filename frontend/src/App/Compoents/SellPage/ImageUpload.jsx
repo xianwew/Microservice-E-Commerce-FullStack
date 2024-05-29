@@ -3,7 +3,7 @@ import { Box, Typography, IconButton } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const MAX_IMAGES = 5;
+const MAX_IMAGES = 4;
 
 const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageUpload, onAdditionalImagesUpload }) => {
     const [coverImage, setCoverImage] = useState(initialCoverImage || null);
