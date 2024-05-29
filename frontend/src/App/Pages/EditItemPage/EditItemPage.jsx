@@ -122,7 +122,7 @@ const EditItemPage = () => {
                             initialData={itemData}
                         />
                         <Box display="flex" justifyContent="flex-end" mt={2}>
-                            <Button variant="contained" color="error" onClick={handleOpenDialog} sx={{ marginRight: '30px', height: '42.25px' }}>
+                            <Button variant="contained" color="error" onClick={handleOpenDialog} sx={{ marginRight: '120px', height: '42.25px', transform: 'translateY(-58px)' }}>
                                 Delete Listing
                             </Button>
                         </Box>

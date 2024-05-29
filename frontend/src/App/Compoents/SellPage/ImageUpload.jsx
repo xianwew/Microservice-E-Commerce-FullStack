@@ -45,9 +45,8 @@ const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageU
 
     return (
         <Box>
-            <Typography variant="h5" mb={2} sx={{ marginTop: '15px', fontWeight: "bold" }}>Upload Images</Typography>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1} sx={{ fontWeight: "bold" }}>Cover Image</Typography>
+                <Typography variant="h5" mb={1} sx={{ fontWeight: "bold" }}>Cover Image</Typography>
                 <Box
                     component="label"
                     display="flex"
@@ -89,7 +88,7 @@ const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageU
                 </Box>
             </Box>
             <Box mb={2}>
-                <Typography variant="subtitle1" mb={1} sx={{ fontWeight: "bold" }}>Additional Images</Typography>
+                <Typography variant="h5" mb={1} sx={{ fontWeight: "bold" }}>Additional Images</Typography>
                 <Box display="flex" flexWrap="wrap" gap="30px">
                     {additionalImages.map((image, index) => (
                         <Box

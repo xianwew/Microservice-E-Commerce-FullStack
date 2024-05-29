@@ -62,7 +62,7 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                 />
             </div>
             <Box sx={{ display: 'flex', gap: 4, width: '100%' }}>
-                <div style={{ flexDirection: 'column', flex: '1', marginTop: '20px' }}>
+                <div style={{ flexDirection: 'column', flex: '1' }}>
                     <Typography variant="h6">Description</Typography>
                     <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
                         <TextField
@@ -83,9 +83,9 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
                         />
                     </Box>
                 </div>
-                <div style={{ flexDirection: 'column', maxWidth: '550px', marginTop: '20px' }}>
+                <div style={{ flexDirection: 'column', maxWidth: '550px' }}>
                     <div>
-                        <Typography variant="h6">Description</Typography>
+                        <Typography variant="h6">Price & Quantity</Typography>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <TextField
                                 label="Price"
