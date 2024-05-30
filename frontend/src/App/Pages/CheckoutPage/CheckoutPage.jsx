@@ -1,89 +1,61 @@
-import React from 'react';
-import { Box, Grid, Typography, RadioGroup, FormControlLabel, Radio, Button, Card, CardContent, CardMedia, FormControl, Select, MenuItem } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import { Box, Grid, Typography } from '@mui/material';
+import SummuryCard from '../../Compoents/CheckoutPage/SummuryCard';
+import AddressBox from '../../Compoents/CheckoutPage/AddressBox';
+import PaymentSelection from '../../Compoents/CheckoutPage/PaymentSelection';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadCartItems } from '../../redux/slice/cartSlice';
+import { fetchUserCards } from '../../service/UserService';
 
 const CheckoutPage = () => {
-    const navigate = useNavigate();
-    const [paymentMethod, setPaymentMethod] = React.useState('');
-    const [shippingMethod, setShippingMethod] = React.useState('');
+    const user = useSelector((state) => state.auth.user);
+    const cart = useSelector((state) => state.cart);
+    const dispatch = useDispatch();
 
-    const handlePaymentChange = (event) => {
-        setPaymentMethod(event.target.value);
+    const [cards, setCards] = useState([]);
+
+    useEffect(() => {
+        if (user?.id) {
+            dispatch(loadCartItems(user.id));
+
+            const getUserCards = async () => {
+                try {
+                    const fetchedCards = await fetchUserCards(user.id);
+                    setCards(fetchedCards);
+                } catch (error) {
+                    console.error('Error fetching user cards:', error);
+                }
+            };
+
+            getUserCards();
+        }
+    }, [user, dispatch]);
+
+    const calculateTotalPrice = () => {
+        return cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
     };
 
-    const handleShippingChange = (event) => {
-        setShippingMethod(event.target.value);
-    };
+    if (cart.status === 'loading') {
+        return <div>Loading...</div>;
+    }
+
+    if (cart.status === 'failed') {
+        return <div>Error loading cart</div>;
+    }
 
     return (
-        <div className='app-content' style={{backgroundColor: '#fafafa', width: '100vw'}}>
-            <div style={{ padding: '50px', marginTop:'50px' }}>
+        <div className='app-content' style={{ backgroundColor: '#fafafa', width: '100vw' }}>
+            <div style={{ padding: '50px', marginTop: '50px', width: '100%', boxSizing: 'border-box' }}>
                 <Typography variant="h3" fontWeight='bold' textAlign='center'>Checkout</Typography>
-                <Box display="flex" justifyContent="center" padding={4} mt={3} >
-                    <Grid container spacing={4} maxWidth="1200px">
-                        <Grid item xs={12} md={8} >
-                            <Box marginBottom={3}>
-                                <Typography variant="h6" fontWeight='bold'>Pay with</Typography>
-                                <RadioGroup value={paymentMethod} onChange={handlePaymentChange}>
-                                    <FormControlLabel value="visa" control={<Radio />} label="Visa ending in 0993" />
-                                    <FormControlLabel value="mastercard" control={<Radio />} label="Mastercard ending in 2166" />
-                                    <FormControlLabel value="paypal" control={<Radio />} label="PayPal" />
-                                    <FormControlLabel value="googlePay" control={<Radio />} label="Google Pay" />
-                                </RadioGroup>
-                                <Button variant="outlined" onClick={() => navigate('/user')} sx={{marginTop:'10px'}}>Add new payment method</Button>
-                            </Box>
-                            <hr/>
-                            <Box marginBottom={3}>
-                                <Typography variant="h6" fontWeight='bold'>Ship to</Typography>
-                                <Typography variant="body1">Xianwei Wu</Typography>
-                                <Typography variant="body1">4318 Wakefield Dr</Typography>
-                                <Typography variant="body1">Annandale, VA 22003-3611</Typography>
-                                <Typography variant="body1">United States</Typography>
-                                <Typography variant="body1">(949) 490-8098</Typography>
-                                <Button variant="outlined" onClick={() => navigate('/user')} sx={{marginTop:'10px'}}>Change address</Button>
-                            </Box>
-                            <hr/>
-                            <Box marginBottom={3}>
-                                <Typography variant="h6" fontWeight='bold'>Delivery</Typography>
-                                <RadioGroup value={shippingMethod} onChange={handleShippingChange}>
-                                    <FormControlLabel value="economy" control={<Radio />} label="Est. delivery: May 29 - May 31 ($5.99 Economy Shipping)" />
-                                    <FormControlLabel value="standard" control={<Radio />} label="Est. delivery: May 29 - May 31 ($17.25 Standard Shipping)" />
-                                    <FormControlLabel value="expedited" control={<Radio />} label="Est. delivery: May 28 - May 30 ($38.89 Expedited Shipping)" />
-                                </RadioGroup>
-                            </Box>
+                <Box display="flex" justifyContent="center" padding={4} mt={3}>
+                    <Grid container spacing={4} >
+                        <Grid item xs={12} md={8}>
+                            <PaymentSelection cards={cards} />
+                            <hr />
+                            <AddressBox address={user?.address} />
                         </Grid>
                         <Grid item xs={12} md={4}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6">Order Summary</Typography>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="body1">Item 1</Typography>
-                                        <Typography variant="body1">$109.99</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="body1">Quantity: 1</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="body1">Subtotal</Typography>
-                                        <Typography variant="body1">$109.99</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="body1">Shipping</Typography>
-                                        <Typography variant="body1">$5.99</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="body1">Tax</Typography>
-                                        <Typography variant="body1">$6.60</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                                        <Typography variant="h6">Order total</Typography>
-                                        <Typography variant="h6">$122.58</Typography>
-                                    </Box>
-                                    <Button variant="contained" color="primary" fullWidth>
-                                        Confirm and pay
-                                    </Button>
-                                </CardContent>
-                            </Card>
+                            <SummuryCard items={cart?.items} total={calculateTotalPrice()} />
                         </Grid>
                     </Grid>
                 </Box>

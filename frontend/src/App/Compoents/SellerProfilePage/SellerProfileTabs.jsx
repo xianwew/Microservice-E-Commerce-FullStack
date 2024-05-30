@@ -3,7 +3,7 @@ import { Box, Tabs, Tab } from '@mui/material';
 import SellerItems from './SellerItems';
 import SellerFeedback from './SellerFeedback';
 
-const SellerProfileTabs = () => {
+const SellerProfileTabs = (seller) => {
     const [tabIndex, setTabIndex] = useState(0);
 
     const handleTabChange = (event, newValue) => {
@@ -17,8 +17,8 @@ const SellerProfileTabs = () => {
                 <Tab label="Recent Feedbacks" />
             </Tabs>
             <Box mt={2}>
-                {tabIndex === 0 && <SellerItems />}
-                {tabIndex === 1 && <SellerFeedback />}
+                {tabIndex === 0 && <SellerItems seller={seller}/>}
+                {tabIndex === 1 && <SellerFeedback seller={seller}/>}
             </Box>
         </Box>
     );

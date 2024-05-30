@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, CardMedia, Grid, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { fetchItems } from '../../service/ListingsService';
 
 const sampleItems = [
     {
@@ -37,13 +38,33 @@ const sampleItems = [
     },
 ];
 
-const SellerItems = () => {
+const SellerItems = ({ seller }) => {
     const navigate = useNavigate();
+    const [items, setItems] = useState([]);
+    const userId = seller.seller.id;
+    
+    useEffect(() => {
+        const getItems = async () => {
+            try {
+                if(!userId){
+                    return;
+                }
+                const fetchedItems = await fetchItems(userId);
+                setItems(fetchedItems);
+                console.log(fetchedItems);
+            } 
+            catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        };
+
+        getItems();
+    }, [userId]);
 
     return (
         <Box>
             <Grid container spacing={2}>
-                {sampleItems.map((item) => (
+                {items.map((item) => (
                     <Grid item xs={12} key={item.id}>
                         <Card>
                             <Grid container>
@@ -51,7 +72,7 @@ const SellerItems = () => {
                                     <CardMedia
                                         component="img"
                                         alt={item.title}
-                                        image={item.image}
+                                        image={item.imageUrl}
                                         sx={{
                                             width: '230px',
                                             height: '230px',
