@@ -48,14 +48,19 @@ const CheckoutPage = () => {
             <div style={{ padding: '50px', marginTop: '50px', width: '100%', boxSizing: 'border-box' }}>
                 <Typography variant="h3" fontWeight='bold' textAlign='center'>Checkout</Typography>
                 <Box display="flex" justifyContent="center" padding={4} mt={3}>
-                    <Grid container spacing={4} >
+                    <Grid container spacing={4} maxWidth="1200px">
                         <Grid item xs={12} md={8}>
                             <PaymentSelection cards={cards} />
                             <hr />
                             <AddressBox address={user?.address} />
                         </Grid>
                         <Grid item xs={12} md={4}>
-                            <SummuryCard items={cart?.items} total={calculateTotalPrice()} />
+                            <SummuryCard 
+                                items={cart.items} 
+                                total={calculateTotalPrice()} 
+                                cards={cards} 
+                                address={user?.address} 
+                            />
                         </Grid>
                     </Grid>
                 </Box>

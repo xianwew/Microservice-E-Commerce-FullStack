@@ -1,12 +1,20 @@
 import { Box, Typography, RadioGroup, FormControlLabel, Radio, Button } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const PaymentSelection = ({ cards }) => {
-    const [paymentMethod, setPaymentMethod] = React.useState('');
+    const [paymentMethod, setPaymentMethod] = React.useState(cards.length > 0 ? cards[0].id : '');
+    
+    useEffect(() => {
+        if (cards.length > 0) {
+            setPaymentMethod(cards[0].id);
+        }
+    }, [cards]);
+
     const handlePaymentChange = (event) => {
         setPaymentMethod(event.target.value);
     };
+
     const navigate = useNavigate();
 
     return (
@@ -18,7 +26,7 @@ const PaymentSelection = ({ cards }) => {
                         key={index} 
                         value={card.id} 
                         control={<Radio />} 
-                        label={`${card.cardholderName}'s ${card.type} ending in ${card.cardNumber.slice(-4)}`} 
+                        label={`${card.cardholderName}'s ${card.type} card ending in ${card.cardNumber.slice(-4)}`} 
                     />
                 ))}
             </RadioGroup>

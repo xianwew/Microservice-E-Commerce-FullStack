@@ -17,7 +17,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
                 </Box>
                 <Box>
                     <Typography variant="h6">
-                        <Link href={`/item/${item.id}`} underline="hover">{item.title}</Link>
+                        <Link href={`/item/${item.itemId}`} underline="hover">{item.title}</Link>
                     </Typography>
                     <Typography variant="body2" color="textSecondary">{item.condition}</Typography>
                     <Typography variant="body2" color="textSecondary">{item.shipping}</Typography>
