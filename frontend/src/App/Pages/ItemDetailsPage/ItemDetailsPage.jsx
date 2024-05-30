@@ -81,7 +81,7 @@ const ItemDetailsPage = () => {
         } 
         catch (error) {
             console.error('Error adding item to cart:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to add item to cart', severity: 'error' }));
+            dispatch(showSnackbar({ open: true, message: 'Failed to add item to cart! ' + error.response.data, severity: 'error' }));
         }
     };
 

@@ -3,7 +3,10 @@ package com.example.XianweiECommerce.controller;
 import com.example.XianweiECommerce.dto.CartDTO;
 import com.example.XianweiECommerce.dto.CartItemInputDTO;
 import com.example.XianweiECommerce.dto.CartItemOutputDTO;
+import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
+import com.example.XianweiECommerce.model.Item;
+import com.example.XianweiECommerce.repository.ItemRepository;
 import com.example.XianweiECommerce.service.CartService;
 import com.example.XianweiECommerce.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +23,14 @@ public class CartController {
     private final CartService cartService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final ItemRepository itemRepository;
 
     @Autowired
-    public CartController(CartService cartService, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public CartController(CartService cartService, JwtTokenProvider jwtTokenProvider, UserService userService, ItemRepository itemRepository) {
         this.cartService = cartService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.itemRepository = itemRepository;
     }
 
     @PostMapping
@@ -70,6 +75,17 @@ public class CartController {
     @PostMapping("/items")
     public ResponseEntity<CartItemOutputDTO> addItemToCart(@RequestBody CartItemInputDTO cartItemDTO, @RequestHeader("Authorization") String token) {
         String userId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));
+
+        // Query the item table to get the seller ID using the item ID
+        Item item = itemRepository.findById(cartItemDTO.getItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", cartItemDTO.getItemId().toString()));
+        String sellerId = item.getSeller().getId();
+
+        // Compare the seller ID with the extracted user ID
+        if (userId.equals(sellerId)) {
+            throw new InvalidDataAccessApiUsageException("You cannot add your own product to your cart");
+        }
+
         CartDTO cartDTO = cartService.ensureCartExists(userId);
         cartItemDTO.setCartId(cartDTO.getId());
 

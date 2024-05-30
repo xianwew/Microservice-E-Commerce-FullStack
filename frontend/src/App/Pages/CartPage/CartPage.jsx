@@ -25,7 +25,8 @@ const sampleRecommendations = [
 
 const Cart = () => {
     const dispatch = useDispatch();
-    const cartItems = useSelector((state) => state.cart.items) || []; // Ensure cartItems is always an array
+    const cartItems = useSelector((state) => state.cart?.items) || [];
+    const cartId = useSelector((state) => state.cart.cartId); // Select cartId from the state
     const currentUserId = useSelector((state) => state.auth.user?.id);
 
     useEffect(() => {
@@ -47,17 +48,17 @@ const Cart = () => {
     };
 
     const calculateTotal = () => {
-        return cartItems.reduce((total, item) => total + item.quantity * item.price, 0); // Only call reduce if cartItems is defined and not empty
+        return cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
     };
 
     return (
-        <div className='app-content'>
+        <div className='app-content' >
             <Typography variant="h3" mb={4} sx={{ paddingTop: '50px', boxSizing: 'border-box', fontWeight: 'bold', textAlign: 'center' }}>
                 Shopping Cart
             </Typography>
-            <Box display="flex" justifyContent="space-between" mb={1}>
-                <Box flex={3} mr={2} sx={{ backgroundColor: '#fafafa', borderRadius: '25px' }}>
-                    {cartItems && cartItems.length > 0 ? (
+            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px'}}>
+                <div style={{ backgroundColor: '#fafafa', borderRadius: '25px', flex: '1', marginRight: '30px' }}>
+                    {cartItems && cartItems.length > 0 ?
                         cartItems.map(item => (
                             <CartItem
                                 key={item.id}
@@ -66,14 +67,12 @@ const Cart = () => {
                                 onRemove={handleRemove}
                             />
                         ))
-                    ) : (
-                        <Typography variant="h6" sx={{ textAlign: 'center', padding: '20px' }}>
-                            Your cart is empty.
-                        </Typography>
-                    )}
-                </Box>
+                        :
+                        <p style={{width: '100%', textAlign: 'center', fontSize: '20px'}}>Your cart is empty.</p>
+                    }
+                </div>
                 <CartTotal total={calculateTotal()} />
-            </Box>
+            </div>
             <Divider sx={{ my: 4 }} />
             <Typography variant="h5" mb={2}>Recommended for you</Typography>
             <Grid container spacing={2}>

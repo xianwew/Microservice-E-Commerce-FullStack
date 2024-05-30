@@ -45,6 +45,15 @@ public class ItemService {
         this.cloudinaryService = cloudinaryService;
     }
 
+    public List<ItemDTO> getItemsByUserId(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId)
+        );
+        List<Item> items = itemRepository.findBySellerId(user.getId());
+        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+    }
+
+
     private void uploadSubImages(Item existingItem, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
         // Clear existing sub-image URLs
         existingItem.setSubImageUrl1(null);

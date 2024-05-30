@@ -105,8 +105,14 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDTO>> getAllItems() {
-        List<ItemDTO> items = itemService.getAllItems();
+    public ResponseEntity<List<ItemDTO>> getAllItems(
+            @RequestParam(value = "userId", required = false) String userId) {
+        List<ItemDTO> items;
+        if (userId != null) {
+            items = itemService.getItemsByUserId(userId);
+        } else {
+            items = itemService.getAllItems();
+        }
         return ResponseEntity.ok(items);
     }
 

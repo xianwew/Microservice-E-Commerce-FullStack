@@ -6,6 +6,7 @@ import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import ConfirmDeletion from '../ConfirmDialog/ConfirmDeletion';
 import emptyBox from '../../assets/images/profilePage/emptyBox.png'
+import { useSelector } from 'react-redux';
 
 function ItemsOnSale() {
     const [items, setItems] = useState([]);
@@ -13,11 +14,12 @@ function ItemsOnSale() {
     const [itemToDelete, setItemToDelete] = useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const userId = useSelector(state => state.auth.user?.id);
 
     useEffect(() => {
         const loadItems = async () => {
             try {
-                const itemsData = await fetchItems();
+                const itemsData = await fetchItems(userId);
                 setItems(itemsData);
             } catch (error) {
                 console.error('Failed to fetch items:', error);
@@ -25,7 +27,7 @@ function ItemsOnSale() {
         };
 
         loadItems();
-    }, []);
+    }, [userId]);
 
     const handleEdit = (itemId) => {
         navigate(`/item/${itemId}/edit`);

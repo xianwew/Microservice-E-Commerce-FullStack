@@ -29,8 +29,9 @@ export const createListing = async (itemData, coverImage, additionalImages) => {
     return response.data;
 };
 
-export const fetchItems = async () => {
-    const response = await axiosInstance.get('/api/item');
+export const fetchItems = async (userId) => {
+    const url = userId ? `/api/item?userId=${userId}` : '/api/item';
+    const response = await axiosInstance.get(url);
     return response.data;
 };
 

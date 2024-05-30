@@ -21,7 +21,7 @@ import SnackbarComponent from './App/Compoents/SnackBars/SnackbarComponent';
 import { fetchUser } from './App/service/UserService';
 import { logout as reduxLogout }from './App/redux/slice/authSlice'
 import { setUser } from './App/redux/slice/authSlice';
-
+import { clearCart } from './App/redux/slice/cartSlice';
 
 export default function App() {
     const token = useSelector(state => state.auth.token);
@@ -39,6 +39,7 @@ export default function App() {
                     localStorage.removeItem('token');
                     localStorage.removeItem('refreshToken');
                     dispatch(reduxLogout());
+                    dispatch(clearCart()); // Clear the cart state on logout
                     dispatch(showSnackbar({ open: true, message: "Session Expired, Please login again!", severity: 'error' }));
                     console.error('Error fetching user data:', error);
                 }

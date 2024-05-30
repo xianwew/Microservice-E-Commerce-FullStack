@@ -39,6 +39,12 @@ const cartSlice = createSlice({
         setCartItems(state, action) {
             state.items = action.payload.cartItems;
             state.cartId = action.payload.id; // Set cartId from the action payload
+        },
+        clearCart(state) { // Add clearCart action
+            state.items = [];
+            state.cartId = null;
+            state.status = 'idle';
+            state.error = null;
         }
     },
     extraReducers: (builder) => {
@@ -56,12 +62,12 @@ const cartSlice = createSlice({
                 state.error = action.payload;
             })
             .addCase(updateCartState.fulfilled, (state, action) => {
-                state.items = action.payload.cartItemsInput;
+                state.items = action.payload.cartItemsOutput;
                 state.cartId = action.payload.id; // Set cartId from the action payload
             });
     }
 });
 
-export const { setCartItems } = cartSlice.actions;
+export const { setCartItems, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
