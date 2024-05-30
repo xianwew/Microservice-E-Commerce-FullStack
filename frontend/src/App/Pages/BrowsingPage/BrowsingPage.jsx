@@ -73,9 +73,9 @@ const BrowsePage = () => {
     }, [searchQuery, countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery]);
 
     return (
-        <div className='app-content' style={{ width: '100%', paddingTop: '52px', backgroundColor: '#F5F9FF', boxSizing: "border-box" }}>
-            <div style={{ borderRadius: '25px', padding: '0px 20px 20px 0px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box"  }}>
-                <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px" }}>
+        <div className='app-content' style={{ width: '100%', paddingTop: '52px', boxSizing: "border-box" }}>
+            <div style={{ borderRadius: '25px',  display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box" }}>
+                <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px"}}>
                     <SearchBar 
                         initialQuery={searchQuery} 
                         countryQuery={countryQuery}
@@ -86,7 +86,7 @@ const BrowsePage = () => {
                         subCategoryQuery={subCategoryQuery}
                     />
                 </div>
-                <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%' }}>
+                <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%'}}>
                     <FilterSidebar
                         mainCategories={mainCategories}
                         subCategories={subCategories}

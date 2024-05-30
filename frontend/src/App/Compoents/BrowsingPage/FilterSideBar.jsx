@@ -88,7 +88,7 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
     };
 
     return (
-        <Box sx={{ width: "10%", minWidth: '300px', boxSizing: 'border-box', display: 'flex', justifyContent: 'center', paddingTop: '55px' }}>
+        <Box sx={{ width: "10%", minWidth: '320px', display: 'flex', justifyContent: 'center', paddingTop: '55px', backgroundColor: '#fafafa', borderRadius: '25px', padding: '40px 0px', marginRight: '15px' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Box mb={2}>
                     <Typography variant="h6" mb={1}>Main Category</Typography>

@@ -4,7 +4,7 @@ import { Grid } from '@mui/material';
 
 const SearchResults = ({ results }) => {
     return (
-        <div style={{ flex: '1', padding: '0px 30px 0px 20px', boxSizing: 'border-box' }}>
+        <div style={{ flex: '1', padding: '0px 0px 0px 20px', boxSizing: 'border-box' }}>
             <Grid container spacing={2}>
                 {results.map((result, index) => (
                     <SearchItem key={index} result={result} />
