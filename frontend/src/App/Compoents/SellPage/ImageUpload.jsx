@@ -87,7 +87,7 @@ const ImageUpload = ({ initialCoverImage, initialAdditionalImages, onCoverImageU
                     )}
                 </Box>
             </Box>
-            <Box mb={2}>
+            <Box mb={2} sx={{marginTop: '40px'}}>
                 <Typography variant="h5" mb={1} sx={{ fontWeight: "bold" }}>Additional Images</Typography>
                 <Box display="flex" flexWrap="wrap" gap="30px">
                     {additionalImages.map((image, index) => (

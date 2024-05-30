@@ -93,3 +93,13 @@ export const fetchItem = async (itemId) => {
         throw error;
     }
 };
+
+export const fetchItemFeedbacks = async (itemId) => {
+    try {
+        const response = await axiosInstance.get(`/api/feedback/item/${itemId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item feedbacks:', error);
+        throw error;
+    }
+};

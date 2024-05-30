@@ -8,6 +8,7 @@ CREATE TABLE users (
     phone_number VARCHAR(20),
     address_id BIGINT,
     rating_id BIGINT,
+    cart_id BIGINT,
     profile_picture_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -139,7 +140,6 @@ CREATE TABLE cart_items (
     cart_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
     quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

@@ -1,13 +1,19 @@
 import React from 'react';
-import { Box, Typography, Link, IconButton, TextField } from '@mui/material';
+import { Box, Typography, Link, CardMedia, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const CartItem = ({ item, onQuantityChange, onRemove }) => {
+    console.log(item);
     return (
         <Box display="flex" alignItems="center" p={2} mb={2} borderBottom={1} borderColor="grey.300">
             <Box display="flex" alignItems="center" flexGrow={1}>
                 <Box sx={{ width: 100, height: 100, overflow: 'hidden', mr: 2 }}>
-                    <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <CardMedia
+                        component="img"
+                        image={item.imageUrl}
+                        alt={item.title}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                 </Box>
                 <Box>
                     <Typography variant="h6">
@@ -23,17 +29,16 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
                             value={item.quantity}
                             onChange={(e) => onQuantityChange(item.id, e.target.value)}
                             inputProps={{ min: 1 }}
-                            sx={{ width: 80 }}
+                            sx={{ width: '100px', padding: '0px' }}
                         />
-                    </Box>
-                    <Box display="flex" alignItems="center" mt={1}>
-                        <Link href="#" underline="hover" onClick={() => onRemove(item.id)} sx={{ mr: 2 }}>Remove</Link>
-                        <Link href="#" underline="hover">Save for later</Link>
                     </Box>
                 </Box>
             </Box>
             <Box textAlign="right" ml={2}>
-                <Typography variant="h6">{item.price}</Typography>
+                <Typography variant="h6">${item.price}</Typography>
+                <Box display="flex" alignItems="center" mt={1}>
+                    <Link href="#" underline="hover" onClick={() => onRemove(item.id)}> Remove</Link>
+                </Box>
             </Box>
         </Box>
     );

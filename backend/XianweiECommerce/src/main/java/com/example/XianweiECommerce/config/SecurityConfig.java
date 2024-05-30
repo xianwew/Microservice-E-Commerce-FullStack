@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/item/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/item/**").authenticated()
                         .requestMatchers("/api/user/{id}").authenticated()
+                        .requestMatchers("/api/cart/{id}").authenticated()
                         .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

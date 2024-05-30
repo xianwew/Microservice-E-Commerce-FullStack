@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -17,5 +20,6 @@ public class Cart extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    // Getters and setters are inherited from BaseEntity
+    @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
 }

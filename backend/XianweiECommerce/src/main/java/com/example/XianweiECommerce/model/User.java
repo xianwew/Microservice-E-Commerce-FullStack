@@ -34,6 +34,10 @@ public class User extends BaseEntity {
     @JoinColumn(name = "ratingId")
     private Rating rating;
 
+    @OneToOne
+    @JoinColumn(name = "cartId")
+    private Cart cart; // New field for cart
+
     // Getters and setters are inherited from BaseEntity
 }
 

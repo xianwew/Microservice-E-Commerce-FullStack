@@ -5,7 +5,7 @@ import lombok.Data;
 public class FeedbackDTO {
     private Long id;
     private Long itemId;
-    private Long userId;
+    private String userId;
     private String userName;
     private int rating;
     private String comment;

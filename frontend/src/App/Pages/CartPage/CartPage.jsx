@@ -1,31 +1,11 @@
-import React, { useState } from 'react';
-import { Box, Typography, Divider, Grid } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Divider, Grid, TextField, Link } from '@mui/material';
 import CartItem from '../../Compoents/CartPage/CartItem';
 import CartTotal from '../../Compoents/CartPage/CartTotal';
 import RecommendationItem from '../../Compoents/CartPage/RecommendationItem';
-
-const sampleCartItems = [
-    {
-        id: 1,
-        title: 'AYANEO AIR Handheld Gaming Console',
-        image: 'https://via.placeholder.com/150',
-        price: '$499.00',
-        quantity: 1,
-        condition: 'Open box',
-        shipping: 'Free shipping',
-        returns: 'Free Returns'
-    },
-    {
-        id: 2,
-        title: 'Another Item',
-        image: 'https://via.placeholder.com/150',
-        price: '$200.00',
-        quantity: 2,
-        condition: 'New',
-        shipping: 'Free shipping',
-        returns: 'Free Returns'
-    },
-];
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { loadCartItems, updateCartState } from '../../redux/slice/cartSlice';
 
 const sampleRecommendations = [
     {
@@ -40,37 +20,57 @@ const sampleRecommendations = [
         image: 'https://via.placeholder.com/150',
         price: '$450.00',
     },
-    // Add more recommended items as needed
 ];
 
+
 const Cart = () => {
-    const [cartItems, setCartItems] = useState(sampleCartItems);
+    const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart.items) || []; // Ensure cartItems is always an array
+    const currentUserId = useSelector((state) => state.auth.user?.id);
+
+    useEffect(() => {
+        if (currentUserId) {
+            dispatch(loadCartItems(currentUserId));
+        }
+    }, [currentUserId, dispatch]);
 
     const handleQuantityChange = (id, quantity) => {
-        setCartItems(cartItems.map(item => item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item));
+        const updatedItems = cartItems.map(item =>
+            item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        );
+        dispatch(updateCartState({ userId: currentUserId, cartItems: updatedItems }));
     };
 
     const handleRemove = (id) => {
-        setCartItems(cartItems.filter(item => item.id !== id));
+        const updatedItems = cartItems.filter(item => item.id !== id);
+        dispatch(updateCartState({ userId: currentUserId, cartItems: updatedItems }));
     };
 
     const calculateTotal = () => {
-        return cartItems.reduce((total, item) => total + item.quantity * parseFloat(item.price.replace('$', '')), 0);
+        return cartItems.reduce((total, item) => total + item.quantity * item.price, 0); // Only call reduce if cartItems is defined and not empty
     };
 
     return (
         <div className='app-content'>
-            <Typography variant="h3" mb={4} sx={{paddingTop: '50px', boxSizing: 'border-box', fontWeight: 'bold', textAlign:'center'}}>Shopping Cart</Typography>
-            <Box display="flex" justifyContent="space-between" mb={1} >
-                <Box flex={3} mr={2} sx={{backgroundColor: '#fafafa', borderRadius: '25px'}}>
-                    {cartItems.map(item => (
-                        <CartItem
-                            key={item.id}
-                            item={item}
-                            onQuantityChange={handleQuantityChange}
-                            onRemove={handleRemove}
-                        />
-                    ))}
+            <Typography variant="h3" mb={4} sx={{ paddingTop: '50px', boxSizing: 'border-box', fontWeight: 'bold', textAlign: 'center' }}>
+                Shopping Cart
+            </Typography>
+            <Box display="flex" justifyContent="space-between" mb={1}>
+                <Box flex={3} mr={2} sx={{ backgroundColor: '#fafafa', borderRadius: '25px' }}>
+                    {cartItems && cartItems.length > 0 ? (
+                        cartItems.map(item => (
+                            <CartItem
+                                key={item.id}
+                                item={item}
+                                onQuantityChange={handleQuantityChange}
+                                onRemove={handleRemove}
+                            />
+                        ))
+                    ) : (
+                        <Typography variant="h6" sx={{ textAlign: 'center', padding: '20px' }}>
+                            Your cart is empty.
+                        </Typography>
+                    )}
                 </Box>
                 <CartTotal total={calculateTotal()} />
             </Box>
@@ -88,4 +88,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

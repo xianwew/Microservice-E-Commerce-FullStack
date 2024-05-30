@@ -135,7 +135,6 @@ public class ItemController {
         List<ItemDTO> items = itemService.searchItems(query, country, city, minPrice, maxPrice, mainCategoryIdLong == -1? null: mainCategoryIdLong, subCategoryIdLong == -1? null: subCategoryIdLong);
         return ResponseEntity.ok(items);
     }
-
 }
 
 

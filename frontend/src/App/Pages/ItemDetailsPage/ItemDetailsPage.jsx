@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Grid, Button, Typography, Box, Divider, TextField } from '@mui/material';
 import ItemImageGallery from '../../Compoents/ItemDetailsPage/ItemImageGallery';
-import AddToCart from '../../Compoents/ItemDetailsPage/AddToCart';
 import ItemDetails from '../../Compoents/ItemDetailsPage/ItemDetails';
 import { fetchItem } from '../../service/ListingsService';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Rating from '@mui/material/Rating';
 import { fetchSeller } from '../../service/UserService';
+import { addItemToCart } from '../../service/CartService';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
+import { useDispatch } from 'react-redux';
 
 const ItemDetailsPage = () => {
     const { id } = useParams();
@@ -16,8 +18,9 @@ const ItemDetailsPage = () => {
     const [seller, setSeller] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const currentUserId = useSelector((state) => state.auth.user.id);
-    const [quantity, setQuantity] = useState(1); 
+    const currentUserId = useSelector((state) => state.auth.user?.id);
+    const [quantity, setQuantity] = useState(1);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const getItem = async () => {
@@ -67,6 +70,21 @@ const ItemDetailsPage = () => {
         setQuantity(event.target.value);
     };
 
+    const handleAddToCart = async () => {
+        try {
+            const cartItem = {
+                itemId: item.id,
+                quantity: parseInt(quantity, 10),
+            };
+            await addItemToCart(cartItem);
+            dispatch(showSnackbar({ open: true, message: 'Item added to cart', severity:'success' })); 
+        } 
+        catch (error) {
+            console.error('Error adding item to cart:', error);
+            dispatch(showSnackbar({ open: true, message: 'Failed to add item to cart', severity: 'error' }));
+        }
+    };
+
     return (
         <Container className='app-content' style={{ minWidth: '100%' }}>
             <Box sx={{ padding: '40px 60px', width: '100%', boxSizing: 'border-box' }}>
@@ -112,7 +130,7 @@ const ItemDetailsPage = () => {
                                 inputProps={{ min: 1, max: item.quantity }}
                                 sx={{ width: '100px' }}
                             />
-                            <Button variant="contained" color="primary" sx={{height: '55px'}} onClick={() => AddToCart({ itemId: item.id, quantity })}>
+                            <Button variant="contained" color="primary" sx={{height: '55px'}} onClick={handleAddToCart}>
                                 Add to Cart
                             </Button>
                         </Box>
@@ -122,7 +140,7 @@ const ItemDetailsPage = () => {
                     </Box>
                 </Box>
                 <Box mt={4}>
-                    <ItemDetails details={item.details} />
+                    <ItemDetails item={item} />
                 </Box>
             </Box>
         </Container>

@@ -5,7 +5,8 @@ ALTER TABLE addresses
 -- Users table foreign keys
 ALTER TABLE users
     ADD FOREIGN KEY (address_id) REFERENCES addresses(id),
-    ADD FOREIGN KEY (rating_id) REFERENCES ratings(id);
+    ADD FOREIGN KEY (rating_id) REFERENCES ratings(id),
+    ADD FOREIGN KEY (cart_id) REFERENCES carts(id);
 
 -- SubCategories table foreign key
 ALTER TABLE sub_categories
@@ -37,8 +38,8 @@ ALTER TABLE carts
 
 -- CartItems table foreign keys
 ALTER TABLE cart_items
-    ADD FOREIGN KEY (cart_id) REFERENCES carts(id),
-    ADD FOREIGN KEY (item_id) REFERENCES items(id);
+    ADD FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    ADD FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE;
 
 -- Feedback table foreign keys
 ALTER TABLE feedback

@@ -23,10 +23,5 @@ public class CartItem extends BaseEntity {
 
     @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
-    private double price;
-
-    // Getters and setters are inherited from BaseEntity
 }
 

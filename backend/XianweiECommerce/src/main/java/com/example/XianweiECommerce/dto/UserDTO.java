@@ -13,6 +13,8 @@ public class UserDTO {
     private AddressDTO address;
     private RatingDTO rating;
     private String password;
+    private Long cartId; // New field for cartId
 }
+
 
 

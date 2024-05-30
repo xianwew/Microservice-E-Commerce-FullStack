@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Box, Grid, CardMedia, Typography } from '@mui/material';
 
 const ItemImageGallery = ({ images }) => {
-    const [mainImage, setMainImage] = React.useState(images[0]);
+    const [mainImage, setMainImage] = useState(images[0]);
 
     return (
         <Box>
@@ -10,7 +10,7 @@ const ItemImageGallery = ({ images }) => {
                 component="img"
                 image={mainImage}
                 alt="Main item image"
-                sx={{ width: '100%', height: '500px', objectFit: 'cover' }}
+                sx={{ objectFit: 'cover', maxHeight: '600px' }}
             />
             <Grid container spacing={1} mt={2}>
                 {images.map((image, index) => (
@@ -19,7 +19,7 @@ const ItemImageGallery = ({ images }) => {
                             component="img"
                             image={image}
                             alt={`Thumbnail ${index + 1}`}
-                            sx={{ width: '100%', width: '150px', objectFit: 'cover', cursor: 'pointer' }}
+                            sx={{ width: '100%', height: '150px', objectFit: 'cover', cursor: 'pointer' }}
                             onClick={() => setMainImage(image)}
                         />
                     </Grid>

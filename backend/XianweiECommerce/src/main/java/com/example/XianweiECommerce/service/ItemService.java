@@ -249,15 +249,6 @@ public class ItemService {
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
-    public ItemService(ItemRepository itemRepository, UserRepository userRepository, RatingRepository ratingRepository, MainCategoryRepository mainCategoryRepository, SubCategoryRepository subCategoryRepository, CloudinaryService cloudinaryService) {
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-        this.ratingRepository = ratingRepository;
-        this.mainCategoryRepository = mainCategoryRepository;
-        this.subCategoryRepository = subCategoryRepository;
-        this.cloudinaryService = cloudinaryService;
-    }
-
     public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where(null);
         boolean hasCriteria = false;

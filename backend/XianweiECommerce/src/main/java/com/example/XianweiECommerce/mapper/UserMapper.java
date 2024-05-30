@@ -1,5 +1,6 @@
 package com.example.XianweiECommerce.mapper;
 import com.example.XianweiECommerce.dto.UserDTO;
+import com.example.XianweiECommerce.model.Cart;
 import com.example.XianweiECommerce.model.User;
 
 public class UserMapper {
@@ -19,6 +20,7 @@ public class UserMapper {
         userDTO.setProfilePictureUrl(user.getProfilePictureUrl());
         userDTO.setAddress(AddressMapper.toDTO(user.getAddress()));
         userDTO.setRating(RatingMapper.toDTO(user.getRating()));
+        userDTO.setCartId(user.getCart() != null ? user.getCart().getId() : null); // Set this field
         return userDTO;
     }
 
@@ -37,6 +39,12 @@ public class UserMapper {
         user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
         user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
         user.setRating(RatingMapper.toEntity(userDTO.getRating()));
+        // Find the Cart entity by its ID and set it
+        if (userDTO.getCartId() != null) {
+            Cart cart = new Cart();
+            cart.setId(userDTO.getCartId());
+            user.setCart(cart); // Set this field
+        }
         return user;
     }
 
@@ -53,8 +61,14 @@ public class UserMapper {
         user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
         user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
         user.setRating(RatingMapper.toEntity(userDTO.getRating()));
+        if (userDTO.getCartId() != null) {
+            Cart cart = new Cart();
+            cart.setId(userDTO.getCartId());
+            user.setCart(cart); // Set this field
+        }
     }
 }
+
 
 
 

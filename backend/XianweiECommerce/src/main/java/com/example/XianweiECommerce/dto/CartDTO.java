@@ -6,5 +6,6 @@ import java.util.List;
 public class CartDTO {
     private Long id;
     private String userId;
-    private List<CartItemDTO> cartItems;
+    private List<CartItemInputDTO> cartItemsInput;
+    private List<CartItemOutputDTO> cartItemsOutput;
 }
