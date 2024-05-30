@@ -21,7 +21,8 @@ ALTER TABLE items
 
 -- Orders table foreign key
 ALTER TABLE orders
-    ADD FOREIGN KEY (user_id) REFERENCES users(id);
+    ADD FOREIGN KEY (user_id) REFERENCES users(id),
+    ADD FOREIGN KEY (shipping_method_id) REFERENCES shipping_methods(id);
 
 -- OrderItems table foreign keys
 ALTER TABLE order_items

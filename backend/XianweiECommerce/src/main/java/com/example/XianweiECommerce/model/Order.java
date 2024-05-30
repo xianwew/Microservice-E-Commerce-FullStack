@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -14,7 +16,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
@@ -22,6 +24,19 @@ public class Order extends BaseEntity {
 
     @Column(nullable = false)
     private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "shipping_method_id", nullable = false)
+    private ShippingMethod shippingMethod;
+
+    @Column(name = "card_type", nullable = false)
+    private String cardType;
+
+    @Column(name = "last_four_digit", nullable = false)
+    private String lastFourDigit;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems;
 
     // Getters and setters are inherited from BaseEntity
 }

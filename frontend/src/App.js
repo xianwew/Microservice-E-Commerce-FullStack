@@ -60,7 +60,7 @@ export default function App() {
                         <Route path="/item/:id" element={<ItemDetailsPage />} />
                         <Route element={<ProtectedRoute />}>
                             <Route path="/item/:itemId/edit" element={<EditItemPage />} />
-                            <Route path="/receipt/:receiptId" element={<UserReceiptPage />} />
+                            <Route path="/receipt/:id" element={<UserReceiptPage />} />
                             <Route path="/profile" element={<UserProfilePage />} />
                             <Route path="/sell" element={<SellPage />} />
                             <Route path="/cart" element={<CartPage />} />

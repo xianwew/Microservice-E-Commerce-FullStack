@@ -56,3 +56,13 @@ export const addItemToCart = async (cartItem) => {
         throw error;
     }
 };
+
+export const fetchShippingMethods = async () => {
+    try {
+        const response = await axiosInstance.get('/api/orders/shipping-methods');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching shipping methods:', error);
+        throw error;
+    }
+};

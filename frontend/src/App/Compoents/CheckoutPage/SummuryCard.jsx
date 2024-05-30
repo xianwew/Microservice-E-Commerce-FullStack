@@ -1,10 +1,11 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
 
-const SummuryCard = ({ items, total, cards, address }) => {
+const SummuryCard = ({ items, total, cards, address, shippingCost = 0, tax = 6.60, onConfirmAndPay }) => {
     const isAddressValid = address && Object.values(address).every(field => field && field !== '');
     const isCardsAvailable = cards && cards.length > 0;
     const isButtonDisabled = !isCardsAvailable || !isAddressValid;
+    const orderTotal = total + shippingCost + tax;
 
     return (
         <Card>
@@ -23,22 +24,23 @@ const SummuryCard = ({ items, total, cards, address }) => {
                 <hr style={{ marginTop: '40px' }} />
                 <Box display="flex" justifyContent="space-between" marginBottom={2}>
                     <Typography variant="body1">Shipping</Typography>
-                    <Typography variant="body1">$5.99</Typography>
+                    <Typography variant="body1">${shippingCost.toFixed(2)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" marginBottom={2}>
                     <Typography variant="body1">Tax</Typography>
-                    <Typography variant="body1">$6.60</Typography>
+                    <Typography variant="body1">${tax.toFixed(2)}</Typography>
                 </Box>
                 <hr style={{ marginTop: '40px' }} />
                 <Box display="flex" justifyContent="space-between" marginBottom={2}>
                     <Typography variant="h6">Order total</Typography>
-                    <Typography variant="h6">${(total + 5.99 + 6.60).toFixed(2)}</Typography>
+                    <Typography variant="h6">${orderTotal.toFixed(2)}</Typography>
                 </Box>
                 <Button 
                     variant="contained" 
                     color="primary" 
                     fullWidth 
                     disabled={isButtonDisabled}
+                    onClick={onConfirmAndPay}
                 >
                     Confirm and pay
                 </Button>

@@ -87,6 +87,9 @@ CREATE TABLE orders (
     user_id VARCHAR(36) NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(50) NOT NULL,
+    shipping_method_id BIGINT,
+	card_type VARCHAR(50) NOT NULL,
+    last_four_digit VARCHAR(4) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
