@@ -10,6 +10,7 @@ import ShippingMethodSelection from '../../Compoents/CheckoutPage/ShippingMethod
 import { fetchShippingMethods } from '../../service/CartService';
 import { createOrder } from '../../service/OrderSerivce';
 import { useNavigate } from 'react-router-dom';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
 
 
 const CheckoutPage = () => {
@@ -74,9 +75,19 @@ const CheckoutPage = () => {
     const handleConfirmAndPay = async () => {
         try {
             const orderId = await createOrder(cart.cartId, selectedShippingMethod, selectedPaymentMethod);
-            // navigate(`/order-confirmation/${orderId}`);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Order successfully created!',
+                severity: 'success'
+            }));
+            navigate(`/receipt/${orderId}`);
         } catch (error) {
             console.error('Error creating order:', error);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Failed to create order. Please try again.',
+                severity: 'error'
+            }));
         }
     };
 

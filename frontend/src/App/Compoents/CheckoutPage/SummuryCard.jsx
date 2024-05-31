@@ -1,10 +1,12 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
 
-const SummuryCard = ({ items, total, cards, address, shippingCost = 0, tax = 6.60, onConfirmAndPay }) => {
+const SummuryCard = ({ items, total, cards, address, shippingCost = 0, taxRate = 0.06, onConfirmAndPay }) => {
     const isAddressValid = address && Object.values(address).every(field => field && field !== '');
     const isCardsAvailable = cards && cards.length > 0;
     const isButtonDisabled = !isCardsAvailable || !isAddressValid;
+
+    const tax = (total + shippingCost) * taxRate;
     const orderTotal = total + shippingCost + tax;
 
     return (

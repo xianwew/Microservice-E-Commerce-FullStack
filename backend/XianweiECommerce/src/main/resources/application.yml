@@ -42,3 +42,7 @@ cloudinary:
   category-upload-folder: XianweiECommerce/Category
   item-upload-folder: XianweiECommerce/Item
 
+payment:
+  service:
+    url:
+      http://localhost:8080/api/payment

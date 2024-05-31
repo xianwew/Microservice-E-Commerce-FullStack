@@ -18,8 +18,8 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<Boolean> processPayment(@RequestBody Cart cart) {
-        boolean paymentSuccessful = paymentService.processPayment(cart);
+    public ResponseEntity<Boolean> processPayment(@RequestBody double totalAmount) {
+        boolean paymentSuccessful = paymentService.processPayment(totalAmount);
         return ResponseEntity.ok(paymentSuccessful);
     }
 }

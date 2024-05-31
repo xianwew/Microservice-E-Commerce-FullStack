@@ -3,7 +3,6 @@ package com.example.XianweiECommerce.controller;
 import com.example.XianweiECommerce.dto.CreateOrderRequestDTO;
 import com.example.XianweiECommerce.dto.OrderDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
-import com.example.XianweiECommerce.model.Order;
 import com.example.XianweiECommerce.model.ShippingMethod;
 import com.example.XianweiECommerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,12 @@ public class OrderController {
         OrderDTO orderDTO = orderService.getOrder(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId.toString()));
         return ResponseEntity.ok(orderDTO);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByUser(@PathVariable String userId) {
+        List<OrderDTO> orders = orderService.getOrdersByUser(userId);
+        return ResponseEntity.ok(orders);
     }
 
     @PostMapping
