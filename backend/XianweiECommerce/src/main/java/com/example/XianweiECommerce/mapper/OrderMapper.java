@@ -24,6 +24,7 @@ public class OrderMapper {
         orderDTO.setLastFourDigit(order.getLastFourDigit());
         orderDTO.setShippingMethodId(order.getShippingMethod().getId());
         orderDTO.setShippingMethodName(order.getShippingMethod().getName());
+        orderDTO.setShippingCost(order.getShippingMethod().getPrice()); // Include shipping cost
 
         // Convert OrderItems to OrderItemDTOs
         List<OrderItemDTO> orderItems = order.getOrderItems().stream()

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Grid, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { fetchUserOrders } from '../../service/OrderSerivce';
+import { useSelector } from 'react-redux';
 
 const sampleOrderHistory = [
     {
@@ -23,32 +25,48 @@ const sampleOrderHistory = [
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState([]);
+    const user = useSelector((state) => state.auth.user);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch order history data from backend API
-        // For now, we'll use sample data
-        setOrders(sampleOrderHistory);
-    }, []);
+        if (user?.id) {
+            const getUserOrders = async () => {
+                try {
+                    const fetchedOrders = await fetchUserOrders(user.id);
+                    setOrders(fetchedOrders);
+                } catch (error) {
+                    console.error('Error fetching user orders:', error);
+                }
+            };
+
+            getUserOrders();
+        }
+    }, [user]);
 
     return (
         <Box p={3}>
             <Typography variant="h4" gutterBottom>Order History</Typography>
             <Grid container spacing={2}>
                 {orders.map((order) => (
-                    <Grid item xs={12} key={order.orderId}>
+                    <Grid item xs={12} key={order.id}>
                         <Card>
                             <CardContent>
-                                <Typography variant="h6">Order Date: {order.orderDate}</Typography>
-                                {order.items.map((item, index) => (
+                                <Typography variant="h6">Order Date: {new Date(order.createdAt).toLocaleDateString()}</Typography>
+                                {order.orderItems.map((item, index) => (
                                     <Box key={index} mt={2}>
-                                        <Typography variant="subtitle1">{item.title}</Typography>
-                                        <Typography variant="body2" color="textSecondary">Price: {item.price}</Typography>
-                                        <Typography variant="body2" color="textSecondary">Merchant: {item.merchant}</Typography>
+                                        <Typography variant="subtitle1">{item.itemName}</Typography>
+                                        <Typography variant="body2" color="textSecondary">Price: ${item.price.toFixed(2)}</Typography>
+                                        <Typography variant="body2" color="textSecondary">Quantity: {item.quantity}</Typography>
                                     </Box>
                                 ))}
                                 <Box display="flex" justifyContent="flex-end" mt={2}>
-                                    <Button variant="contained" color="primary" onClick={() => navigate(`/user/:userId/receipt/${order.orderId}`)}>View Receipt</Button>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        onClick={() => navigate(`/receipt/${order.id}`)}
+                                    >
+                                        View Receipt
+                                    </Button>
                                 </Box>
                             </CardContent>
                         </Card>

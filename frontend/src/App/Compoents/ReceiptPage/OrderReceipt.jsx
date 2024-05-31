@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Button, Grid, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
-
-// const sampleOrderDetails = {
-//     orderId: '001',
-//     orderDate: '2023-05-01',
-//     items: [
-//         { id: 'item1', title: 'Gaming Laptop', quantity: 1, price: 1049.99, merchant: 'Tech Store' },
-//         { id: 'item2', title: 'Wireless Mouse', quantity: 2, price: 29.99, merchant: 'Gadgets Galore' }
-//     ],
-//     total: 1109.97
-// };
+import FeedbackDialog from '../FeedbackDialog/FeedbackDialog';
 
 const OrderReceipt = ({ order }) => {
     const navigate = useNavigate();
+    const itemTotal = order.orderItems.reduce((total, item) => total + item.quantity * item.price, 0);
+    const tax = (itemTotal + order.shippingCost) * 0.06;
+    const orderTotal = itemTotal + order.shippingCost + tax;
+
+    const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    const handleLeaveFeedback = (item) => {
+        setSelectedItem(item);
+        setFeedbackDialogOpen(true);
+    };
 
     return (
         <Box p={3}>
@@ -22,27 +24,58 @@ const OrderReceipt = ({ order }) => {
                 <CardContent>
                     <Typography variant="h6" gutterBottom>Order Date: {new Date(order.createdAt).toLocaleDateString()}</Typography>
                     <Divider />
-                    <Grid container spacing={2} mt={2}>
-                        {order.orderItems.map((item) => (
-                            <Grid item xs={12} key={item.id}>
-                                <Card variant="outlined">
-                                    <CardContent>
-                                        <Typography variant="subtitle1" gutterBottom>{item.productName}</Typography>
+                    <Box mt={2}>
+                        <Typography variant="subtitle1" gutterBottom><strong>Order Items</strong></Typography>
+                        <Grid container spacing={2}>
+                            {order.orderItems.map((item) => (
+                                <Grid item xs={12} key={item.id}>
+                                    <div>
+                                        <Typography variant="subtitle1" gutterBottom>{item.itemName}</Typography>
                                         <Typography variant="body2" color="textSecondary">Quantity: {item.quantity}</Typography>
                                         <Typography variant="body2" color="textSecondary">Price: ${item.price.toFixed(2)}</Typography>
                                         <Typography variant="body2" color="textSecondary">Subtotal: ${(item.quantity * item.price).toFixed(2)}</Typography>
-                                        <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.productId}`)} sx={{ mt: 2 }}>View Details</Button>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <Box mt={4} display="flex" justifyContent="space-between">
-                        <Typography variant="h6">Total: ${order.totalAmount.toFixed(2)}</Typography>
+                                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px', marginBottom: '20px' }}>
+                                            <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.itemId}`)} >View Details</Button>
+                                            <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => handleLeaveFeedback(item)}>Leave Feedback</Button>
+                                        </div>
+                                        <hr />
+                                    </div>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Box>
+                    <Box mt={4}>
+                        <Typography variant="subtitle1" gutterBottom><strong>Payment Information</strong></Typography>
+                        <Typography variant="body2" color="textSecondary">Card Used: {order.cardType} ending in {order.lastFourDigit}</Typography>
+                    </Box>
+                    <Box mt={4}>
+                        <Typography variant="subtitle1" gutterBottom><strong>Shipping Information</strong></Typography>
+                        <Typography variant="body2" color="textSecondary">Shipping Method: {order.shippingMethodName}</Typography>
+                        <Typography variant="body2" color="textSecondary">Shipping Cost: ${order.shippingCost.toFixed(2)}</Typography>
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Box mt={4}>
+                        <Typography variant="subtitle1" gutterBottom><strong>Order Summary</strong></Typography>
+                        <Typography variant="body2" color="textSecondary">Item Total: ${itemTotal.toFixed(2)}</Typography>
+                        <Typography variant="body2" color="textSecondary">Shipping: ${order.shippingCost.toFixed(2)}</Typography>
+                        <Typography variant="body2" color="textSecondary">Tax: ${tax.toFixed(2)}</Typography>
+                        <Typography variant="h6">Order Total: ${orderTotal.toFixed(2)}</Typography>
+                    </Box>
+                    <Box mt={4} display="flex" justifyContent="flex-end">
                         <Button variant="contained" color="primary" onClick={() => navigate('/browse')}>Continue Shopping</Button>
                     </Box>
                 </CardContent>
             </Card>
+
+            {selectedItem && (
+                <FeedbackDialog
+                    open={feedbackDialogOpen}
+                    onClose={() => setFeedbackDialogOpen(false)}
+                    itemName={selectedItem.itemName}
+                    itemId={selectedItem.itemId}
+                    userId={order.userId} // Assuming you have userId in the order object
+                />
+            )}
         </Box>
     );
 };

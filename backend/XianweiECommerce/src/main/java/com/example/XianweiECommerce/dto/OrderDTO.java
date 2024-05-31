@@ -17,4 +17,5 @@ public class OrderDTO {
     private String lastFourDigit;
     private Long shippingMethodId;
     private String shippingMethodName;
+    private double shippingCost;
 }
