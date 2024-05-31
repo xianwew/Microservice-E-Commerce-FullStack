@@ -17,3 +17,37 @@ export const submitFeedback = async (itemId, feedback) => {
         throw error;
     }
 };
+
+export const updateFeedback = async (feedbackId, updatedFeedback) => {
+    const state = store.getState();
+    const token = state.auth.user.token;
+
+    try {
+        const response = await axiosInstance.put(`/api/feedback/${feedbackId}`, updatedFeedback, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating feedback:', error);
+        throw error;
+    }
+};
+
+export const deleteFeedback = async (feedbackId) => {
+    const state = store.getState();
+    const token = state.auth.user.token;
+
+    try {
+        const response = await axiosInstance.delete(`/api/feedback/${feedbackId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting feedback:', error);
+        throw error;
+    }
+};

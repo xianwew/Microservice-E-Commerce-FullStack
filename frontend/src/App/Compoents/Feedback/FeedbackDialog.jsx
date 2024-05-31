@@ -21,16 +21,19 @@ const FeedbackDialog = ({ open, onClose, itemName, itemId, userId }) => {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Leave Feedback for {itemName}</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ minWidth: '500px', padding: '30px', paddingBottom: '5px' }}>
+                <DialogTitle sx={{ fontWeight: 'bold', fontSize: '24px', marginBottom: '10px', paddingLeft: '0px', paddingTop: '0px' }}>Leave Feedback</DialogTitle>
+                <Typography variant="h6" gutterBottom>
+                    {itemName}
+                </Typography>
+                <Rating
+                    value={rating}
+                    onChange={(event, newValue) => {
+                        setRating(newValue);
+                    }}
+                    size="large"
+                />
                 <Box display="flex" flexDirection="column" alignItems="center">
-                    <Rating
-                        value={rating}
-                        onChange={(event, newValue) => {
-                            setRating(newValue);
-                        }}
-                        size="large"
-                    />
                     <TextField
                         margin="dense"
                         label="Your feedback"
@@ -40,11 +43,11 @@ const FeedbackDialog = ({ open, onClose, itemName, itemId, userId }) => {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         multiline
-                        rows={4}
+                        rows={8}
                     />
                 </Box>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{marginRight: '22px', marginBottom: '20px'}}>
                 <Button onClick={onClose} color="primary">
                     Cancel
                 </Button>

@@ -12,7 +12,7 @@ import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
 
 const ItemDetailsPage = () => {
-    const { id } = useParams();
+    const { id, tabIndex: tabIndexParam } = useParams();
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [seller, setSeller] = useState(null);

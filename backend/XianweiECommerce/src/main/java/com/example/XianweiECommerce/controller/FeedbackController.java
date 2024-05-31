@@ -42,8 +42,9 @@ public class FeedbackController {
     }
 
     @DeleteMapping("/{feedbackId}")
-    public ResponseEntity<Void> deleteFeedback(@PathVariable Long feedbackId) {
-        feedbackService.deleteFeedback(feedbackId);
+    public ResponseEntity<Void> deleteFeedback(@PathVariable Long feedbackId, @RequestHeader("Authorization") String token) {
+        String userId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));
+        feedbackService.deleteFeedback(feedbackId, userId);
         return ResponseEntity.noContent().build();
     }
 }

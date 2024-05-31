@@ -22,7 +22,7 @@ const SearchItem = ({ result }) => {
     };
 
     const handleItemClick = () => {
-        navigate(`/item/${result.id}`);
+        navigate(`/item/${result.id}/0`);
     };
 
     const renderStars = (totalRating, numRatings) => {

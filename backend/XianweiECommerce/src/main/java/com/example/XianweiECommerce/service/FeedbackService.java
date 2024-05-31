@@ -9,24 +9,27 @@ import com.example.XianweiECommerce.repository.FeedbackRepository;
 import com.example.XianweiECommerce.repository.ItemRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
-    private final UserRepository userRepository; // To fetch user data
-    private final ItemRepository itemRepository; // To fetch item data
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final FeedbackMapper feedbackMapper;
 
     @Autowired
-    public FeedbackService(FeedbackRepository feedbackRepository, UserRepository userRepository, ItemRepository itemRepository, FeedbackMapper feedbackMapper) {
+    public FeedbackService(FeedbackRepository feedbackRepository, ItemRepository itemRepository, UserRepository userRepository, FeedbackMapper feedbackMapper) {
         this.feedbackRepository = feedbackRepository;
-        this.userRepository = userRepository;
         this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
         this.feedbackMapper = feedbackMapper;
     }
 
@@ -37,11 +40,27 @@ public class FeedbackService {
     }
 
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId.toString()));
-        Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item);
+
+        if (item.getSeller().getId().equals(userId)) {
+            throw new InvalidDataAccessApiUsageException("Users cannot comment on their own items");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Check if the user has already provided feedback for this item
+        Optional<Feedback> existingFeedback = feedbackRepository.findByItemIdAndUserId(itemId, userId);
+        if (existingFeedback.isPresent()) {
+            throw new InvalidDataAccessApiUsageException("User has already provided feedback for this item");
+        }
+
+        Feedback feedback = new Feedback();
+        feedback.setItem(item);
+        feedback.setUser(user);
+        feedback.setRating(feedbackDTO.getRating());
+        feedback.setComment(feedbackDTO.getComment());
         Feedback savedFeedback = feedbackRepository.save(feedback);
         return feedbackMapper.toDTO(savedFeedback);
     }
@@ -49,17 +68,25 @@ public class FeedbackService {
     public FeedbackDTO updateFeedback(Long feedbackId, FeedbackDTO feedbackDTO, String userId) {
         Feedback feedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        if (!feedback.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Users can only update their own feedback");
+        }
+
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComment());
         Feedback updatedFeedback = feedbackRepository.save(feedback);
         return feedbackMapper.toDTO(updatedFeedback);
     }
 
-    public void deleteFeedback(Long feedbackId) {
+    public void deleteFeedback(Long feedbackId, String userId) {
         Feedback feedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
+
+        if (!feedback.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Users can only delete their own feedback");
+        }
+
         feedbackRepository.delete(feedback);
     }
 }

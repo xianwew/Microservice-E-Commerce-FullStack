@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Button, Grid, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
-import FeedbackDialog from '../FeedbackDialog/FeedbackDialog';
+import FeedbackDialog from '../Feedback/FeedbackDialog';
 
 const OrderReceipt = ({ order }) => {
     const navigate = useNavigate();
@@ -35,7 +35,7 @@ const OrderReceipt = ({ order }) => {
                                         <Typography variant="body2" color="textSecondary">Price: ${item.price.toFixed(2)}</Typography>
                                         <Typography variant="body2" color="textSecondary">Subtotal: ${(item.quantity * item.price).toFixed(2)}</Typography>
                                         <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px', marginBottom: '20px' }}>
-                                            <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.itemId}`)} >View Details</Button>
+                                            <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.itemId}/0`)} >View Details</Button>
                                             <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => handleLeaveFeedback(item)}>Leave Feedback</Button>
                                         </div>
                                         <hr />
@@ -73,7 +73,7 @@ const OrderReceipt = ({ order }) => {
                     onClose={() => setFeedbackDialogOpen(false)}
                     itemName={selectedItem.itemName}
                     itemId={selectedItem.itemId}
-                    userId={order.userId} // Assuming you have userId in the order object
+                    userId={order.userId} 
                 />
             )}
         </Box>
