@@ -4,6 +4,7 @@ import '../../../App.css'
 import React, { useState, useEffect } from 'react';
 import { fetchMainCategories } from "../../service/CategoryService";
 import HomePageCarousal from "../../Compoents/HomePage/HomePageCarsoual";
+import { useLocation } from "react-router-dom";
 
 export default function HomePage() {
     const [mainCategories, setMainCategories] = useState([]);
@@ -11,6 +12,9 @@ export default function HomePage() {
     const [trendingItems, setTrendingItems] = useState([]);
     const [itemsOnSale, setItemsOnSale] = useState([]);
     const [justForYouItems, setJustForYouItems] = useState([]);
+
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -44,14 +48,22 @@ export default function HomePage() {
     return (
         <div className="app-content" style={{ paddingTop: '30px', backgroundColor: 'rgba(0, 0, 0, 0)' }}>
             <div style={{ margin: '20px 0px' }}>
-                <SearchBar />
+                <SearchBar 
+                    initialQuery={query.get('query') || ''} 
+                    countryQuery={query.get('country') || ''}
+                    stateQuery={query.get('state') || ''}
+                    minPriceQuery={query.get('minPrice') || ''}
+                    maxPriceQuery={query.get('maxPrice') || ''}
+                    mainCategoryQuery={query.get('mainCategory') || 'all'}
+                    subCategoryQuery={query.get('subCategory') || 'all'}
+                />
             </div>
             <CategoryCardHomePage
                 categories={mainCategories}
                 onSelectCategory={setSelectedCategory}
                 selectedCategory={selectedCategory}
             />
-            <div style={{display: 'flex', flexDirection: 'column', margin: '10px 0px 60px 0px'}}>
+            <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 0px 60px 0px' }}>
                 <HomePageCarousal title="Trending Today" items={trendingItems} />
                 <HomePageCarousal title="Items On Sale" items={itemsOnSale} />
                 <HomePageCarousal title="Just For You" items={justForYouItems} />
