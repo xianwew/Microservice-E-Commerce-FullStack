@@ -214,20 +214,20 @@ public class ItemService {
 //        feedbackRepository.deleteAll(feedbacks);
 
         // Fetch the item's rating
-        Rating itemRating = ratingRepository.findByEntityIdAndEntityType(item.getId().toString(), Rating.EntityType.PRODUCT)
-                .orElse(null);
+//        Rating itemRating = ratingRepository.findByEntityIdAndEntityType(item.getId().toString(), Rating.EntityType.PRODUCT)
+//                .orElse(null);
 
         // Update the user's rating by subtracting the item's rating
-        if (itemRating != null) {
-            Rating userRating = ratingRepository.findByEntityIdAndEntityType(item.getSeller().getId(), Rating.EntityType.SELLER)
-                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "userId", item.getSeller().getId()));
-            userRating.setTotalRating(userRating.getTotalRating() - itemRating.getTotalRating());
-            userRating.setNumRatings(userRating.getNumRatings() - itemRating.getNumRatings());
-            ratingRepository.save(userRating);
-
-            // Delete the item's rating entry
-            ratingRepository.delete(itemRating);
-        }
+//        if (itemRating != null) {
+//            Rating userRating = ratingRepository.findByEntityIdAndEntityType(item.getSeller().getId(), Rating.EntityType.SELLER)
+//                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "userId", item.getSeller().getId()));
+//            userRating.setTotalRating(userRating.getTotalRating() - itemRating.getTotalRating());
+//            userRating.setNumRatings(userRating.getNumRatings() - itemRating.getNumRatings());
+//            ratingRepository.save(userRating);
+//
+//            // Delete the item's rating entry
+//            ratingRepository.delete(itemRating);
+//        }
 
         // Delete the cover image from Cloudinary
         if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {

@@ -22,4 +22,26 @@ VALUES
 (13, 4, 'Children\'s', '2024-05-27 18:20:49', '2024-05-27 19:01:42', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716850901/XianweiECommerce/Category/utofnnbgzjzotwauyhrh.png'),
 (14, 5, 'Board Games', '2024-05-27 18:21:22', '2024-05-27 18:21:22', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716848482/XianweiECommerce/Category/fedkphtcykmvdg5qremp.png'),
 (15, 5, 'Puzzles', '2024-05-27 18:21:55', '2024-05-27 18:21:55', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716848515/XianweiECommerce/Category/d5ufoghwl6cya8t9gal0.png'),
-(16, 5, 'Outdoor Toys', '2024-05-27 18:22:45', '2024-05-27 18:22:44', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716848564/XianweiECommerce/Category/ip9cet3ngltcwwk3v5ga.png');
+(16, 5, 'Outdoor Toys', '2024-05-27 18:22:45', '2024-05-27 18:22:44', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716848564/XianweiECommerce/Category/ip9cet3ngltcwwk3v5ga.png'),
+
+(17, 1, 'Headphones', '2024-05-28 09:00:00', '2024-05-28 09:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717279791/XianweiECommerce/Category/izsqrtb0fzjzhblyfzfn.png'),
+(18, 1, 'Smart Watches', '2024-05-28 09:10:00', '2024-05-28 09:10:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717279909/XianweiECommerce/Category/cyew2qu4oghixexsl0ub.png'),
+(19, 1, 'Tablets', '2024-05-28 09:20:00', '2024-05-28 09:20:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717279971/XianweiECommerce/Category/vpkqqonfqcdhg8nxrpod.png'),
+(20, 1, 'Gaming Consoles', '2024-05-28 09:30:00', '2024-05-28 09:30:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717279997/XianweiECommerce/Category/rov1zgj9tepwpdsbyduo.png'),
+(21, 2, 'Shoes', '2024-05-28 09:40:00', '2024-05-28 09:40:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280063/XianweiECommerce/Category/en95r3o9h8jz6vvxrm9m.png'),
+(22, 2, 'Accessories', '2024-05-28 09:50:00', '2024-05-28 09:50:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280100/XianweiECommerce/Category/vhuwnts15xogakfehg6h.png'),
+(23, 2, 'Sportswear', '2024-05-28 10:00:00', '2024-05-28 10:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280139/XianweiECommerce/Category/eqvgwjnxgj5s5lawgkps.png'),
+(24, 2, 'Outerwear', '2024-05-28 10:10:00', '2024-05-28 10:10:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280182/XianweiECommerce/Category/phvqau3eumf7bvimvgfn.png'),
+(25, 3, 'Bedding', '2024-05-28 10:20:00', '2024-05-28 10:20:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280227/XianweiECommerce/Category/vghhuuqi6gv4oo0k0nmb.png'),
+(26, 3, 'Cookware', '2024-05-28 10:30:00', '2024-05-28 10:30:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280278/XianweiECommerce/Category/ch7laxpv1wuz2odkbuef.png'),
+(27, 3, 'Lighting', '2024-05-28 10:40:00', '2024-05-28 10:40:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280328/XianweiECommerce/Category/uw9itoejlkk3bxvmia3n.png'),
+(28, 3, 'Storage Solutions', '2024-05-28 10:50:00', '2024-05-28 10:50:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280361/XianweiECommerce/Category/usq8khm1yed0useuikxw.png'),
+(29, 4, 'Romantic', '2024-05-28 11:00:00', '2024-05-28 11:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716849371/XianweiECommerce/Category/nonfiction.png'),
+(30, 4, 'Biographies', '2024-05-28 11:10:00', '2024-05-28 11:10:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280463/XianweiECommerce/Category/j5k7sjrxkxef6lzkcqbm.png'),
+(31, 4, 'Science Fiction', '2024-05-28 11:20:00', '2024-05-28 11:20:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280496/XianweiECommerce/Category/zpnj2fcc1kukf5sojlrc.png'),
+(32, 4, 'Fantasy', '2024-05-28 11:30:00', '2024-05-28 11:30:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280534/XianweiECommerce/Category/bvny2jsy5bopiizt1iea.png'),
+(33, 5, 'Dolls & Action Figures', '2024-05-28 11:40:00', '2024-05-28 11:40:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280583/XianweiECommerce/Category/feff7nj9nhflb751okni.png'),
+(34, 5, 'Educational Toys', '2024-05-28 11:50:00', '2024-05-28 11:50:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280638/XianweiECommerce/Category/mdstsdfnxpm6opqori7r.png'),
+(35, 5, 'Remote Control Toys', '2024-05-28 12:00:00', '2024-05-28 12:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280684/XianweiECommerce/Category/oavedo8o1pvcyrifekwk.png'),
+(36, 5, 'Stuffed Animals', '2024-05-28 12:10:00', '2024-05-28 12:10:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280721/XianweiECommerce/Category/n7bmh1npynrdqjhbju41.png');
+
