@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -70,6 +71,12 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     @Min(value = 0, message = "Quantity must be at least 0")
     private int quantity; // New field
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     // Getters and setters are inherited from BaseEntity
     @PrePersist

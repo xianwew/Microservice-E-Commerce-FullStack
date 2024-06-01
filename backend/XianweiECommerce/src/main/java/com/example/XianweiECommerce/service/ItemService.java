@@ -8,6 +8,7 @@ import com.example.XianweiECommerce.repository.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,9 @@ public class ItemService {
     private final RatingRepository ratingRepository;
     private final CloudinaryService cloudinaryService;
 
+    private final OrderItemRepository orderItemRepository;
+    private final FeedbackRepository feedbackRepository;
+
     @Value("${cloudinary.item-upload-folder}")
     private String imageFolder;
 
@@ -36,20 +40,24 @@ public class ItemService {
                        MainCategoryRepository mainCategoryRepository,
                        SubCategoryRepository subCategoryRepository,
                        RatingRepository ratingRepository,
-                       CloudinaryService cloudinaryService) {
+                       CloudinaryService cloudinaryService,
+                       OrderItemRepository orderItemRepository,
+                       FeedbackRepository feedbackRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.mainCategoryRepository = mainCategoryRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.ratingRepository = ratingRepository;
         this.cloudinaryService = cloudinaryService;
+        this.orderItemRepository = orderItemRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public List<ItemDTO> getItemsByUserId(String userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", userId)
+                () -> new RuntimeException("The item can't be found!")
         );
-        List<Item> items = itemRepository.findBySellerId(user.getId());
+        List<Item> items = itemRepository.findBySellerIdAndDeletedFalse(user.getId());
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
@@ -198,6 +206,13 @@ public class ItemService {
                 () -> new ResourceNotFoundException("Item", "id", itemId.toString())
         );
 
+        // Soft delete by setting the deleted flag to true
+        item.setDeleted(true);
+        itemRepository.save(item);
+
+        List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
+        feedbackRepository.deleteAll(feedbacks);
+
         // Fetch the item's rating
         Rating itemRating = ratingRepository.findByEntityIdAndEntityType(item.getId().toString(), Rating.EntityType.PRODUCT)
                 .orElse(null);
@@ -238,24 +253,32 @@ public class ItemService {
             cloudinaryService.deleteFile(publicId4, imageFolder);
         }
 
-        // Delete the item from the repository
-        itemRepository.delete(item);
+        // Save the item to persist the deleted flag
+        itemRepository.save(item);
     }
 
     public ItemDTO getItem(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ResourceNotFoundException("Item", "id", itemId.toString())
         );
+
+        if (item.isDeleted()) {
+            throw new ResourceNotFoundException("Item", "id", itemId.toString());
+        }
+
         return ItemMapper.toDTO(item);
     }
 
     public List<ItemDTO> getAllItems() {
-        List<Item> items = itemRepository.findAll();
+        List<Item> items = itemRepository.findAllByDeletedFalse();
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
+
     public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
-        Specification<Item> spec = Specification.where(null);
+        Specification<Item> spec = Specification.where((root, query1, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("deleted"))
+        );
         boolean hasCriteria = false;
 
         // Normalize and validate inputs
@@ -325,7 +348,7 @@ public class ItemService {
 
         if (!hasCriteria) {
             log.info("No search criteria provided, fetching all items");
-            return itemRepository.findAll().stream().map(item -> {
+            return itemRepository.findAllByDeletedFalse().stream().map(item -> {
                 ItemDTO itemDTO = ItemMapper.toDTO(item);
                 User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
                 if (seller != null) {

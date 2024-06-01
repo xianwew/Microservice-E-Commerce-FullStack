@@ -55,6 +55,10 @@ public class FeedbackService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId.toString()));
 
+        if (item.isDeleted()) {
+            throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
+        }
+
         if (item.getSeller().getId().equals(userId)) {
             throw new InvalidDataAccessApiUsageException("Users cannot comment on their own items");
         }
@@ -62,7 +66,6 @@ public class FeedbackService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Check if the user already has feedback for the item
         if (feedbackRepository.existsByItemIdAndUserId(itemId, userId)) {
             throw new IllegalArgumentException("User has already provided feedback for this item");
         }
@@ -73,6 +76,7 @@ public class FeedbackService {
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComment());
         Feedback savedFeedback = feedbackRepository.save(feedback);
+
         updateItemRating(itemId);
         updateUserRating(item.getSeller().getId());
 
@@ -119,8 +123,6 @@ public class FeedbackService {
         Rating itemRating = ratingRepository.findByEntityIdAndEntityType(itemId.toString(), Rating.EntityType.PRODUCT)
                 .orElse(new Rating(itemId.toString(), Rating.EntityType.PRODUCT));
 
-        log.info("totalRating(item): " + totalRating);
-        log.info("numRatings(item): " + numRatings);
         itemRating.setTotalRating(totalRating);
         itemRating.setNumRatings(numRatings);
 
@@ -128,15 +130,19 @@ public class FeedbackService {
     }
 
     private void updateUserRating(String userId) {
-        List<Feedback> feedbacks = feedbackRepository.findByItem_Seller_Id(userId);
-        int totalRating = feedbacks.stream().mapToInt(Feedback::getRating).sum();
-        int numRatings = feedbacks.size();
+        List<Item> items = itemRepository.findBySellerId(userId);
+        int totalRating = 0;
+        int numRatings = 0;
+
+        for (Item item : items) {
+            List<Feedback> feedbacks = feedbackRepository.findByItemId(item.getId());
+            totalRating += feedbacks.stream().mapToInt(Feedback::getRating).sum();
+            numRatings += feedbacks.size();
+        }
 
         Rating userRating = ratingRepository.findByEntityIdAndEntityType(userId, Rating.EntityType.SELLER)
                 .orElse(new Rating(userId, Rating.EntityType.SELLER));
 
-        log.info("totalRating(user): " + totalRating);
-        log.info("numRatings(user): " + numRatings);
         userRating.setTotalRating(totalRating);
         userRating.setNumRatings(numRatings);
 

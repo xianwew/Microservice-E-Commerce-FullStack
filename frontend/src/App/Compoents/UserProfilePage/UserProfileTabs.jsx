@@ -31,7 +31,7 @@ const UserProfileTabs = () => {
                 <Tab label="Payment" />
                 <Tab label="Items On Sale" />
                 <Tab label="Order History" />
-                <Tab label="Feedback" />
+                <Tab label="Feedback As Seller" />
             </Tabs>
             {tabIndex === 0 && <ContactTab />}
             {tabIndex === 1 && <PaymentTab />}

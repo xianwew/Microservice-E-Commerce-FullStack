@@ -1,5 +1,7 @@
-import React from 'react';
-import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, List, ListItem, ListItemText, Rating } from '@mui/material';
+import { fetchUserFeedbacks } from '../../service/FeedbackService';
+import { useSelector } from 'react-redux';
 
 const feedbacks = [
     { id: 1, user: 'discountprintsupplies', comment: 'Good buyer, prompt payment, valued customer, highly recommended.', time: 'Past 6 months' },
@@ -9,26 +11,54 @@ const feedbacks = [
 ];
 
 const FeedbackTab = () => {
+    const [feedbacks, setFeedbacks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const user = useSelector((state) => state.auth.user);
+    const userId = user?.id;
+
+    useEffect(() => {
+        const getUserFeedbacks = async () => {
+            try {
+                const feedbackData = await fetchUserFeedbacks(userId);
+                console.log(feedbackData);
+                setFeedbacks(feedbackData);
+            } catch (error) {
+                setError('Error fetching feedbacks');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getUserFeedbacks();
+    }, [userId]);
+
     return (
         <Box mt={2}>
-            <Typography variant="h6" mb={2}>Feedback Ratings</Typography>
-            <Typography variant="body2" mb={2}>Last 12 months</Typography>
-            <Box mb={2}>
-                <Typography variant="body2">Positive: 5</Typography>
-                <Typography variant="body2">Neutral: 0</Typography>
-                <Typography variant="body2">Negative: 0</Typography>
-            </Box>
             <Typography variant="h6" mb={2}>All Feedback ({feedbacks.length})</Typography>
-            <List>
-                {feedbacks.map(feedback => (
-                    <ListItem key={feedback.id}>
-                        <ListItemText
-                            primary={feedback.user}
-                            secondary={`${feedback.comment} - ${feedback.time}`}
-                        />
-                    </ListItem>
-                ))}
-            </List>
+            {loading ? (
+                <Typography>Loading...</Typography>
+            ) : error ? (
+                <Typography>{error}</Typography>
+            ) : (
+                <List>
+                    {feedbacks.map(feedback => (
+                        <Box key={feedback.id} sx={{marginBottom: '20px'}}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography sx={{ fontWeight: 'bold', fontSize: '16px', marginRight: '12px' }}>{feedback.userName}</Typography>
+                                <Rating
+                                    value={feedback.rating}
+                                    sx={{ 'transform': 'translateY(-1px)' }}
+                                />
+                            </div>
+                            <ListItemText
+                                primary={feedback.username}
+                                secondary={`${feedback.comment} - ${new Date(feedback.updatedAt).toLocaleDateString()}`}
+                            />
+                        </Box>
+                    ))}
+                </List>
+            )}
         </Box>
     );
 };
