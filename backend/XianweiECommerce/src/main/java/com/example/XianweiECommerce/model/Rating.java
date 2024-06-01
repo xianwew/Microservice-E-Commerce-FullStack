@@ -31,4 +31,13 @@ public class Rating extends BaseEntity {
     public enum EntityType {
         PRODUCT, SELLER
     }
+
+    public Rating() {}
+
+    public Rating(String entityId, EntityType entityType) {
+        this.entityId = entityId;
+        this.entityType = entityType;
+        this.totalRating = 0;
+        this.numRatings = 0;
+    }
 }

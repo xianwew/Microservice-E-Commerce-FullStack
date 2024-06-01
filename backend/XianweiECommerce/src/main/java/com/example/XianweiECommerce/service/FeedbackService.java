@@ -4,10 +4,13 @@ import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.FeedbackMapper;
 import com.example.XianweiECommerce.model.Feedback;
 import com.example.XianweiECommerce.model.Item;
+import com.example.XianweiECommerce.model.Rating;
 import com.example.XianweiECommerce.model.User;
 import com.example.XianweiECommerce.repository.FeedbackRepository;
 import com.example.XianweiECommerce.repository.ItemRepository;
+import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
@@ -18,18 +21,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final RatingRepository ratingRepository;
     private final FeedbackMapper feedbackMapper;
 
     @Autowired
-    public FeedbackService(FeedbackRepository feedbackRepository, ItemRepository itemRepository, UserRepository userRepository, FeedbackMapper feedbackMapper) {
+    public FeedbackService(FeedbackRepository feedbackRepository, ItemRepository itemRepository, UserRepository userRepository, RatingRepository ratingRepository, FeedbackMapper feedbackMapper) {
         this.feedbackRepository = feedbackRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.ratingRepository = ratingRepository;
         this.feedbackMapper = feedbackMapper;
     }
 
@@ -67,6 +73,9 @@ public class FeedbackService {
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComment());
         Feedback savedFeedback = feedbackRepository.save(feedback);
+        updateItemRating(itemId);
+        updateUserRating(item.getSeller().getId());
+
         return feedbackMapper.toDTO(savedFeedback);
     }
 
@@ -81,6 +90,10 @@ public class FeedbackService {
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComment());
         Feedback updatedFeedback = feedbackRepository.save(feedback);
+
+        updateItemRating(feedback.getItem().getId());
+        updateUserRating(feedback.getItem().getSeller().getId());
+
         return feedbackMapper.toDTO(updatedFeedback);
     }
 
@@ -93,6 +106,41 @@ public class FeedbackService {
         }
 
         feedbackRepository.delete(feedback);
+
+        updateItemRating(feedback.getItem().getId());
+        updateUserRating(feedback.getItem().getSeller().getId());
+    }
+
+    private void updateItemRating(Long itemId) {
+        List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
+        int totalRating = feedbacks.stream().mapToInt(Feedback::getRating).sum();
+        int numRatings = feedbacks.size();
+
+        Rating itemRating = ratingRepository.findByEntityIdAndEntityType(itemId.toString(), Rating.EntityType.PRODUCT)
+                .orElse(new Rating(itemId.toString(), Rating.EntityType.PRODUCT));
+
+        log.info("totalRating(item): " + totalRating);
+        log.info("numRatings(item): " + numRatings);
+        itemRating.setTotalRating(totalRating);
+        itemRating.setNumRatings(numRatings);
+
+        ratingRepository.save(itemRating);
+    }
+
+    private void updateUserRating(String userId) {
+        List<Feedback> feedbacks = feedbackRepository.findByItem_Seller_Id(userId);
+        int totalRating = feedbacks.stream().mapToInt(Feedback::getRating).sum();
+        int numRatings = feedbacks.size();
+
+        Rating userRating = ratingRepository.findByEntityIdAndEntityType(userId, Rating.EntityType.SELLER)
+                .orElse(new Rating(userId, Rating.EntityType.SELLER));
+
+        log.info("totalRating(user): " + totalRating);
+        log.info("numRatings(user): " + numRatings);
+        userRating.setTotalRating(totalRating);
+        userRating.setNumRatings(numRatings);
+
+        ratingRepository.save(userRating);
     }
 }
 

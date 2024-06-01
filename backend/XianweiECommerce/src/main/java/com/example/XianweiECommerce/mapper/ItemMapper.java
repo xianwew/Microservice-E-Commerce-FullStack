@@ -29,8 +29,6 @@ public class ItemMapper {
         itemDTO.setCreatedAt(item.getCreatedAt());
         itemDTO.setUpdatedAt(item.getUpdatedAt());
         itemDTO.setQuantity(item.getQuantity());
-        itemDTO.setTotalRating(item.getRating() != null ? item.getRating().getTotalRating() : 0);
-        itemDTO.setNumRatings(item.getRating() != null ? item.getRating().getNumRatings() : 0);
         return itemDTO;
     }
 

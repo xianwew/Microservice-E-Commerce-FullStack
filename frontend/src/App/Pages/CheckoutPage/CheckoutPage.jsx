@@ -101,7 +101,7 @@ const CheckoutPage = () => {
 
     return (
         <div className='app-content' style={{ backgroundColor: '#fafafa', width: '100vw' }}>
-            <div style={{ padding: '50px', marginTop: '50px', width: '100%', boxSizing: 'border-box' }}>
+            <div style={{ padding: '50px', width: '100%', boxSizing: 'border-box' }}>
                 <Typography variant="h3" fontWeight='bold' textAlign='center'>Checkout</Typography>
                 <Box display="flex" justifyContent="center" padding={4} mt={3}>
                     <Grid container spacing={4} maxWidth="1200px">

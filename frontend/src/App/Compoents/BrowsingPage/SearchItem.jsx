@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Grid, Card, CardMedia, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
@@ -6,12 +6,30 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import { decodeToken } from '../../Auth/JwtUtils';
 import { useSelector } from 'react-redux';
+import { fetchItemRating } from '../../service/RatingSerivce';
 
 const SearchItem = ({ result }) => {
     const navigate = useNavigate();
     const token = useSelector((state) => state.auth.token);
     const decodedToken = decodeToken(token);
     const currentUserId = decodedToken?.sub;
+
+    const [rating, setRating] = useState(null);
+    const [numRatings, setNumRatings] = useState(0);
+
+    useEffect(() => {
+        const getItemRating = async () => {
+            try {
+                const ratingData = await fetchItemRating(result.id);
+                setRating(ratingData.totalRating / ratingData.numRatings);
+                setNumRatings(ratingData.numRatings);
+            } catch (error) {
+                console.error('Error fetching item rating:', error);
+            }
+        };
+
+        getItemRating();
+    }, [result.id]);
 
     const handleSellerClick = () => {
         if (result.sellerId === currentUserId) {
@@ -25,9 +43,8 @@ const SearchItem = ({ result }) => {
         navigate(`/item/${result.id}/0`);
     };
 
-    const renderStars = (totalRating, numRatings) => {
+    const renderStars = (averageRating) => {
         if (numRatings === 0) return "No ratings yet";
-        const averageRating = totalRating / numRatings;
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             if (i <= averageRating) {
@@ -58,7 +75,7 @@ const SearchItem = ({ result }) => {
                         />
                     </Grid>
                     <Grid item xs container direction="column" justifyContent="space-between" paddingBottom={1}>
-                        <CardContent sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: '1', paddingBottom: '5px'}}>
+                        <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: '1', paddingBottom: '5px' }}>
                             <div>
                                 <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{result.title}</Typography>
                                 <Typography variant="body1" color="textSecondary" sx={{ fontSize: '18px' }}>{result.shortDescription}</Typography>
@@ -76,10 +93,10 @@ const SearchItem = ({ result }) => {
                                         {result.username}
                                     </Button>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {renderStars(result.totalRating, result.numRatings)}
-                                        {result.numRatings > 0 && (
+                                        {renderStars(rating)}
+                                        {numRatings > 0 && (
                                             <Typography variant="body2" color="textSecondary" sx={{ marginLeft: 1 }}>
-                                                ({(result.totalRating / result.numRatings).toFixed(1)} / {result.numRatings} ratings)
+                                                ({rating.toFixed(1)} / {numRatings} ratings)
                                             </Typography>
                                         )}
                                     </Box>

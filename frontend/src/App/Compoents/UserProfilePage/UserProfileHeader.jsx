@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Modal, TextField } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, Rating  } from '@mui/material';
 import { useAuth } from '../../Auth/AuthContext';
-import axios from 'axios';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
-import CloudinaryService from '../../service/CloudinaryService';
 import { useDispatch } from 'react-redux';
-import { decodeToken } from '../../Auth/JwtUtils';
-import axiosInstance from '../../service/AxiosConfig';
 import { saveUserProfile } from '../../service/UserService';
 import { useSelector } from 'react-redux';
 import { setUser } from '../../redux/slice/authSlice';
+import { fetchUserRating } from '../../service/RatingSerivce';
 
 const UserProfileHeader = () => {
     const defaultProfileImageURL = "https://via.placeholder.com/100";
-
 
     const { logout } = useAuth();
     const dispatch = useDispatch();
@@ -23,6 +19,7 @@ const UserProfileHeader = () => {
     const [username, setUsername] = useState(user?.username || '');
     const [profilePicture, setProfilePicture] = useState(user?.profilePictureUrl || defaultProfileImageURL);
     const [file, setFile] = useState(null);
+    const [rating, setRating] = useState(0);
 
     const handleLogout = () => {
         logout();
@@ -47,7 +44,7 @@ const UserProfileHeader = () => {
                 address: user.address,
                 profilePictureUrl: user.profilePictureUrl
             }
-            const updatedUser = await saveUserProfile({user: newUser, file});
+            const updatedUser = await saveUserProfile({ user: newUser, file });
             dispatch(setUser({ user: updatedUser }));
             setProfilePicture(updatedUser.profilePictureUrl || defaultProfileImageURL);
             setIsEditing(false);
@@ -67,8 +64,20 @@ const UserProfileHeader = () => {
 
     useEffect(() => {
         if (user) {
-            setUsername(user.username  || '');
+            setUsername(user.username || '');
             setProfilePicture(user.profilePictureUrl || defaultProfileImageURL);
+
+            // Fetch user rating
+            const fetchRating = async () => {
+                try {
+                    const userRating = await fetchUserRating(user.id);
+                    setRating(userRating.totalRating / userRating.numRatings);
+                } catch (error) {
+                    console.error('Failed to fetch user rating:', error);
+                }
+            };
+
+            fetchRating();
         }
     }, [user]);
 
@@ -85,7 +94,12 @@ const UserProfileHeader = () => {
                         />
                         <Box>
                             <Typography variant="h4">{username}</Typography>
-                            <Typography variant="body1" color="textSecondary">{user.rating}</Typography>
+                            <Box display="flex" alignItems="center">
+                                <Rating value={rating} readOnly />
+                                <Typography variant="body2" color="textSecondary" ml={1}>
+                                    ({rating.toFixed(1)})
+                                </Typography>
+                            </Box>
                         </Box>
                         <Box ml="auto">
                             <Button variant="outlined" onClick={handleEditProfile}>Edit Profile</Button>
@@ -157,7 +171,7 @@ const UserProfileHeader = () => {
                     </Box>
                     :
                     <div>
-                        loading
+                        Loading...
                     </div>
             }
         </>

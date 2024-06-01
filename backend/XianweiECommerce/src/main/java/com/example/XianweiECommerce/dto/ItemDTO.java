@@ -41,8 +41,6 @@ public class ItemDTO {
     private LocalDateTime updatedAt;
     @Min(value = 0, message = "Quantity cannot be negative")
     private int quantity;
-    private int totalRating;
-    private int numRatings;
 }
 
 

@@ -151,6 +151,14 @@ public class ItemService {
 
         Item savedItem = itemRepository.save(item);
         log.info("listing saved");
+        // Create an empty rating for the new product
+        Rating productRating = new Rating();
+        productRating.setEntityId(savedItem.getId().toString());
+        productRating.setEntityType(Rating.EntityType.PRODUCT);
+        productRating.setTotalRating(0);
+        productRating.setNumRatings(0);
+        ratingRepository.save(productRating);
+
         return ItemMapper.toDTO(savedItem);
     }
 
@@ -185,38 +193,26 @@ public class ItemService {
         return ItemMapper.toDTO(updatedItem);
     }
 
-    private void deleteNonMatchingSubImages(Item existingItem, List<Object> subImageFiles) throws IOException {
-        List<String> subImageUrls = subImageFiles.stream()
-                .filter(file -> file instanceof String)
-                .map(Object::toString)
-                .toList();
-
-        if (existingItem.getSubImageUrl1() != null && !subImageUrls.contains(existingItem.getSubImageUrl1())) {
-            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl1());
-            cloudinaryService.deleteFile(publicId, imageFolder);
-            existingItem.setSubImageUrl1(null);
-        }
-        if (existingItem.getSubImageUrl2() != null && !subImageUrls.contains(existingItem.getSubImageUrl2())) {
-            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl2());
-            cloudinaryService.deleteFile(publicId, imageFolder);
-            existingItem.setSubImageUrl2(null);
-        }
-        if (existingItem.getSubImageUrl3() != null && !subImageUrls.contains(existingItem.getSubImageUrl3())) {
-            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl3());
-            cloudinaryService.deleteFile(publicId, imageFolder);
-            existingItem.setSubImageUrl3(null);
-        }
-        if (existingItem.getSubImageUrl4() != null && !subImageUrls.contains(existingItem.getSubImageUrl4())) {
-            String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getSubImageUrl4());
-            cloudinaryService.deleteFile(publicId, imageFolder);
-            existingItem.setSubImageUrl4(null);
-        }
-    }
-
     public void deleteItem(Long itemId) throws IOException {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ResourceNotFoundException("Item", "id", itemId.toString())
         );
+
+        // Fetch the item's rating
+        Rating itemRating = ratingRepository.findByEntityIdAndEntityType(item.getId().toString(), Rating.EntityType.PRODUCT)
+                .orElse(null);
+
+        // Update the user's rating by subtracting the item's rating
+        if (itemRating != null) {
+            Rating userRating = ratingRepository.findByEntityIdAndEntityType(item.getSeller().getId(), Rating.EntityType.SELLER)
+                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "userId", item.getSeller().getId()));
+            userRating.setTotalRating(userRating.getTotalRating() - itemRating.getTotalRating());
+            userRating.setNumRatings(userRating.getNumRatings() - itemRating.getNumRatings());
+            ratingRepository.save(userRating);
+
+            // Delete the item's rating entry
+            ratingRepository.delete(itemRating);
+        }
 
         // Delete the cover image from Cloudinary
         if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
@@ -336,13 +332,6 @@ public class ItemService {
                     itemDTO.setUsername(seller.getUsername());
                     Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
                             .orElse(null);
-                    if (rating != null) {
-                        itemDTO.setTotalRating(rating.getTotalRating());
-                        itemDTO.setNumRatings(rating.getNumRatings());
-                    } else {
-                        itemDTO.setTotalRating(0);
-                        itemDTO.setNumRatings(0);
-                    }
                 }
                 return itemDTO;
             }).collect(Collectors.toList());
@@ -358,17 +347,9 @@ public class ItemService {
                 itemDTO.setUsername(seller.getUsername());
                 Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
                         .orElse(null);
-                if (rating != null) {
-                    itemDTO.setTotalRating(rating.getTotalRating());
-                    itemDTO.setNumRatings(rating.getNumRatings());
-                } else {
-                    itemDTO.setTotalRating(0);
-                    itemDTO.setNumRatings(0);
-                }
             }
             return itemDTO;
         }).collect(Collectors.toList());
     }
-
 }
 
