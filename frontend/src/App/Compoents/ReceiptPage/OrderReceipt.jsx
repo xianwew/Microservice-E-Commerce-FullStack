@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Button, Grid, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import FeedbackDialog from '../Feedback/FeedbackDialog';
+import { fetchItemFeedbacks } from '../../service/FeedbackService';
 
 const OrderReceipt = ({ order }) => {
     const navigate = useNavigate();
@@ -11,10 +12,28 @@ const OrderReceipt = ({ order }) => {
 
     const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [userFeedbacks, setUserFeedbacks] = useState([]);
+
+    useEffect(() => {
+        const fetchFeedbacks = async () => {
+            try {
+                const feedbacks = await fetchItemFeedbacks(order.userId);
+                setUserFeedbacks(feedbacks);
+            } catch (error) {
+                console.error('Error fetching user feedbacks:', error);
+            }
+        };
+
+        fetchFeedbacks();
+    }, [order.userId]);
 
     const handleLeaveFeedback = (item) => {
         setSelectedItem(item);
         setFeedbackDialogOpen(true);
+    };
+
+    const hasFeedback = (itemId) => {
+        return userFeedbacks.some(feedback => feedback.itemId === itemId);
     };
 
     return (
@@ -36,7 +55,11 @@ const OrderReceipt = ({ order }) => {
                                         <Typography variant="body2" color="textSecondary">Subtotal: ${(item.quantity * item.price).toFixed(2)}</Typography>
                                         <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px', marginBottom: '20px' }}>
                                             <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.itemId}/0`)} >View Details</Button>
-                                            <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => handleLeaveFeedback(item)}>Leave Feedback</Button>
+                                            {hasFeedback(item.itemId) ? (
+                                                <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => navigate(`/item/${item.itemId}/1`)}>View Feedback</Button>
+                                            ) : (
+                                                <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => handleLeaveFeedback(item)}>Leave Feedback</Button>
+                                            )}
                                         </div>
                                         <hr />
                                     </div>

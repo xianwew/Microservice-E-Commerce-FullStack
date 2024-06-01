@@ -39,6 +39,12 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
+    public List<FeedbackDTO> getFeedbacksByUserId(String userId) {
+        return feedbackRepository.findByUserId(userId).stream()
+                .map(feedbackMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId.toString()));
@@ -50,10 +56,8 @@ public class FeedbackService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Check if the user has already provided feedback for this item
-        Optional<Feedback> existingFeedback = feedbackRepository.findByItemIdAndUserId(itemId, userId);
-        if (existingFeedback.isPresent()) {
-            throw new InvalidDataAccessApiUsageException("User has already provided feedback for this item");
+        if (feedbackRepository.existsByItemIdAndUserId(itemId, userId)) {
+            throw new IllegalArgumentException("User has already provided feedback for this item");
         }
 
         Feedback feedback = new Feedback();
@@ -80,19 +84,13 @@ public class FeedbackService {
     }
 
     public void deleteFeedback(Long feedbackId, String userId) {
-        Feedback feedback;
-        try {
-            feedback = feedbackRepository.findById(feedbackId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
+        Feedback feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
 
-            if (!feedback.getUser().getId().equals(userId)) {
-                throw new RuntimeException("Users can only delete their own feedback");
-            }
-
-            feedbackRepository.delete(feedback);
-        } catch (ResourceNotFoundException e) {
-            // Log the error if needed
+        if (!feedback.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Users can only delete their own feedback");
         }
+
+        feedbackRepository.delete(feedback);
     }
 }
-

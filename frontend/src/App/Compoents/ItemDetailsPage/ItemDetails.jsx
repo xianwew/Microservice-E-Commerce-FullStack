@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Tabs, Tab } from '@mui/material';
-import { fetchItemFeedbacks } from '../../service/ListingsService';
+import { fetchItemFeedbacks } from '../../service/FeedbackService';
 import FeedbackCard from '../FeedbackCard/FeedbackCard';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { deleteFeedback, updateFeedback } from '../../service/FeedbackService';
 
 const ItemDetails = ({ item }) => {
     const { tabIndex: tabIndexParam } = useParams();

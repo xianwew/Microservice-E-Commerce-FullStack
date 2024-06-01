@@ -1,6 +1,17 @@
 import axiosInstance from "./AxiosConfig";
 import store from "../redux/store/store";
 
+export const fetchItemFeedbacks = async (itemId) => {
+    try {
+        const response = await axiosInstance.get(`/api/feedback/item/${itemId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item feedbacks:', error);
+        throw error;
+    }
+};
+
+
 export const submitFeedback = async (itemId, feedback) => {
     const state = store.getState();
     const token = state.auth.user.token;

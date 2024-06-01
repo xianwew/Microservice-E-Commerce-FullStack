@@ -11,9 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class FeedbackMapper {
 
-//    @Autowired
-//    private UserRepository userRepository; // Assuming you have this repository to fetch user data
-
     public FeedbackDTO toDTO(Feedback feedback) {
         FeedbackDTO dto = new FeedbackDTO();
         dto.setId(feedback.getId());
