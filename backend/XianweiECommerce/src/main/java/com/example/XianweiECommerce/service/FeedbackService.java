@@ -51,6 +51,12 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
+    public List<FeedbackDTO> getFeedbacksBySellerId(String sellerId) {
+        return feedbackRepository.findBySellerId(sellerId).stream()
+                .map(feedbackMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId.toString()));

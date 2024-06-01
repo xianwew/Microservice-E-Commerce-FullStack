@@ -210,8 +210,8 @@ public class ItemService {
         item.setDeleted(true);
         itemRepository.save(item);
 
-        List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
-        feedbackRepository.deleteAll(feedbacks);
+//        List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
+//        feedbackRepository.deleteAll(feedbacks);
 
         // Fetch the item's rating
         Rating itemRating = ratingRepository.findByEntityIdAndEntityType(item.getId().toString(), Rating.EntityType.PRODUCT)

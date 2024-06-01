@@ -32,6 +32,11 @@ public class FeedbackController {
         return feedbackService.getFeedbacksByUserId(userId);
     }
 
+    @GetMapping("/seller/{sellerId}")
+    public List<FeedbackDTO> getFeedbacksBySeller(@PathVariable String sellerId) {
+        return feedbackService.getFeedbacksBySellerId(sellerId);
+    }
+
     @PostMapping("/item/{itemId}")
     public ResponseEntity<FeedbackDTO> postFeedback(@PathVariable Long itemId, @RequestBody FeedbackDTO feedbackDTO, @RequestHeader("Authorization") String token) {
         String userId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, List, ListItem, ListItemText, Rating } from '@mui/material';
-import { fetchUserFeedbacks } from '../../service/FeedbackService';
+import { fetchSellerFeedbacks, fetchUserFeedbacks } from '../../service/FeedbackService';
 import { useSelector } from 'react-redux';
 
 const feedbacks = [
@@ -10,18 +10,22 @@ const feedbacks = [
     // Add more feedbacks as needed
 ];
 
-const FeedbackTab = () => {
+const FeedbackTab = ({ seller, userId }) => {
     const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const user = useSelector((state) => state.auth.user);
-    const userId = user?.id;
 
     useEffect(() => {
         const getUserFeedbacks = async () => {
             try {
-                const feedbackData = await fetchUserFeedbacks(userId);
-                console.log(feedbackData);
+                let feedbackData = [];
+                if (seller) {
+                    feedbackData = await fetchSellerFeedbacks(userId);
+                }
+                else {
+                    feedbackData = await fetchUserFeedbacks(userId);
+                }
+
                 setFeedbacks(feedbackData);
             } catch (error) {
                 setError('Error fetching feedbacks');
@@ -43,18 +47,20 @@ const FeedbackTab = () => {
             ) : (
                 <List>
                     {feedbacks.map(feedback => (
-                        <Box key={feedback.id} sx={{marginBottom: '20px'}}>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Typography sx={{ fontWeight: 'bold', fontSize: '16px', marginRight: '12px' }}>{feedback.userName}</Typography>
-                                <Rating
-                                    value={feedback.rating}
-                                    sx={{ 'transform': 'translateY(-1px)' }}
-                                />
+                        <Box key={feedback.id} sx={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px'}}>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: '18px', marginRight: '12px' }}>{feedback.userName}</Typography>
+                                    <Rating
+                                        value={feedback.rating}
+                                        sx={{ 'transform': 'translateY(-1px)' }}
+                                    />
+                                </div>
+                                <div>
+                                    <Typography>{new Date(feedback.updatedAt).toLocaleDateString()}</Typography>
+                                </div>
                             </div>
-                            <ListItemText
-                                primary={feedback.username}
-                                secondary={`${feedback.comment} - ${new Date(feedback.updatedAt).toLocaleDateString()}`}
-                            />
+                            <Typography>{feedback.comment}</Typography>
                         </Box>
                     ))}
                 </List>
