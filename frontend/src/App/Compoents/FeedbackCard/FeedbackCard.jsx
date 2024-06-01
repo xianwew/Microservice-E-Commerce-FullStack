@@ -59,7 +59,7 @@ const FeedbackCard = ({ feedback, onDelete, onUpdate }) => {
     };
 
     return (
-        <Box border={1} borderColor="grey.300" borderRadius={2} p={2} mb={2}>
+        <Box border={1} borderColor="grey.300" borderRadius={2} p={2} mb={2} sx={{backgroundColor: 'rgb(225, 222, 237)'}}>
             <Box display="flex" alignItems="center" mb={1}>
                 <Typography variant="h6" mr={2}>
                     {feedback.userName}

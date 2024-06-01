@@ -20,6 +20,7 @@ const UserProfileHeader = () => {
     const [profilePicture, setProfilePicture] = useState(user?.profilePictureUrl || defaultProfileImageURL);
     const [file, setFile] = useState(null);
     const [rating, setRating] = useState(0);
+    const [numRatings, setNumRatings] = useState(0);
 
     const handleLogout = () => {
         logout();
@@ -71,7 +72,8 @@ const UserProfileHeader = () => {
             const fetchRating = async () => {
                 try {
                     const userRating = await fetchUserRating(user.id);
-                    setRating(userRating.totalRating / userRating.numRatings);
+                    setNumRatings(userRating.numRatings);
+                    setRating(userRating.numRatings? (userRating.totalRating / userRating.numRatings): 0);
                 } catch (error) {
                     console.error('Failed to fetch user rating:', error);
                 }
@@ -93,11 +95,11 @@ const UserProfileHeader = () => {
                             sx={{ width: 100, height: 100, borderRadius: '50%', mr: 2 }}
                         />
                         <Box>
-                            <Typography variant="h4">{username}</Typography>
+                            <Typography  variant="h5" fontWeight="bold">{username}</Typography>
                             <Box display="flex" alignItems="center">
                                 <Rating value={rating} readOnly />
                                 <Typography variant="body2" color="textSecondary" ml={1}>
-                                    ({rating.toFixed(1)})
+                                    ({rating.toFixed(1)} / {numRatings} ratings)
                                 </Typography>
                             </Box>
                         </Box>

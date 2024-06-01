@@ -10,9 +10,11 @@ import { fetchSeller } from '../../service/UserService';
 import { addItemToCart } from '../../service/CartService';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
+import { fetchUserRating, fetchItemRating } from '../../service/RatingSerivce';
+
 
 const ItemDetailsPage = () => {
-    const { id, tabIndex: tabIndexParam } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [seller, setSeller] = useState(null);
@@ -27,8 +29,25 @@ const ItemDetailsPage = () => {
             try {
                 const data = await fetchItem(id);
                 setItem(data);
+
                 const sellerData = await fetchSeller(data.sellerId);
                 setSeller(sellerData);
+
+                const itemRating = await fetchItemRating(id);
+                const sellerRating = await fetchUserRating(data.sellerId);
+
+                setItem(prevItem => ({
+                    ...prevItem,
+                    totalRating: itemRating.totalRating,
+                    numRatings: itemRating.numRatings,
+                }));
+
+                setSeller(prevSeller => ({
+                    ...prevSeller,
+                    totalRating: sellerRating.totalRating,
+                    numRatings: sellerRating.numRatings,
+                }));
+
                 setLoading(false);
             } catch (error) {
                 setError('Error fetching item or seller details');

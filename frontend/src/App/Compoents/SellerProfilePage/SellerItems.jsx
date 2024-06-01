@@ -88,7 +88,7 @@ const SellerItems = ({ seller }) => {
                                         <Typography variant="body2" color="textSecondary">Listed on: {new Date(item.dateListed).toLocaleDateString()}</Typography>
                                     </CardContent>
                                     <Box padding={1}>
-                                        <Button variant="contained" color="primary" size="small" onClick={() => navigate(`/item/${item.id}`)}>View Details</Button>
+                                        <Button variant="contained" color="primary" size="small" onClick={() => navigate(`/item/${item.id}/0`)}>View Details</Button>
                                     </Box>
                                 </Grid>
                             </Grid>
