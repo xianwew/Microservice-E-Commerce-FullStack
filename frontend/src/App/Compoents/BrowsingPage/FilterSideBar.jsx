@@ -40,6 +40,14 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
         updateQueryParams();
     }, [debouncedMainCategorySelection, debouncedSubCategorySelection, debouncedPriceRange, debouncedLocationFilter]);
 
+    useEffect(() => {
+        if (mainCategorySelection !== 'all') {
+            fetchSubCategories(mainCategorySelection);
+        } else {
+            setSubCategories([{ id: 'all', name: 'All' }]);
+        }
+    }, [mainCategorySelection, fetchSubCategories, setSubCategories]);
+
     const handleMainCategoryChange = (event) => {
         const selectedMainCategory = event.target.value;
         setMainCategorySelection(selectedMainCategory);
@@ -59,7 +67,7 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
         const { name, value } = event.target;
         setPriceRange((prevRange) => {
             let newRange = { ...prevRange, [name]: value };
-    
+
             if (name === 'min') {
                 if (!newRange.max || parseFloat(value) > parseFloat(newRange.max)) {
                     newRange.max = value;
@@ -75,7 +83,7 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
                     newRange.min = '';
                 }
             }
-    
+
             return newRange;
         });
     };

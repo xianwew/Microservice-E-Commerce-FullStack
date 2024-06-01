@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { fetchSubCategories } from '../../service/CategoryService';
 import CategoryItemCard from './CategoryItemCard';
+import { useNavigate } from 'react-router-dom';
 
 const BrowseCategory = ({ mainCategoryId }) => {
     const [subCategories, setSubCategories] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (mainCategoryId) {
@@ -21,6 +23,10 @@ const BrowseCategory = ({ mainCategoryId }) => {
         return null;
     }
 
+    const handleCategoryClick = (subCategoryId) => {
+        navigate(`/browse?mainCategory=${mainCategoryId}&subCategory=${subCategoryId}`);
+    };
+
     return (
         <Box
             sx={{
@@ -35,7 +41,10 @@ const BrowseCategory = ({ mainCategoryId }) => {
         >
             {subCategories.map((subCategory) => (
                 <Box key={subCategory.id} sx={{ maxWidth: 'calc(33.333% - 16px)' }}>
-                    <CategoryItemCard item={{ image: subCategory.imageUrl, title: subCategory.name, subtitle: '' }} />
+                    <CategoryItemCard
+                        item={{ image: subCategory.imageUrl, title: subCategory.name, subtitle: '' }}
+                        onClick={() => handleCategoryClick(subCategory.id)}
+                    />
                 </Box>
             ))}
         </Box>

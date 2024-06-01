@@ -1,9 +1,12 @@
 import React from 'react';
 import { Card, CardMedia, CardContent, Typography } from '@mui/material';
 
-const CategoryItemCard = ({ item }) => {
+const CategoryItemCard = ({ item, onClick }) => {
     return (
-        <Card sx={{ maxWidth: '150px', height: '200px', margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Card
+            sx={{ maxWidth: '150px', height: '200px', margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}
+            onClick={onClick}
+        >
             <CardMedia
                 component="img"
                 alt={item.title}

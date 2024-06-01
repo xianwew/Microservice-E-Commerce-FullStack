@@ -36,7 +36,7 @@ VALUES
 (26, 3, 'Cookware', '2024-05-28 10:30:00', '2024-05-28 10:30:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280278/XianweiECommerce/Category/ch7laxpv1wuz2odkbuef.png'),
 (27, 3, 'Lighting', '2024-05-28 10:40:00', '2024-05-28 10:40:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280328/XianweiECommerce/Category/uw9itoejlkk3bxvmia3n.png'),
 (28, 3, 'Storage Solutions', '2024-05-28 10:50:00', '2024-05-28 10:50:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280361/XianweiECommerce/Category/usq8khm1yed0useuikxw.png'),
-(29, 4, 'Romantic', '2024-05-28 11:00:00', '2024-05-28 11:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1716849371/XianweiECommerce/Category/nonfiction.png'),
+(29, 4, 'Romantic', '2024-05-28 11:00:00', '2024-05-28 11:00:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717283752/XianweiECommerce/Category/dzbdlsg4qhp7yrxldvie.png'),
 (30, 4, 'Biographies', '2024-05-28 11:10:00', '2024-05-28 11:10:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280463/XianweiECommerce/Category/j5k7sjrxkxef6lzkcqbm.png'),
 (31, 4, 'Science Fiction', '2024-05-28 11:20:00', '2024-05-28 11:20:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280496/XianweiECommerce/Category/zpnj2fcc1kukf5sojlrc.png'),
 (32, 4, 'Fantasy', '2024-05-28 11:30:00', '2024-05-28 11:30:00', 'http://res.cloudinary.com/dl7atizzb/image/upload/v1717280534/XianweiECommerce/Category/bvny2jsy5bopiizt1iea.png'),
