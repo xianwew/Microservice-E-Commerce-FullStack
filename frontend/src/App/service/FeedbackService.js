@@ -11,6 +11,17 @@ export const fetchItemFeedbacks = async (itemId) => {
     }
 };
 
+// Fetch feedbacks for a specific user
+export const fetchUserFeedbacks = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`/api/feedback/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user feedbacks:', error);
+        throw error;
+    }
+};
+
 
 export const submitFeedback = async (itemId, feedback) => {
     const state = store.getState();

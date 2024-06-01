@@ -10,11 +10,7 @@ import java.util.Optional;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findByItemId(Long itemId);
-
-    Optional<Feedback> findByItemIdAndUserId(Long itemId, String userId);
-
-    boolean existsByItemIdAndUserId(Long itemId, String userId);
-
     List<Feedback> findByUserId(String userId);
+    boolean existsByItemIdAndUserId(Long itemId, String userId);
 }
 

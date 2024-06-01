@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Button, Grid, Divider } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import FeedbackDialog from '../Feedback/FeedbackDialog';
-import { fetchItemFeedbacks } from '../../service/FeedbackService';
+import { fetchItemFeedbacks, fetchUserFeedbacks } from '../../service/FeedbackService';
 
 const OrderReceipt = ({ order }) => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ const OrderReceipt = ({ order }) => {
     useEffect(() => {
         const fetchFeedbacks = async () => {
             try {
-                const feedbacks = await fetchItemFeedbacks(order.userId);
+                const feedbacks = await fetchUserFeedbacks(order.userId); // Correctly fetch user feedbacks
                 setUserFeedbacks(feedbacks);
             } catch (error) {
                 console.error('Error fetching user feedbacks:', error);

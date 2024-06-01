@@ -56,6 +56,7 @@ public class FeedbackService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
+        // Check if the user already has feedback for the item
         if (feedbackRepository.existsByItemIdAndUserId(itemId, userId)) {
             throw new IllegalArgumentException("User has already provided feedback for this item");
         }
@@ -94,3 +95,4 @@ public class FeedbackService {
         feedbackRepository.delete(feedback);
     }
 }
+
