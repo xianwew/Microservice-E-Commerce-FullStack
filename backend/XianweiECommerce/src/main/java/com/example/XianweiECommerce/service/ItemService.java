@@ -254,19 +254,19 @@ public class ItemService {
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
-    public List<ItemDTO> searchItems(String query, String country, String city, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+    public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where(null);
         boolean hasCriteria = false;
 
         // Normalize and validate inputs
         final String finalQuery = query != null ? query.trim() : "";
         final String finalCountry = country != null ? country.trim() : "";
-        final String finalCity = city != null ? city.trim() : "";
+        final String finalState = state != null ? state.trim() : "";
         final Double finalMinPrice = (minPrice != null && minPrice >= 0) ? minPrice : null;
         final Double finalMaxPrice = (maxPrice != null && maxPrice >= 0) ? maxPrice : null;
 
-        log.info("Starting search with parameters: query={}, country={}, city={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
-                finalQuery, finalCountry, finalCity, finalMinPrice, finalMaxPrice, mainCategoryId, subCategoryId);
+        log.info("Starting search with parameters: query={}, country={}, state={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                finalQuery, finalCountry, finalState, finalMinPrice, finalMaxPrice, mainCategoryId, subCategoryId);
 
         if (!finalQuery.isEmpty() && !"all".equalsIgnoreCase(finalQuery)) {
             hasCriteria = true;
@@ -286,11 +286,11 @@ public class ItemService {
                     criteriaBuilder.equal(root.get("country"), finalCountry));
             log.info("Added country criteria");
         }
-        if (!finalCity.isEmpty() && !"all".equalsIgnoreCase(finalCity)) {
+        if (!finalState.isEmpty() && !"all".equalsIgnoreCase(finalState)) {
             hasCriteria = true;
             spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("city"), finalCity));
-            log.info("Added city criteria");
+                    criteriaBuilder.equal(root.get("state"), finalState));
+            log.info("Added state criteria");
         }
         if (finalMinPrice != null) {
             hasCriteria = true;
