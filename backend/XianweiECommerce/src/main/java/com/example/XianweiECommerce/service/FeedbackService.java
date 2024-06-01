@@ -80,14 +80,19 @@ public class FeedbackService {
     }
 
     public void deleteFeedback(Long feedbackId, String userId) {
-        Feedback feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
+        Feedback feedback;
+        try {
+            feedback = feedbackRepository.findById(feedbackId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
 
-        if (!feedback.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Users can only delete their own feedback");
+            if (!feedback.getUser().getId().equals(userId)) {
+                throw new RuntimeException("Users can only delete their own feedback");
+            }
+
+            feedbackRepository.delete(feedback);
+        } catch (ResourceNotFoundException e) {
+            // Log the error if needed
         }
-
-        feedbackRepository.delete(feedback);
     }
 }
 

@@ -25,6 +25,7 @@ const ItemDetails = ({ item }) => {
                 const data = await fetchItemFeedbacks(item.id);
                 setFeedbacks(data);
                 setLoading(false);
+                console.log(data);
             } catch (error) {
                 setError('Error fetching feedbacks');
                 setLoading(false);
@@ -37,21 +38,11 @@ const ItemDetails = ({ item }) => {
     }, [tabIndex, item.id]);
 
     const handleDeleteFeedback = async (feedbackId) => {
-        try {
-            await deleteFeedback(feedbackId);
-            setFeedbacks(feedbacks.filter((feedback) => feedback.id !== feedbackId));
-        } catch (error) {
-            console.error('Error deleting feedback:', error);
-        }
+        setFeedbacks(feedbacks.filter((feedback) => feedback.id !== feedbackId));
     };
 
     const handleUpdateFeedback = async (feedbackId, updatedFeedback) => {
-        try {
-            const data = await updateFeedback(feedbackId, updatedFeedback);
-            setFeedbacks(feedbacks.map((feedback) => (feedback.id === feedbackId ? data : feedback)));
-        } catch (error) {
-            console.error('Error updating feedback:', error);
-        }
+        setFeedbacks(feedbacks.map((feedback) => (feedback.id === feedbackId ? updatedFeedback : feedback)));
     };
 
     return (

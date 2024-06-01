@@ -63,7 +63,7 @@ export default function App() {
                             <Route path="/receipt/:id" element={<UserReceiptPage />} />
                             <Route path="/profile" element={<UserProfilePage />} />
                             <Route path="/sell" element={<SellPage />} />
-                            <Route path="/cart" element={<CartPage />} />
+                            <Route path="/cart" element={<CartPage />} /> 
                             <Route path="/checkout" element={<CheckoutPage />} />
                         </Route>
                         <Route path="/seller-profile/:id" element={<SellerProfilePage />} />

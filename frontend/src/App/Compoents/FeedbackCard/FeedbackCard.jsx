@@ -2,11 +2,14 @@ import React, {useState} from 'react';
 import { Box, Typography, Rating, TextField, Button } from '@mui/material';
 import { deleteFeedback, updateFeedback } from '../../service/FeedbackService';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
 
 const FeedbackCard = ({ feedback, onDelete, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [updatedFeedback, setUpdatedFeedback] = useState(feedback);
     const userId = useSelector((state) => state.auth.user?.id);
+    const dispatch = useDispatch();
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -21,8 +24,18 @@ const FeedbackCard = ({ feedback, onDelete, onUpdate }) => {
             const data = await updateFeedback(feedback.id, updatedFeedback);
             onUpdate(feedback.id, data);
             setIsEditing(false);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Feedback updated successfully!',
+                severity: 'success'
+            }));
         } catch (error) {
             console.error('Error updating feedback:', error);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Failed to update feedback!',
+                severity: 'error'
+            }));
         }
     };
 
@@ -30,8 +43,18 @@ const FeedbackCard = ({ feedback, onDelete, onUpdate }) => {
         try {
             await deleteFeedback(feedback.id);
             onDelete(feedback.id);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Feedback deleted successfully!',
+                severity: 'success'
+            }));
         } catch (error) {
             console.error('Error deleting feedback:', error);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Failed to delete feedback!',
+                severity: 'error'
+            }));
         }
     };
 

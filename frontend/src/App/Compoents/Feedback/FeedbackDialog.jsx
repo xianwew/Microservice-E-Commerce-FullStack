@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Rating, Box, Typography } from '@mui/material';
 import { submitFeedback } from '../../service/FeedbackService';
+import { showSnackbar } from '../../redux/slice/snackbarSlice';
+import { useDispatch } from 'react-redux';
 
-const FeedbackDialog = ({ open, onClose, itemName, itemId, userId }) => {
+const FeedbackDialog = ({ open, onClose, itemName, itemId }) => {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
+    const dispatch = useDispatch();
 
     const handleSubmit = async () => {
         const feedback = {
@@ -12,10 +15,20 @@ const FeedbackDialog = ({ open, onClose, itemName, itemId, userId }) => {
             comment
         };
         try {
-            await submitFeedback(itemId, feedback); // Pass itemId to submitFeedback
+            await submitFeedback(itemId, feedback);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Feedback submitted successfully!',
+                severity: 'success'
+            }));
             onClose();
         } catch (error) {
             console.error('Error submitting feedback:', error);
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Failed to submit feedback!',
+                severity: 'error'
+            }));
         }
     };
 
@@ -47,7 +60,7 @@ const FeedbackDialog = ({ open, onClose, itemName, itemId, userId }) => {
                     />
                 </Box>
             </DialogContent>
-            <DialogActions sx={{marginRight: '22px', marginBottom: '20px'}}>
+            <DialogActions sx={{ marginRight: '22px', marginBottom: '20px' }}>
                 <Button onClick={onClose} color="primary">
                     Cancel
                 </Button>
