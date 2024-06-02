@@ -4,6 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
 
+
 const SearchBar = ({ initialQuery = '', countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery }) => {
     const [inputValue, setInputValue] = useState(initialQuery);
     const [suggestions, setSuggestions] = useState([]);

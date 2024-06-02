@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import FilterSidebar from '../../Compoents/BrowsingPage/FilterSideBar';
 import SearchResults from '../../Compoents/BrowsingPage/SearchResults';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
@@ -13,17 +13,14 @@ const useQuery = () => {
 };
 
 const BrowsePage = () => {
-    const navigate = useNavigate();
     const query = useQuery();
-    const location = useLocation();
-    
-    const [searchQuery, setSearchQuery] = useState(query.get('query') || '');
-    const [mainCategoryQuery, setMainCategoryQuery] = useState(query.get('mainCategory') || 'all');
-    const [subCategoryQuery, setSubCategoryQuery] = useState(query.get('subCategory') || 'all');
-    const [minPriceQuery, setMinPriceQuery] = useState(query.get('minPrice') || '');
-    const [maxPriceQuery, setMaxPriceQuery] = useState(query.get('maxPrice') || '');
-    const [stateQuery, setStateQuery] = useState(query.get('state') || '');
-    const [countryQuery, setCountryQuery] = useState(query.get('country') || '');
+    const searchQuery = query.get('query') || '';
+    const mainCategoryQuery = query.get('mainCategory') || 'all';
+    const subCategoryQuery = query.get('subCategory') || 'all';
+    const minPriceQuery = query.get('minPrice') || '';
+    const maxPriceQuery = query.get('maxPrice') || '';
+    const stateQuery = query.get('state') || '';
+    const countryQuery = query.get('country') || '';
 
     const [results, setResults] = useState([]);
     const [mainCategories, setMainCategories] = useState([{ id: 'all', name: 'All' }]);
@@ -56,10 +53,6 @@ const BrowsePage = () => {
     };
 
     useEffect(() => {
-        fetchSubCategoriesForMainCategory(mainCategoryQuery);
-    }, [mainCategoryQuery]);
-
-    useEffect(() => {
         const fetchSearchResults = async () => {
             try {
                 const data = await SearchService.searchItems(
@@ -80,64 +73,26 @@ const BrowsePage = () => {
         fetchSearchResults();
     }, [searchQuery, countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery]);
 
-    const updateURLParams = () => {
-        const params = new URLSearchParams();
-        if (searchQuery) params.set('query', searchQuery);
-        if (countryQuery) params.set('country', countryQuery);
-        if (stateQuery) params.set('state', stateQuery);
-        if (minPriceQuery) params.set('minPrice', minPriceQuery);
-        if (maxPriceQuery) params.set('maxPrice', maxPriceQuery);
-        if (mainCategoryQuery !== 'all') params.set('mainCategory', mainCategoryQuery);
-        if (subCategoryQuery !== 'all') params.set('subCategory', subCategoryQuery);
-
-        navigate({ search: params.toString() });
-    };
-
-    useEffect(() => {
-        updateURLParams();
-    }, [searchQuery, countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery]);
-
     return (
         <div className='app-content' style={{ width: '100%', paddingTop: '52px', boxSizing: "border-box" }}>
-            <div style={{ borderRadius: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box" }}>
-                <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px" }}>
+            <div style={{ borderRadius: '25px',  display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box" }}>
+                <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px"}}>
                     <SearchBar 
                         initialQuery={searchQuery} 
-                        setSearchQuery={setSearchQuery}
                         countryQuery={countryQuery}
-                        setCountryQuery={setCountryQuery}
                         stateQuery={stateQuery}
-                        setStateQuery={setStateQuery}
                         minPriceQuery={minPriceQuery}
-                        setMinPriceQuery={setMinPriceQuery}
                         maxPriceQuery={maxPriceQuery}
-                        setMaxPriceQuery={setMaxPriceQuery}
                         mainCategoryQuery={mainCategoryQuery}
-                        setMainCategoryQuery={setMainCategoryQuery}
                         subCategoryQuery={subCategoryQuery}
-                        setSubCategoryQuery={setSubCategoryQuery}
                     />
                 </div>
-                <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%' }}>
+                <div style={{ display: 'flex', paddingTop: '20px', boxSizing: 'border-box', padding: '10px 20px 40px 20px', width: '100%'}}>
                     <FilterSidebar
                         mainCategories={mainCategories}
                         subCategories={subCategories}
                         setSubCategories={setSubCategories}
                         fetchSubCategories={fetchSubCategoriesForMainCategory}
-                        mainCategorySelection={mainCategoryQuery}
-                        setMainCategorySelection={setMainCategoryQuery}
-                        subCategorySelection={subCategoryQuery}
-                        setSubCategorySelection={setSubCategoryQuery}
-                        priceRange={{ min: minPriceQuery, max: maxPriceQuery }}
-                        setPriceRange={({ min, max }) => {
-                            setMinPriceQuery(min);
-                            setMaxPriceQuery(max);
-                        }}
-                        locationFilter={{ state: stateQuery, country: countryQuery }}
-                        setLocationFilter={({ state, country }) => {
-                            setStateQuery(state);
-                            setCountryQuery(country);
-                        }}
                     />
                     <SearchResults results={results} />
                 </div>
