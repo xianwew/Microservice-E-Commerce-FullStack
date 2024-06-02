@@ -1,12 +1,17 @@
 server:
-  port: 8070
+  port: 8080
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:7080/realms/XianweiECommerce
   application:
-    name: "Item"
+    name: "XianweiECommerce"
 
   datasource:
-    url: jdbc:mysql://localhost:3306/itemserivce
+    url: jdbc:mysql://localhost:3306/ecommerce
     username: root
     password: wxwwxw123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -18,6 +23,16 @@ spring:
   sql:
     init:
       mode: always
+
+keycloak:
+  auth-server-url: http://localhost:7080
+  realm: XianweiECommerce
+  client-id: xianwei-ecommerce-monolith-client
+  client-secret: 4M8WYjvd1HV1WLvMGxZUhV60IKADbIxH
+  master-id: xianwei-ecommerce-monolith-client
+  master-secret: kHn11XuL8pytqXTW2eQiK6l6VlT8DYlc
+  admin-username: admin
+  admin-password: admin
 
 cloudinary:
   cloud-name: dl7atizzb
