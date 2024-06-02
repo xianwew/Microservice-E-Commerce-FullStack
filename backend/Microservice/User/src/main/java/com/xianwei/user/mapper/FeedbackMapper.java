@@ -1,11 +1,10 @@
-package com.example.XianweiECommerce.mapper;
+package com.xianwei.user.mapper;
 
 import com.example.XianweiECommerce.dto.FeedbackDTO;
-import com.example.XianweiECommerce.model.Feedback;
-import com.example.XianweiECommerce.model.Item;
-import com.example.XianweiECommerce.model.User;
-import com.example.XianweiECommerce.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.xianwei.user.model.Feedback;
+import com.xianwei.user.model.Item;
+import com.xianwei.user.model.User;
 import org.springframework.stereotype.Component;
 
 @Component

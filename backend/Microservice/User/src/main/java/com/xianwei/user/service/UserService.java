@@ -1,16 +1,18 @@
-package com.example.XianweiECommerce.service;
+package com.xianwei.user.service;
 import com.example.XianweiECommerce.dto.UserDTO;
 import com.example.XianweiECommerce.dto.CardDTO;
-import com.example.XianweiECommerce.mapper.CardMapper;
+
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.exception.UserAlreadyExistsException;
-import com.example.XianweiECommerce.mapper.UserMapper;
-import com.example.XianweiECommerce.model.*;
+
 import com.example.XianweiECommerce.repository.AddressRepository;
 import com.example.XianweiECommerce.repository.CardRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
-import com.example.XianweiECommerce.repository.UserRepository;
+
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
+import com.example.XianweiECommerce.service.CloudinaryService;
+import com.example.XianweiECommerce.service.KeycloakService;
+import com.xianwei.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,11 +3,9 @@ import com.example.XianweiECommerce.dto.FeedbackDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.FeedbackMapper;
 import com.example.XianweiECommerce.model.Feedback;
-import com.example.XianweiECommerce.model.Item;
 import com.example.XianweiECommerce.model.Rating;
 import com.example.XianweiECommerce.model.User;
 import com.example.XianweiECommerce.repository.FeedbackRepository;
-import com.example.XianweiECommerce.repository.ItemRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

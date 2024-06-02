@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.mapper;
+package com.xianwei.user.mapper;
 import com.example.XianweiECommerce.dto.CardDTO;
 import com.example.XianweiECommerce.model.Card;
 

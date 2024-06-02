@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.model;
+package com.xianwei.user.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

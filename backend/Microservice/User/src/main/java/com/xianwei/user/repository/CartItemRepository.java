@@ -1,5 +1,6 @@
-package com.example.XianweiECommerce.repository;
-import com.example.XianweiECommerce.model.CartItem;
+package com.xianwei.user.repository;
+
+import com.xianwei.user.model.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

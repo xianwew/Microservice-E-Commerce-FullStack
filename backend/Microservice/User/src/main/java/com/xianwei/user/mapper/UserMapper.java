@@ -1,7 +1,8 @@
-package com.example.XianweiECommerce.mapper;
+package com.xianwei.user.mapper;
 import com.example.XianweiECommerce.dto.UserDTO;
-import com.example.XianweiECommerce.model.Cart;
-import com.example.XianweiECommerce.model.User;
+import com.xianwei.user.model.Cart;
+import com.xianwei.user.model.User;
+
 
 public class UserMapper {
 

@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.jwt;
+package com.xianwei.user.jwt;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;

@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.controller;
+package com.xianwei.user.controller;
 
 import com.example.XianweiECommerce.dto.CartDTO;
 import com.example.XianweiECommerce.dto.CartItemInputDTO;
@@ -6,15 +6,16 @@ import com.example.XianweiECommerce.dto.CartItemOutputDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
 import com.example.XianweiECommerce.model.Item;
-import com.example.XianweiECommerce.repository.ItemRepository;
-import com.example.XianweiECommerce.service.CartService;
 import com.example.XianweiECommerce.service.UserService;
+import com.xianwei.user.service.CartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @Slf4j
@@ -23,14 +24,17 @@ public class CartController {
     private final CartService cartService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
-    private final ItemRepository itemRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${itemservice.url}")
+    private String itemServiceBaseUrl;
 
     @Autowired
-    public CartController(CartService cartService, JwtTokenProvider jwtTokenProvider, UserService userService, ItemRepository itemRepository) {
+    public CartController(CartService cartService, JwtTokenProvider jwtTokenProvider, UserService userService, RestTemplate restTemplate) {
         this.cartService = cartService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
-        this.itemRepository = itemRepository;
+        this.restTemplate = restTemplate;
     }
 
     @PostMapping
@@ -76,9 +80,15 @@ public class CartController {
     public ResponseEntity<CartItemOutputDTO> addItemToCart(@RequestBody CartItemInputDTO cartItemDTO, @RequestHeader("Authorization") String token) {
         String userId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));
 
-        // Query the item table to get the seller ID using the item ID
-        Item item = itemRepository.findById(cartItemDTO.getItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", cartItemDTO.getItemId().toString()));
+        // Query the item service to get the seller ID using the item ID
+        String itemServiceUrl = itemServiceBaseUrl + "/" + cartItemDTO.getItemId();
+        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(itemServiceUrl, Item.class);
+        Item item = itemResponse.getBody();
+
+        if (item == null) {
+            throw new ResourceNotFoundException("Item", "id", cartItemDTO.getItemId().toString());
+        }
+
         String sellerId = item.getSeller().getId();
 
         // Compare the seller ID with the extracted user ID

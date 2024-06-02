@@ -1,7 +1,6 @@
 package com.example.XianweiECommerce.validator;
 
 import com.example.XianweiECommerce.annotation.ItemValidInitialQuantity;
-import com.example.XianweiECommerce.dto.ItemDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

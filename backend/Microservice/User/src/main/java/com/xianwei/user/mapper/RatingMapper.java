@@ -1,7 +1,8 @@
-package com.example.XianweiECommerce.mapper;
+package com.xianwei.user.mapper;
 
 import com.example.XianweiECommerce.dto.RatingDTO;
-import com.example.XianweiECommerce.model.Rating;
+import com.xianwei.user.model.Rating;
+
 
 public class RatingMapper {
 

@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.dto;
+package com.xianwei.user.dto;
 import com.example.XianweiECommerce.utils.CustomLocalDateDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;

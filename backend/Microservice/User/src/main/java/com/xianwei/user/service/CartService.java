@@ -1,21 +1,26 @@
-package com.example.XianweiECommerce.service;
+package com.xianwei.user.service;
 
 import com.example.XianweiECommerce.dto.CartDTO;
 import com.example.XianweiECommerce.dto.CartItemInputDTO;
 import com.example.XianweiECommerce.dto.CartItemOutputDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
-import com.example.XianweiECommerce.mapper.CartItemMapper;
-import com.example.XianweiECommerce.mapper.CartMapper;
-import com.example.XianweiECommerce.model.Cart;
-import com.example.XianweiECommerce.model.CartItem;
+
 import com.example.XianweiECommerce.model.Item;
-import com.example.XianweiECommerce.model.User;
-import com.example.XianweiECommerce.repository.CartItemRepository;
-import com.example.XianweiECommerce.repository.ItemRepository;
-import com.example.XianweiECommerce.repository.CartRepository;
-import com.example.XianweiECommerce.repository.UserRepository;
+
+import com.xianwei.user.mapper.CartItemMapper;
+import com.xianwei.user.mapper.CartMapper;
+import com.xianwei.user.model.Cart;
+import com.xianwei.user.model.CartItem;
+import com.xianwei.user.model.User;
+import com.xianwei.user.repository.CartItemRepository;
+import com.xianwei.user.repository.CartRepository;
+import com.xianwei.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,26 +30,32 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
+
+    private final CartItemMapper cartItemMapper;
+    private final RestTemplate restTemplate;
+
+    @Value("${itemservice.url}")
+    private String itemServiceUrl;
 
     @Autowired
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, UserRepository userRepository, ItemRepository itemRepository) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, UserRepository userRepository, RestTemplate restTemplate, CartItemMapper cartItemMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
+        this.restTemplate = restTemplate;
+        this.cartItemMapper = cartItemMapper;
     }
 
     public CartDTO createCart(CartDTO cartDTO) {
-        Cart cart = CartMapper.toEntity(cartDTO, itemRepository);
+        Cart cart = CartMapper.toEntity(cartDTO);
         cart = cartRepository.save(cart);
-        return CartMapper.toDTO(cart, itemRepository);
+        return CartMapper.toDTO(cart);
     }
 
     public CartDTO getCart(Long id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", id.toString()));
-        return CartMapper.toDTO(cart, itemRepository);
+        return CartMapper.toDTO(cart);
     }
 
     public CartDTO updateCart(CartDTO cartDTO) {
@@ -54,7 +65,8 @@ public class CartService {
         List<CartItemInputDTO> cartItemInputDTOs = cartDTO.getCartItemsInput().stream()
                 .map(itemDTO -> (CartItemInputDTO) itemDTO)
                 .collect(Collectors.toList());
-        List<CartItem> cartItems = CartItemMapper.toEntityList(cartItemInputDTOs, itemRepository);
+
+        List<CartItem> cartItems = CartItemMapper.toEntityList(cartItemInputDTOs);
 
         // Clear existing items and add the updated items
         cart.getCartItems().clear();
@@ -64,7 +76,7 @@ public class CartService {
         }
 
         cart = cartRepository.save(cart);
-        return CartMapper.toDTO(cart, itemRepository);
+        return CartMapper.toDTO(cart);
     }
 
     public void deleteCartByUserId(String userId) {
@@ -90,15 +102,14 @@ public class CartService {
             user.setCart(cart);
             userRepository.save(user);
         }
-        return CartMapper.toDTO(user.getCart(), itemRepository);
+        return CartMapper.toDTO(user.getCart());
     }
 
     public CartItemOutputDTO addItemToCart(CartItemInputDTO cartItemDTO) {
         Cart cart = cartRepository.findById(cartItemDTO.getCartId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartItemDTO.getCartId().toString()));
 
-        Item item = itemRepository.findById(cartItemDTO.getItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "itemId", cartItemDTO.getItemId().toString()));
+        Item item = getItemById(cartItemDTO.getItemId());
 
         Optional<CartItem> existingCartItem = cart.getCartItems().stream()
                 .filter(ci -> ci.getItem().getId().equals(cartItemDTO.getItemId()))
@@ -116,6 +127,16 @@ public class CartService {
 
         cartItem = cartItemRepository.save(cartItem);
         return CartItemMapper.toOutputDTO(cartItem, item);
+    }
+
+    private Item getItemById(Long itemId) {
+        String url = String.format("%s/%s", itemServiceUrl, itemId);
+        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(url, Item.class);
+        Item item = itemResponse.getBody();
+        if (item == null) {
+            throw new ResourceNotFoundException("Item", "id", itemId.toString());
+        }
+        return item;
     }
 }
 

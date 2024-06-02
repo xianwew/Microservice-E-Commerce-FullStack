@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.model;
+package com.xianwei.user.model;
 import jakarta.persistence.Entity;
 import lombok.Data;
 import jakarta.persistence.*;

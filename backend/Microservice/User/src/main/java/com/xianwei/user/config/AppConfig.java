@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.config;
+package com.xianwei.user.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;

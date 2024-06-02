@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.exception;
+package com.xianwei.user.exception;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 

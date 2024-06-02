@@ -1,6 +1,7 @@
-package com.example.XianweiECommerce.exception;
+package com.xianwei.user.exception;
 
-import com.example.XianweiECommerce.dto.ErrorResponseDto;
+
+import com.xianwei.user.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.dto;
+package com.xianwei.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

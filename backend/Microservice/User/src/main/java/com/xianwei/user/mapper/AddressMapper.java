@@ -1,7 +1,9 @@
-package com.example.XianweiECommerce.mapper;
+package com.xianwei.user.mapper;
 
-import com.example.XianweiECommerce.dto.AddressDTO;
-import com.example.XianweiECommerce.model.Address;
+
+import com.xianwei.user.dto.AddressDTO;
+import com.xianwei.user.model.Address;
+
 
 public class AddressMapper {
 

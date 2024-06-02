@@ -1,4 +1,4 @@
-package com.example.XianweiECommerce.model;
+package com.xianwei.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
