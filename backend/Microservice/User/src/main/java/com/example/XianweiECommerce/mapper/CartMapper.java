@@ -2,13 +2,29 @@ package com.example.XianweiECommerce.mapper;
 
 import com.example.XianweiECommerce.dto.CartDTO;
 import com.example.XianweiECommerce.model.Cart;
+import com.example.XianweiECommerce.model.CartItem;
 import com.example.XianweiECommerce.model.User;
-import com.example.XianweiECommerce.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
 public class CartMapper {
 
-    public static Cart toEntity(CartDTO cartDTO, ItemRepository itemRepository) {
+    private static RestTemplate restTemplate;
+    private static String itemServiceUrl;
+
+    @Autowired
+    public CartMapper(RestTemplate restTemplate, @Value("${itemservice.url}") String itemServiceUrl) {
+        CartMapper.restTemplate = restTemplate;
+        CartMapper.itemServiceUrl = itemServiceUrl;
+    }
+
+    public static Cart toEntity(CartDTO cartDTO) {
         Cart cart = new Cart();
         cart.setId(cartDTO.getId());
 
@@ -16,15 +32,21 @@ public class CartMapper {
         user.setId(cartDTO.getUserId());
         cart.setUser(user);
 
-        cart.setCartItems(CartItemMapper.toEntityList(cartDTO.getCartItemsInput(), itemRepository));
+        List<CartItem> cartItems = cartDTO.getCartItemsInput().stream()
+                .map(cartItemDTO -> CartItemMapper.toEntity(cartItemDTO))
+                .collect(Collectors.toList());
+        cart.setCartItems(cartItems);
+
         return cart;
     }
 
-    public static CartDTO toDTO(Cart cart, ItemRepository itemRepository) {
+    public static CartDTO toDTO(Cart cart) {
         CartDTO cartDTO = new CartDTO();
         cartDTO.setId(cart.getId());
         cartDTO.setUserId(cart.getUser().getId());
-        cartDTO.setCartItemsOutput(CartItemMapper.toOutputDTOList(cart.getCartItems(), itemRepository));
+        cartDTO.setCartItemsOutput(cart.getCartItems().stream()
+                .map(cartItem -> CartItemMapper.toOutputDTO(cartItem))
+                .collect(Collectors.toList()));
         return cartDTO;
     }
 }

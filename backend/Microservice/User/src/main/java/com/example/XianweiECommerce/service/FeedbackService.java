@@ -7,17 +7,17 @@ import com.example.XianweiECommerce.model.Item;
 import com.example.XianweiECommerce.model.Rating;
 import com.example.XianweiECommerce.model.User;
 import com.example.XianweiECommerce.repository.FeedbackRepository;
-import com.example.XianweiECommerce.repository.ItemRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,18 +25,21 @@ import java.util.stream.Collectors;
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
-    private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     private final FeedbackMapper feedbackMapper;
+    private final RestTemplate restTemplate;
+
+    @Value("${itemservice.url}")
+    private String itemServiceUrl;
 
     @Autowired
-    public FeedbackService(FeedbackRepository feedbackRepository, ItemRepository itemRepository, UserRepository userRepository, RatingRepository ratingRepository, FeedbackMapper feedbackMapper) {
+    public FeedbackService(FeedbackRepository feedbackRepository, UserRepository userRepository, RatingRepository ratingRepository, FeedbackMapper feedbackMapper, RestTemplate restTemplate) {
         this.feedbackRepository = feedbackRepository;
-        this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
         this.feedbackMapper = feedbackMapper;
+        this.restTemplate = restTemplate;
     }
 
     public List<FeedbackDTO> getFeedbacksByItemId(Long itemId) {
@@ -58,8 +61,7 @@ public class FeedbackService {
     }
 
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemId.toString()));
+        Item item = getItemById(itemId);
 
         if (item.isDeleted()) {
             throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
@@ -136,7 +138,7 @@ public class FeedbackService {
     }
 
     private void updateUserRating(String userId) {
-        List<Item> items = itemRepository.findBySellerId(userId);
+        List<Item> items = getItemsBySellerId(userId);
         int totalRating = 0;
         int numRatings = 0;
 
@@ -154,5 +156,24 @@ public class FeedbackService {
 
         ratingRepository.save(userRating);
     }
-}
 
+    private Item getItemById(Long itemId) {
+        String url = String.format("%s/%s", itemServiceUrl, itemId);
+        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(url, Item.class);
+        Item item = itemResponse.getBody();
+        if (item == null) {
+            throw new ResourceNotFoundException("Item", "id", itemId.toString());
+        }
+        return item;
+    }
+
+    private List<Item> getItemsBySellerId(String sellerId) {
+        String url = String.format("%s/seller/%s", itemServiceUrl, sellerId);
+        ResponseEntity<Item[]> itemResponse = restTemplate.getForEntity(url, Item[].class);
+        Item[] items = itemResponse.getBody();
+        if (items == null) {
+            throw new ResourceNotFoundException("Items", "sellerId", sellerId);
+        }
+        return List.of(items);
+    }
+}
