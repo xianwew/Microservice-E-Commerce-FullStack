@@ -26,7 +26,7 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
     const [debouncedLocationFilter] = useDebounce(locationFilter, 500);
 
     const updateQueryParams = () => {
-        const params = new URLSearchParams();
+        const params = new URLSearchParams(location.search);
         if (debouncedMainCategorySelection !== 'all') params.set('mainCategory', debouncedMainCategorySelection);
         if (debouncedSubCategorySelection !== 'all') params.set('subCategory', debouncedSubCategorySelection);
         if (debouncedPriceRange.min) params.set('minPrice', debouncedPriceRange.min);
@@ -34,6 +34,7 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
         if (debouncedLocationFilter.state) params.set('state', debouncedLocationFilter.state);
         if (debouncedLocationFilter.country) params.set('country', debouncedLocationFilter.country);
         navigate({ search: params.toString() });
+        // navigate(`/browse?${searchParams.toString()}`);
     };
 
     useEffect(() => {

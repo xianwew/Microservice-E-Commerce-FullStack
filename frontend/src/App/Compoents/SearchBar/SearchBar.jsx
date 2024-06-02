@@ -3,12 +3,13 @@ import { TextField, InputAdornment, Button, Autocomplete, Box } from '@mui/mater
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
-
+import { useLocation } from 'react-router-dom';
 
 const SearchBar = ({ initialQuery = '', countryQuery, stateQuery, minPriceQuery, maxPriceQuery, mainCategoryQuery, subCategoryQuery }) => {
     const [inputValue, setInputValue] = useState(initialQuery);
     const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchSuggestions = async (query) => {
@@ -28,16 +29,16 @@ const SearchBar = ({ initialQuery = '', countryQuery, stateQuery, minPriceQuery,
     }, [inputValue]);
 
     const handleSearch = () => {
-        const params = new URLSearchParams();
-        if (inputValue.trim() !== '') params.set('query', inputValue);
-        if (countryQuery) params.set('country', countryQuery);
-        if (stateQuery) params.set('state', stateQuery);
-        if (minPriceQuery) params.set('minPrice', minPriceQuery);
-        if (maxPriceQuery) params.set('maxPrice', maxPriceQuery);
-        if (mainCategoryQuery && mainCategoryQuery !== 'all') params.set('mainCategory', mainCategoryQuery);
-        if (subCategoryQuery && subCategoryQuery !== 'all') params.set('subCategory', subCategoryQuery);
+        const searchParams = new URLSearchParams(location.search);
+        if (inputValue.trim() !== '') searchParams.set('query', inputValue);
+        if (countryQuery) searchParams.set('country', countryQuery);
+        if (stateQuery) searchParams.set('state', stateQuery);
+        if (minPriceQuery) searchParams.set('minPrice', minPriceQuery);
+        if (maxPriceQuery) searchParams.set('maxPrice', maxPriceQuery);
+        if (mainCategoryQuery && mainCategoryQuery !== 'all') searchParams.set('mainCategory', mainCategoryQuery);
+        if (subCategoryQuery && subCategoryQuery !== 'all') searchParams.set('subCategory', subCategoryQuery);
 
-        navigate(`/browse?${params.toString()}`);
+        navigate(`/browse?${searchParams.toString()}`);
     };
 
     const handleAutocompleteChange = (event, newValue) => {

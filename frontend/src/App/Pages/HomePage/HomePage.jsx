@@ -49,6 +49,7 @@ export default function HomePage() {
         <div className="app-content" style={{ paddingTop: '30px', backgroundColor: 'rgba(0, 0, 0, 0)' }}>
             <div style={{ margin: '20px 0px' }}>
                 <SearchBar 
+                    params={query}
                     initialQuery={query.get('query') || ''} 
                     countryQuery={query.get('country') || ''}
                     stateQuery={query.get('state') || ''}

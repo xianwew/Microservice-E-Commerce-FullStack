@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import FilterSidebar from '../../Compoents/BrowsingPage/FilterSideBar';
 import SearchResults from '../../Compoents/BrowsingPage/SearchResults';
-import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
 import SearchBar from '../../Compoents/SearchBar/SearchBar';
 import { useLocation } from 'react-router-dom';
 import SearchService from '../../service/SearchService';
 import { fetchMainCategories, fetchSubCategories } from '../../service/CategoryService';
-import { useNavigate } from 'react-router-dom';
-
-const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-};
 
 const BrowsePage = () => {
-    const query = useQuery();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
     const searchQuery = query.get('query') || '';
     const mainCategoryQuery = query.get('mainCategory') || 'all';
     const subCategoryQuery = query.get('subCategory') || 'all';
@@ -75,7 +70,7 @@ const BrowsePage = () => {
 
     return (
         <div className='app-content' style={{ width: '100%', paddingTop: '52px', boxSizing: "border-box" }}>
-            <div style={{ borderRadius: '25px',  display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box" }}>
+            <div style={{ borderRadius: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', boxSizing: "border-box" }}>
                 <div style={{ padding: '0px 0px 30px 0px', width: '85%', minWidth: "400px"}}>
                     <SearchBar 
                         initialQuery={searchQuery} 
