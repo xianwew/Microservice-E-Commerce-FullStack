@@ -85,7 +85,7 @@ function ItemsOnSale() {
                                             <Typography variant="body2" color="textSecondary">Listed on: {new Date(item.dateListed).toLocaleDateString()}</Typography>
                                         </CardContent>
                                         <CardActions>
-                                            <Button size="small" color="primary" onClick={() => navigate(`/item/${item.id}`)}>View Details</Button>
+                                            <Button size="small" color="primary" onClick={() => navigate(`/item/${item.id}/0`)}>View Details</Button>
                                             <Button size="small" color="secondary" onClick={() => handleEdit(item.id)}>Edit</Button>
                                             <Button size="small" color="error" onClick={() => handleOpenDialog(item.id)}>Delete</Button>
                                         </CardActions>
