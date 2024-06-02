@@ -10,6 +10,7 @@ import com.example.XianweiECommerce.repository.OrderRepository;
 import com.example.XianweiECommerce.repository.ShippingMethodRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
@@ -50,19 +51,27 @@ public class OrderService {
         return orderRepository.findByUserId(userId).stream().map(orderMapper::toDTO).collect(Collectors.toList());
     }
 
+    @Transactional
     public Long createOrder(Long cartId, Long shippingMethodId, Long cardId) {
-        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId.toString()));
-        ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId).orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId.toString()));
+        ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
 
         // Calculate the total amount
-        double itemsTotal = cart.getCartItems().stream().mapToDouble(item -> item.getQuantity() * item.getItem().getPrice()).sum();
+        double itemsTotal = cart.getCartItems().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getItem().getPrice())
+                .sum();
         double shippingCost = shippingMethod.getPrice();
         double tax = (itemsTotal + shippingCost) * 0.06;
         double totalAmount = itemsTotal + shippingCost + tax;
 
         // Simulate payment processing
-        boolean paymentSuccessful = Boolean.TRUE.equals(restTemplate.postForObject(paymentServiceUrl, totalAmount, Boolean.class));
+        boolean paymentSuccessful = Boolean.TRUE.equals(
+                restTemplate.postForObject(paymentServiceUrl, totalAmount, Boolean.class)
+        );
 
         if (paymentSuccessful) {
             Order order = new Order();
@@ -87,6 +96,11 @@ public class OrderService {
             order.setOrderItems(orderItems);
 
             Order savedOrder = orderRepository.save(order);
+
+            // Clear the cart after the order is successfully created
+            cart.getCartItems().clear();
+            cartRepository.save(cart);
+
             return savedOrder.getId();
         } else {
             throw new RuntimeException("Payment failed");
