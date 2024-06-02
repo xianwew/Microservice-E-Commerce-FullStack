@@ -10,7 +10,7 @@ const HomePageCarousal = ({ title, items }) => {
       </Typography>
       <Box sx={{ display: 'flex', gap: '30px', overflowX: 'auto', padding: '10px', padding: '40px 40px', backgroundColor: '#fafafa', borderRadius: '25px'  }}>
         {items.map((item, index) => (
-          <ShoppingItemCard key={index} image={item.image} title={item.title} price={item.price} />
+          <ShoppingItemCard key={index} item={item} />
         ))}
       </Box>
     </Box>

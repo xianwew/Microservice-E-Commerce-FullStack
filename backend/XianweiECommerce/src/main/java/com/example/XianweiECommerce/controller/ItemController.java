@@ -116,6 +116,24 @@ public class ItemController {
         return ResponseEntity.ok(items);
     }
 
+    @GetMapping("/trending-today")
+    public ResponseEntity<List<ItemDTO>> getTrendingTodayItems() {
+        List<ItemDTO> items = itemService.getRandomItems(8);
+        return ResponseEntity.ok(items);
+    }
+
+    @GetMapping("/items-on-sale")
+    public ResponseEntity<List<ItemDTO>> getItemsOnSale() {
+        List<ItemDTO> items = itemService.getRandomItems(8);
+        return ResponseEntity.ok(items);
+    }
+
+    @GetMapping("/just-for-you")
+    public ResponseEntity<List<ItemDTO>> getJustForYouItems() {
+        List<ItemDTO> items = itemService.getRandomItems(8);
+        return ResponseEntity.ok(items);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<ItemDTO>> searchItems(
             @RequestParam(value = "query", required = false) String query,

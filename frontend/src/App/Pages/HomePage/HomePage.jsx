@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchMainCategories } from "../../service/CategoryService";
 import HomePageCarousal from "../../Compoents/HomePage/HomePageCarsoual";
 import { useLocation } from "react-router-dom";
+import { fetchTrendingTodayItems, fetchItemsOnSale, fetchJustForYouItems } from "../../service/RecommendationService";
 
 export default function HomePage() {
     const [mainCategories, setMainCategories] = useState([]);
@@ -25,24 +26,23 @@ export default function HomePage() {
             }
         };
 
+        const loadRecommendations = async () => {
+            try {
+                const [trending, sale, justForYou] = await Promise.all([
+                    fetchTrendingTodayItems(),
+                    fetchItemsOnSale(),
+                    fetchJustForYouItems()
+                ]);
+                setTrendingItems(trending);
+                setItemsOnSale(sale);
+                setJustForYouItems(justForYou);
+            } catch (error) {
+                console.error("Error fetching recommendation items:", error);
+            }
+        };
+
         loadCategories();
-        setTrendingItems([
-            { image: 'https://via.placeholder.com/200', title: 'Trending Item 1', price: '29.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Trending Item 2', price: '49.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Trending Item 3', price: '19.99' },
-        ]);
-
-        setItemsOnSale([
-            { image: 'https://via.placeholder.com/200', title: 'Sale Item 1', price: '9.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Sale Item 2', price: '14.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Sale Item 3', price: '24.99' },
-        ]);
-
-        setJustForYouItems([
-            { image: 'https://via.placeholder.com/200', title: 'Just For You Item 1', price: '39.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Just For You Item 2', price: '59.99' },
-            { image: 'https://via.placeholder.com/200', title: 'Just For You Item 3', price: '99.99' },
-        ]);
+        loadRecommendations();
     }, []);
 
     return (

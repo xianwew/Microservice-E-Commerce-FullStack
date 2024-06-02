@@ -100,7 +100,14 @@ const ItemDetailsPage = () => {
         } 
         catch (error) {
             console.error('Error adding item to cart:', error);
-            dispatch(showSnackbar({ open: true, message: 'Failed to add item to cart! ' + error.response.data, severity: 'error' }));
+            let message = 'Failed to add item to cart!';
+            if(error.response.status === 401){
+                message = 'Please login and try again!'
+            }
+            else{
+                message += error.message;
+            }
+            dispatch(showSnackbar({ open: true, message, severity: 'error' }));
         }
     };
 

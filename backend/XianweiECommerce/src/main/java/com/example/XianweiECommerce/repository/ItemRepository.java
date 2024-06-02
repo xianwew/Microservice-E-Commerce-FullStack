@@ -21,4 +21,7 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
     List<Item> findAllByDeletedFalse();
 
     List<Item> findBySellerIdAndDeletedFalse(String sellerId);
+
+    @Query(value = "SELECT * FROM items WHERE deleted = false ORDER BY RAND() LIMIT :count", nativeQuery = true)
+    List<Item> findRandomItems(@Param("count") int count);
 }
