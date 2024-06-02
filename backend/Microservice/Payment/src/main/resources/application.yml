@@ -1,6 +1,15 @@
 server:
   port: 8060
 
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8075/eureka/
+
 spring:
   application:
     name: "Payment"

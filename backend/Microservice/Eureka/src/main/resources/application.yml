@@ -1,8 +1,22 @@
+server:
+  port: 8075
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetchRegistry: false
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: "http://localhost:8075/eureka/"
+
 spring:
   application:
     name: "eureka"
-  config:
-    import: "optional:configserver:http://localhost:8071/"
+  security:
+    user:
+      name: admin
+      password: admin
 
 management:
   endpoints:

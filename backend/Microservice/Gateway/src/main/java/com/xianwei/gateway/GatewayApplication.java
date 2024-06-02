@@ -26,37 +26,41 @@ public class GatewayApplication {
 	}
 
 	@Bean
-	public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
+	public RouteLocator customRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
-						.route(p -> p
-								.path("/api/user/**")
-								.filters( f -> f.rewritePath("/eazybank/accounts/(?<segment>.*)","/${segment}")
-										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-										.circuitBreaker(config -> config.setName("accountsCircuitBreaker")
-												.setFallbackUri("forward:/contactSupport")))
-								.uri("lb://ACCOUNTS"))
-					.route(p -> p
-							.path("/api//**")
-							.filters( f -> f.rewritePath("/eazybank/loans/(?<segment>.*)","/${segment}")
-									.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-									.retry(retryConfig -> retryConfig.setRetries(3)
-											.setMethods(HttpMethod.GET)
-											.setBackoff(Duration.ofMillis(100),Duration.ofMillis(1000),2,true)))
-							.uri("lb://LOANS"))
-					.route(p -> p
-							.path("/eazybank/cards/**")
-							.filters( f -> f.rewritePath("/eazybank/cards/(?<segment>.*)","/${segment}")
-									.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-											)
-							.uri("lb://CARDS")).build();
+				.route(p -> p
+						.path("/api/user/**", "/api/cart/**", "/api/feedback/**", "/api/ratings/**")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)", "/${segment}")
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("userCircuitBreaker")
+										.setFallbackUri("forward:/fallback/userFallback")))
+						.uri("lb://USER"))
+				.route(p -> p
+						.path("/api/item/**", "/api/categories/**", "/api/admin/**")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)", "/${segment}")
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+								.retry(retryConfig -> retryConfig.setRetries(3)
+										.setMethods(HttpMethod.GET)
+										.setBackoff(Duration.ofMillis(100), Duration.ofMillis(1000), 2, true)))
+						.uri("lb://ITEM"))
+				.route(p -> p
+						.path("/api/orders/**")
+						.filters(f -> f.rewritePath("/api/orders/(?<segment>.*)", "/${segment}")
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+						.uri("lb://ORDER"))
+				.route(p -> p
+						.path("/api/payment/**")
+						.filters(f -> f.rewritePath("/api/payment/(?<segment>.*)", "/${segment}")
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+						.uri("lb://PAYMENT"))
+				.build();
 	}
 
 	@Bean
 	public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer() {
 		return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
 				.circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
-				.timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(10))
-						.build()).build());
+				.timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(10)).build())
+				.build());
 	}
-
 }
