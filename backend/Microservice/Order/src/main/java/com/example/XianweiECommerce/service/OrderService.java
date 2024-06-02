@@ -4,11 +4,14 @@ import com.example.XianweiECommerce.dto.OrderDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.OrderMapper;
 import com.example.XianweiECommerce.model.*;
-import com.example.XianweiECommerce.repository.CardRepository;
-import com.example.XianweiECommerce.repository.CartRepository;
+import com.example.XianweiECommerce.pojoClass.Card;
+import com.example.XianweiECommerce.pojoClass.Cart;
+import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.repository.OrderRepository;
 import com.example.XianweiECommerce.repository.ShippingMethodRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -19,9 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
-    private final CartRepository cartRepository;
     private final ShippingMethodRepository shippingMethodsRepository;
-    private final CardRepository cardRepository;
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
     private final OrderMapper orderMapper;
@@ -29,11 +30,16 @@ public class OrderService {
     @Value("${payment.service.url}")
     private String paymentServiceUrl;
 
-    public OrderService(CartRepository cartRepository, ShippingMethodRepository shippingMethodsRepository,
-                        CardRepository cardRepository, OrderRepository orderRepository, RestTemplate restTemplate, OrderMapper orderMapper) {
-        this.cartRepository = cartRepository;
+    @Value("${userservice.url}")
+    private String userServiceUrl;
+
+    @Value("${itemservice.url}")
+    private String itemServiceUrl;
+
+    @Autowired
+    public OrderService(ShippingMethodRepository shippingMethodsRepository, OrderRepository orderRepository,
+                        RestTemplate restTemplate, OrderMapper orderMapper) {
         this.shippingMethodsRepository = shippingMethodsRepository;
-        this.cardRepository = cardRepository;
         this.orderRepository = orderRepository;
         this.restTemplate = restTemplate;
         this.orderMapper = orderMapper;
@@ -53,16 +59,17 @@ public class OrderService {
 
     @Transactional
     public Long createOrder(Long cartId, Long shippingMethodId, Long cardId) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId.toString()));
+        Cart cart = getCartById(cartId);
         ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
+        Card card = getCardById(cardId);
 
         // Calculate the total amount
         double itemsTotal = cart.getCartItems().stream()
-                .mapToDouble(item -> item.getQuantity() * item.getItem().getPrice())
+                .mapToDouble(cartItem -> {
+                    Item item = getItemById(cartItem.getItemId());
+                    return cartItem.getQuantity() * item.getPrice();
+                })
                 .sum();
         double shippingCost = shippingMethod.getPrice();
         double tax = (itemsTotal + shippingCost) * 0.06;
@@ -75,7 +82,7 @@ public class OrderService {
 
         if (paymentSuccessful) {
             Order order = new Order();
-            order.setUser(cart.getUser());
+            order.setUserId(cart.getUserId());
             order.setTotalAmount(totalAmount);
             order.setStatus("COMPLETED");
             order.setShippingMethod(shippingMethod);
@@ -87,9 +94,10 @@ public class OrderService {
                     .map(cartItem -> {
                         OrderItem orderItem = new OrderItem();
                         orderItem.setOrder(order);
-                        orderItem.setItem(cartItem.getItem());
+                        orderItem.setItemId(cartItem.getItemId());
                         orderItem.setQuantity(cartItem.getQuantity());
-                        orderItem.setPrice(cartItem.getItem().getPrice());
+                        Item item = getItemById(cartItem.getItemId());
+                        orderItem.setPrice(item.getPrice());
                         return orderItem;
                     })
                     .collect(Collectors.toList());
@@ -98,13 +106,47 @@ public class OrderService {
             Order savedOrder = orderRepository.save(order);
 
             // Clear the cart after the order is successfully created
-            cart.getCartItems().clear();
-            cartRepository.save(cart);
+            clearCart(cartId);
 
             return savedOrder.getId();
         } else {
             throw new RuntimeException("Payment failed");
         }
+    }
+
+    private Cart getCartById(Long cartId) {
+        String url = String.format("%s/carts/%s", userServiceUrl, cartId);
+        ResponseEntity<Cart> cartResponse = restTemplate.getForEntity(url, Cart.class);
+        Cart cart = cartResponse.getBody();
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart", "id", cartId.toString());
+        }
+        return cart;
+    }
+
+    private Card getCardById(Long cardId) {
+        String url = String.format("%s/cards/%s", userServiceUrl, cardId);
+        ResponseEntity<Card> cardResponse = restTemplate.getForEntity(url, Card.class);
+        Card card = cardResponse.getBody();
+        if (card == null) {
+            throw new ResourceNotFoundException("Card", "id", cardId.toString());
+        }
+        return card;
+    }
+
+    private Item getItemById(Long itemId) {
+        String url = String.format("%s/%s", itemServiceUrl, itemId);
+        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(url, Item.class);
+        Item item = itemResponse.getBody();
+        if (item == null) {
+            throw new ResourceNotFoundException("Item", "id", itemId.toString());
+        }
+        return item;
+    }
+
+    private void clearCart(Long cartId) {
+        String url = String.format("%s/carts/%s/clear", userServiceUrl, cartId);
+        restTemplate.postForEntity(url, null, Void.class);
     }
 }
 

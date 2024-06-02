@@ -4,7 +4,7 @@ import com.example.XianweiECommerce.dto.CartItemOutputDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.model.Cart;
 import com.example.XianweiECommerce.model.CartItem;
-import com.example.XianweiECommerce.model.Item;
+import com.example.XianweiECommerce.pojoClass.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -34,18 +34,17 @@ public class CartItemMapper {
         cart.setId(dto.getCartId());
         entity.setCart(cart);
 
-        Item item = getItemById(dto.getItemId());
-        entity.setItem(item);
+        entity.setItemId(dto.getItemId());
         entity.setQuantity(dto.getQuantity());
         return entity;
     }
 
     public static CartItemOutputDTO toOutputDTO(CartItem entity) {
-        Item item = getItemById(entity.getItem().getId());
+        Item item = getItemById(entity.getItemId());
         CartItemOutputDTO dto = new CartItemOutputDTO();
         dto.setId(entity.getId());
         dto.setCartId(entity.getCart().getId());
-        dto.setItemId(entity.getItem().getId());
+        dto.setItemId(entity.getItemId());
         dto.setQuantity(entity.getQuantity());
         dto.setTitle(item.getTitle());
         dto.setImageUrl(item.getImageUrl());
@@ -71,6 +70,5 @@ public class CartItemMapper {
         return item;
     }
 }
-
 
 

@@ -18,19 +18,18 @@ public class Item extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "sellerId", nullable = false)
-    private User seller;
+    @Column(name = "seller_id", nullable = false)
+    private String sellerId;
 
     @Column(nullable = false)
     private String title;
 
     @Lob
-    @Column(name = "short_description", nullable = false) // Changed field
+    @Column(name = "short_description", nullable = false)
     private String shortDescription;
 
     @Lob
-    private String longDescription; // New field
+    private String longDescription;
 
     @Column(nullable = false)
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
@@ -45,13 +44,13 @@ public class Item extends BaseEntity {
     private String subImageUrl4;
 
     @Column(nullable = false)
-    private String city; // New field
+    private String city;
 
     @Column(nullable = false)
-    private String state; // New field
+    private String state;
 
     @Column(nullable = false)
-    private String country; // New field
+    private String country;
 
     @ManyToOne
     @JoinColumn(name = "mainCategoryId", nullable = false)
@@ -61,28 +60,22 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "subCategoryId", nullable = false)
     private SubCategory subCategory;
 
-    @OneToOne
-    @JoinColumn(name = "ratingId")
-    private Rating rating;
+    @Column(name = "rating_id")
+    private Long ratingId;
 
     @Column(nullable = false)
     private LocalDateTime dateListed;
 
     @Column(nullable = false)
     @Min(value = 0, message = "Quantity must be at least 0")
-    private int quantity; // New field
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Feedback> feedbacks;
+    private int quantity;
 
     @Column(nullable = false)
     private boolean deleted = false;
 
-    // Getters and setters are inherited from BaseEntity
     @PrePersist
     protected void onCreate() {
         dateListed = LocalDateTime.now();
     }
 }
-
 

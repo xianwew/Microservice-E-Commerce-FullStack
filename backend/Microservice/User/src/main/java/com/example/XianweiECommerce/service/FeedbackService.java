@@ -3,9 +3,9 @@ import com.example.XianweiECommerce.dto.FeedbackDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.FeedbackMapper;
 import com.example.XianweiECommerce.model.Feedback;
-import com.example.XianweiECommerce.model.Item;
 import com.example.XianweiECommerce.model.Rating;
 import com.example.XianweiECommerce.model.User;
+import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.repository.FeedbackRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
@@ -67,7 +67,7 @@ public class FeedbackService {
             throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
         }
 
-        if (item.getSeller().getId().equals(userId)) {
+        if (item.getSellerId().equals(userId)) {
             throw new InvalidDataAccessApiUsageException("Users cannot comment on their own items");
         }
 
@@ -78,15 +78,11 @@ public class FeedbackService {
             throw new IllegalArgumentException("User has already provided feedback for this item");
         }
 
-        Feedback feedback = new Feedback();
-        feedback.setItem(item);
-        feedback.setUser(user);
-        feedback.setRating(feedbackDTO.getRating());
-        feedback.setComment(feedbackDTO.getComment());
+        Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item.getSellerId());
         Feedback savedFeedback = feedbackRepository.save(feedback);
 
         updateItemRating(itemId);
-        updateUserRating(item.getSeller().getId());
+        updateUserRating(item.getSellerId());
 
         return feedbackMapper.toDTO(savedFeedback);
     }
@@ -103,8 +99,8 @@ public class FeedbackService {
         feedback.setComment(feedbackDTO.getComment());
         Feedback updatedFeedback = feedbackRepository.save(feedback);
 
-        updateItemRating(feedback.getItem().getId());
-        updateUserRating(feedback.getItem().getSeller().getId());
+        updateItemRating(feedback.getItemId());
+        updateUserRating(feedback.getSellerId());
 
         return feedbackMapper.toDTO(updatedFeedback);
     }
@@ -119,8 +115,8 @@ public class FeedbackService {
 
         feedbackRepository.delete(feedback);
 
-        updateItemRating(feedback.getItem().getId());
-        updateUserRating(feedback.getItem().getSeller().getId());
+        updateItemRating(feedback.getItemId());
+        updateUserRating(feedback.getSellerId());
     }
 
     private void updateItemRating(Long itemId) {

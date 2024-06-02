@@ -1,4 +1,5 @@
 package com.example.XianweiECommerce.model;
+import com.example.XianweiECommerce.pojoClass.Item;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -12,9 +13,11 @@ public class Feedback extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "itemId", nullable = false)
-    private Item item;
+    @Column(name = "itemId", nullable = false)
+    private Long itemId;
+
+    @Column(name = "sellerId", nullable = false)
+    private String sellerId;
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)

@@ -15,9 +15,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findByUserId(String userId);
     boolean existsByItemIdAndUserId(Long itemId, String userId);
 
-    List<Feedback> findByItem_Seller_Id(String sellerId);
-
-    @Query("SELECT f FROM Feedback f WHERE f.item.seller.id = :sellerId")
+    @Query("SELECT f FROM Feedback f WHERE f.sellerId = :sellerId")
     List<Feedback> findBySellerId(@Param("sellerId") String sellerId);
 }
 

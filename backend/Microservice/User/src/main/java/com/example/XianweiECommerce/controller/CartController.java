@@ -5,7 +5,7 @@ import com.example.XianweiECommerce.dto.CartItemInputDTO;
 import com.example.XianweiECommerce.dto.CartItemOutputDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
-import com.example.XianweiECommerce.model.Item;
+import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.service.CartService;
 import com.example.XianweiECommerce.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +89,7 @@ public class CartController {
             throw new ResourceNotFoundException("Item", "id", cartItemDTO.getItemId().toString());
         }
 
-        String sellerId = item.getSeller().getId();
+        String sellerId = item.getSellerId();
 
         // Compare the seller ID with the extracted user ID
         if (userId.equals(sellerId)) {

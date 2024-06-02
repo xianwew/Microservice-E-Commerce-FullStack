@@ -1,4 +1,5 @@
 package com.example.XianweiECommerce.model;
+import com.example.XianweiECommerce.pojoClass.Item;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -17,9 +18,8 @@ public class CartItem extends BaseEntity {
     @JoinColumn(name = "cartId", nullable = false)
     private Cart cart;
 
-    @ManyToOne
-    @JoinColumn(name = "itemId", nullable = false)
-    private Item item;
+    @Column(name = "itemId", nullable = false)
+    private Long itemId;
 
     @Column(nullable = false)
     private int quantity;

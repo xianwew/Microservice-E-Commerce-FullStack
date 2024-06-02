@@ -35,10 +35,5 @@ cloudinary:
   api-secret: 1iZYfLLIkyl9QGDTreYx3r-5Mcc
   avatar-upload-folder: XianweiECommerce/UserAvatar
 
-payment:
-  service:
-    url:
-      http://localhost:8080/api/payment
-
 itemservice:
   url: http://localhost:8040/api/items

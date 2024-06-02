@@ -1,16 +1,21 @@
 package com.example.XianweiECommerce.service;
 
 import com.example.XianweiECommerce.dto.ItemDTO;
+import com.example.XianweiECommerce.dto.RatingDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.ItemMapper;
 import com.example.XianweiECommerce.model.*;
+import com.example.XianweiECommerce.pojoClass.Rating;
+import com.example.XianweiECommerce.pojoClass.User;
 import com.example.XianweiECommerce.repository.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
@@ -22,42 +27,39 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
     private final MainCategoryRepository mainCategoryRepository;
     private final SubCategoryRepository subCategoryRepository;
-    private final RatingRepository ratingRepository;
     private final CloudinaryService cloudinaryService;
-
-    private final OrderItemRepository orderItemRepository;
-    private final FeedbackRepository feedbackRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${cloudinary.item-upload-folder}")
     private String imageFolder;
 
+    @Value("${userservice.url}")
+    private String userServiceUrl;
+
+    @Value("${orderservice.url}")
+    private String orderServiceUrl;
+
+    @Value("${ratingservice.url}")
+    private String ratingServiceUrl;
+
     @Autowired
     public ItemService(ItemRepository itemRepository,
-                       UserRepository userRepository,
                        MainCategoryRepository mainCategoryRepository,
                        SubCategoryRepository subCategoryRepository,
-                       RatingRepository ratingRepository,
                        CloudinaryService cloudinaryService,
-                       OrderItemRepository orderItemRepository,
-                       FeedbackRepository feedbackRepository) {
+                       RestTemplate restTemplate) {
         this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
         this.mainCategoryRepository = mainCategoryRepository;
         this.subCategoryRepository = subCategoryRepository;
-        this.ratingRepository = ratingRepository;
         this.cloudinaryService = cloudinaryService;
-        this.orderItemRepository = orderItemRepository;
-        this.feedbackRepository = feedbackRepository;
+        this.restTemplate = restTemplate;
     }
 
     public List<ItemDTO> getItemsByUserId(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("The item can't be found!")
-        );
-        List<Item> items = itemRepository.findBySellerIdAndDeletedFalse(user.getId());
+        User user = getUserById(userId);
+        List<Item> items = itemRepository.findBySellerIdAndDeletedFalse(userId);
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
@@ -67,13 +69,12 @@ public class ItemService {
     }
 
     private void uploadSubImages(Item existingItem, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
-        // Clear existing sub-image URLs
         existingItem.setSubImageUrl1(null);
         existingItem.setSubImageUrl2(null);
         existingItem.setSubImageUrl3(null);
         existingItem.setSubImageUrl4(null);
         int index = 0;
-        for(String s: subImageFileURLs){
+        for (String s : subImageFileURLs) {
             switch (index) {
                 case 0:
                     existingItem.setSubImageUrl1(s);
@@ -91,8 +92,8 @@ public class ItemService {
             index++;
         }
 
-        if(subImageFiles != null){
-            for(MultipartFile o: subImageFiles){
+        if (subImageFiles != null) {
+            for (MultipartFile o : subImageFiles) {
                 Map<String, Object> uploadResult = cloudinaryService.uploadFile(o.getBytes(), imageFolder);
                 String s = (String) uploadResult.get("url");
                 switch (index) {
@@ -116,26 +117,22 @@ public class ItemService {
 
     public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
         log.info("saving new listing!");
-        User seller = userRepository.findById(itemDTO.getSellerId()).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", itemDTO.getSellerId())
-        );
+        User seller = getUserById(itemDTO.getSellerId());
         MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
                 () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
         );
         SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
                 () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
         );
-        Rating rating = itemDTO.getRatingId() != null ?
-                ratingRepository.findById(itemDTO.getRatingId()).orElse(null) : null;
 
-        if(itemDTO.getQuantity() <= 0){
+        if (itemDTO.getQuantity() <= 0) {
             throw new RuntimeException("Quantity should be greater than 0!");
         }
-        if(itemDTO.getPrice() <= 0){
+        if (itemDTO.getPrice() <= 0) {
             throw new RuntimeException("Price should be greater than 0!");
         }
 
-        Item item = ItemMapper.toEntity(itemDTO, seller, mainCategory, subCategory, rating);
+        Item item = ItemMapper.toEntity(itemDTO, mainCategory, subCategory);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
@@ -163,13 +160,18 @@ public class ItemService {
 
         Item savedItem = itemRepository.save(item);
         log.info("listing saved");
+
         // Create an empty rating for the new product
-        Rating productRating = new Rating();
+        RatingDTO productRating = new RatingDTO();
         productRating.setEntityId(savedItem.getId().toString());
-        productRating.setEntityType(Rating.EntityType.PRODUCT);
+        productRating.setEntityType("PRODUCT");
         productRating.setTotalRating(0);
         productRating.setNumRatings(0);
-        ratingRepository.save(productRating);
+        RatingDTO savedRating = createRating(productRating);
+
+        // Update the item with the rating ID
+        savedItem.setRatingId(savedRating.getId());
+        itemRepository.save(savedItem);
 
         return ItemMapper.toDTO(savedItem);
     }
@@ -184,10 +186,8 @@ public class ItemService {
         SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
                 () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
         );
-        Rating rating = itemDTO.getRatingId() != null ?
-                ratingRepository.findById(itemDTO.getRatingId()).orElse(null) : null;
 
-        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory, rating);
+        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             if (existingItem.getImageUrl() != null && !existingItem.getImageUrl().isEmpty()) {
@@ -259,14 +259,12 @@ public class ItemService {
         return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
     }
 
-
     public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         Specification<Item> spec = Specification.where((root, query1, criteriaBuilder) ->
                 criteriaBuilder.isFalse(root.get("deleted"))
         );
         boolean hasCriteria = false;
 
-        // Normalize and validate inputs
         final String finalQuery = query != null ? query.trim() : "";
         final String finalCountry = country != null ? country.trim() : "";
         final String finalState = state != null ? state.trim() : "";
@@ -335,11 +333,10 @@ public class ItemService {
             log.info("No search criteria provided, fetching all items");
             return itemRepository.findAllByDeletedFalse().stream().map(item -> {
                 ItemDTO itemDTO = ItemMapper.toDTO(item);
-                User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
+                User seller = getUserById(item.getSellerId());
                 if (seller != null) {
                     itemDTO.setUsername(seller.getUsername());
-                    Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
-                            .orElse(null);
+                    Rating rating = getRatingById(item.getRatingId());
                 }
                 return itemDTO;
             }).collect(Collectors.toList());
@@ -350,14 +347,52 @@ public class ItemService {
 
         return items.stream().map(item -> {
             ItemDTO itemDTO = ItemMapper.toDTO(item);
-            User seller = userRepository.findById(item.getSeller().getId()).orElse(null);
+            User seller = getUserById(item.getSellerId());
             if (seller != null) {
                 itemDTO.setUsername(seller.getUsername());
-                Rating rating = ratingRepository.findByEntityIdAndEntityType(seller.getId(), Rating.EntityType.SELLER)
-                        .orElse(null);
+                Rating rating = getRatingById(item.getRatingId());
             }
             return itemDTO;
         }).collect(Collectors.toList());
     }
-}
 
+    private User getUserById(String userId) {
+        String url = String.format("%s/%s", userServiceUrl, userId);
+        ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class);
+        User user = userResponse.getBody();
+        if (user == null) {
+            throw new ResourceNotFoundException("User", "id", userId);
+        }
+        return user;
+    }
+
+    private Rating getRatingById(Long ratingId) {
+        String url = String.format("%s/%s", ratingServiceUrl, ratingId);
+        ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
+        Rating rating = ratingResponse.getBody();
+        if (rating == null) {
+            throw new ResourceNotFoundException("Rating", "id", ratingId.toString());
+        }
+        return rating;
+    }
+
+    private RatingDTO createRating(RatingDTO ratingDTO) {
+        String url = String.format("%s", ratingServiceUrl);
+        ResponseEntity<RatingDTO> ratingResponse = restTemplate.postForEntity(url, ratingDTO, RatingDTO.class);
+        RatingDTO savedRating = ratingResponse.getBody();
+        if (savedRating == null) {
+            throw new RuntimeException("Failed to create rating");
+        }
+        return savedRating;
+    }
+
+//    private List<OrderItem> getOrderItemsByItemId(Long itemId) {
+//        String url = String.format("%s/item/%s", orderServiceUrl, itemId);
+//        ResponseEntity<OrderItem[]> orderItemResponse = restTemplate.getForEntity(url, OrderItem[].class);
+//        OrderItem[] orderItems = orderItemResponse.getBody();
+//        if (orderItems == null) {
+//            throw new ResourceNotFoundException("OrderItems", "itemId", itemId.toString());
+//        }
+//        return List.of(orderItems);
+//    }
+}

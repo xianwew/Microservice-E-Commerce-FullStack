@@ -1,5 +1,4 @@
 package com.example.XianweiECommerce.service;
-import com.example.XianweiECommerce.dto.UserDTO;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -77,36 +76,6 @@ public class KeycloakService {
         }
     }
 
-    public void createUserInKeycloak(String token, UserDTO userDTO) {
-        String url = keycloakUrl + "/admin/realms/" + realm + "/users";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-
-        Map<String, Object> credentials = new HashMap<>();
-        credentials.put("type", "password");
-        credentials.put("value", userDTO.getPassword());
-        credentials.put("temporary", false);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("username", userDTO.getEmail());
-        body.put("email", userDTO.getEmail());
-        body.put("enabled", true);
-        body.put("credentials", new Map[] {credentials});
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
-        try {
-            log.info("Creating user in Keycloak. URL: {}, Body: {}", url, body);
-            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-            log.info("User created in Keycloak successfully.");
-        } catch (Exception e) {
-            log.error("Exception occurred while creating user in Keycloak.", e);
-            throw new RuntimeException("Exception occurred while creating user in Keycloak.", e);
-        }
-    }
-
     public String getUserToken(String username, String password) {
         String url = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
@@ -138,25 +107,4 @@ public class KeycloakService {
         }
     }
 
-    public void updateUserInKeycloak(String adminToken, String userId, UserDTO userDTO) {
-        String keycloakUrl = this.keycloakUrl + "/admin/realms/" + realm + "/users/" + userId;
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(adminToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("username", userDTO.getUsername());
-        body.put("email", userDTO.getEmail());
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-
-        try {
-            restTemplate.exchange(keycloakUrl, HttpMethod.PUT, entity, String.class);
-            log.info("Successfully updated user in Keycloak");
-        } catch (Exception e) {
-            log.error("Failed to update user in Keycloak", e);
-            throw new RuntimeException("Failed to update user in Keycloak", e);
-        }
-    }
 }

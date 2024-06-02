@@ -19,6 +19,16 @@ spring:
     init:
       mode: always
 
+keycloak:
+  auth-server-url: http://localhost:7080
+  realm: XianweiECommerce
+  client-id: xianwei-ecommerce-monolith-client
+  client-secret: 4M8WYjvd1HV1WLvMGxZUhV60IKADbIxH
+  master-id: xianwei-ecommerce-monolith-client
+  master-secret: kHn11XuL8pytqXTW2eQiK6l6VlT8DYlc
+  admin-username: admin
+  admin-password: admin
+
 cloudinary:
   cloud-name: dl7atizzb
   api-key: 145491984531442
@@ -30,4 +40,16 @@ cloudinary:
 payment:
   service:
     url:
-      http://localhost:8080/api/payment
+      http://localhost:8060/api/payment
+
+itemservice:
+  url: http://localhost:8040/api/items
+
+userservice:
+  url: http://localhost:8070/api/users
+
+cardservice:
+  url: http://localhost:8070/api/cards
+
+orderservice:
+  url: http://localhost:8050/api/orders

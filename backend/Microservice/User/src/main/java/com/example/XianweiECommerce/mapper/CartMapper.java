@@ -33,7 +33,7 @@ public class CartMapper {
         cart.setUser(user);
 
         List<CartItem> cartItems = cartDTO.getCartItemsInput().stream()
-                .map(cartItemDTO -> CartItemMapper.toEntity(cartItemDTO))
+                .map(CartItemMapper::toEntity)
                 .collect(Collectors.toList());
         cart.setCartItems(cartItems);
 
@@ -45,12 +45,11 @@ public class CartMapper {
         cartDTO.setId(cart.getId());
         cartDTO.setUserId(cart.getUser().getId());
         cartDTO.setCartItemsOutput(cart.getCartItems().stream()
-                .map(cartItem -> CartItemMapper.toOutputDTO(cartItem))
+                .map(CartItemMapper::toOutputDTO)
                 .collect(Collectors.toList()));
         return cartDTO;
     }
 }
-
 
 
 

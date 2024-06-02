@@ -14,12 +14,11 @@ public class OrderItem extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "orderId", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "itemId", nullable = false)
-    private Item item;
+    @Column(name = "item_id", nullable = false)
+    private Long itemId;
 
     @Column(nullable = false)
     private int quantity;

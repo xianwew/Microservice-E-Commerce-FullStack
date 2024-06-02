@@ -8,8 +8,8 @@ import com.example.XianweiECommerce.mapper.CartItemMapper;
 import com.example.XianweiECommerce.mapper.CartMapper;
 import com.example.XianweiECommerce.model.Cart;
 import com.example.XianweiECommerce.model.CartItem;
-import com.example.XianweiECommerce.model.Item;
 import com.example.XianweiECommerce.model.User;
+import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.repository.CartItemRepository;
 import com.example.XianweiECommerce.repository.CartRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
@@ -62,10 +62,7 @@ public class CartService {
                 .collect(Collectors.toList());
 
         List<CartItem> cartItems = cartItemInputDTOs.stream()
-                .map(cartItemDTO -> {
-                    Item item = getItemById(cartItemDTO.getItemId());
-                    return CartItemMapper.toEntity(cartItemDTO);
-                })
+                .map(cartItemDTO -> CartItemMapper.toEntity(cartItemDTO))
                 .collect(Collectors.toList());
 
         // Clear existing items and add the updated items
@@ -109,10 +106,8 @@ public class CartService {
         Cart cart = cartRepository.findById(cartItemDTO.getCartId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartItemDTO.getCartId().toString()));
 
-        Item item = getItemById(cartItemDTO.getItemId());
-
         Optional<CartItem> existingCartItem = cart.getCartItems().stream()
-                .filter(ci -> ci.getItem().getId().equals(cartItemDTO.getItemId()))
+                .filter(ci -> ci.getItemId().equals(cartItemDTO.getItemId()))
                 .findFirst();
 
         CartItem cartItem;
@@ -127,16 +122,6 @@ public class CartService {
 
         cartItem = cartItemRepository.save(cartItem);
         return CartItemMapper.toOutputDTO(cartItem);
-    }
-
-    private Item getItemById(Long itemId) {
-        String url = String.format("%s/%s", itemServiceUrl, itemId);
-        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(url, Item.class);
-        Item item = itemResponse.getBody();
-        if (item == null) {
-            throw new ResourceNotFoundException("Item", "id", itemId.toString());
-        }
-        return item;
     }
 }
 
