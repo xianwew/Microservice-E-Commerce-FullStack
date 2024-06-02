@@ -6,6 +6,7 @@ import RecommendationItem from '../../Compoents/CartPage/RecommendationItem';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { loadCartItems, updateCartState } from '../../redux/slice/cartSlice';
+import { fetchTrendingTodayItems } from '../../service/RecommendationService';
 
 const sampleRecommendations = [
     {
@@ -28,12 +29,26 @@ const Cart = () => {
     const cartItems = useSelector((state) => state.cart?.items) || [];
     const cartId = useSelector((state) => state.cart.cartId); // Select cartId from the state
     const currentUserId = useSelector((state) => state.auth.user?.id);
+    const [sampleRecommendations, setSampleRecommendations] = useState([]);
 
     useEffect(() => {
         if (currentUserId) {
             dispatch(loadCartItems(currentUserId));
         }
     }, [currentUserId, dispatch]);
+
+    useEffect(() => {
+        const fetchRecommendations = async () => {
+            try {
+                const recommendations = await fetchTrendingTodayItems();
+                setSampleRecommendations(recommendations);
+            } catch (error) {
+                console.error('Error fetching recommendations:', error);
+            }
+        };
+
+        fetchRecommendations();
+    }, []);
 
     const handleQuantityChange = (id, quantity) => {
         const updatedItems = cartItems.map(item =>
@@ -52,11 +67,11 @@ const Cart = () => {
     };
 
     return (
-        <div className='app-content' >
+        <div className='app-content'>
             <Typography variant="h3" mb={4} sx={{ paddingTop: '50px', boxSizing: 'border-box', fontWeight: 'bold', textAlign: 'center' }}>
                 Shopping Cart
             </Typography>
-            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ backgroundColor: '#fafafa', borderRadius: '25px', flex: '1', marginRight: '30px' }}>
                     {cartItems && cartItems.length > 0 ?
                         cartItems.map(item => (
@@ -68,7 +83,7 @@ const Cart = () => {
                             />
                         ))
                         :
-                        <p style={{width: '100%', textAlign: 'center', fontSize: '20px'}}>Your cart is empty.</p>
+                        <p style={{ width: '100%', textAlign: 'center', fontSize: '20px' }}>Your cart is empty.</p>
                     }
                 </div>
                 <CartTotal total={calculateTotal()} />
@@ -77,7 +92,7 @@ const Cart = () => {
             <Typography variant="h5" mb={2}>Recommended for you</Typography>
             <Grid container spacing={2}>
                 {sampleRecommendations.map(item => (
-                    <Grid item xs={12} sm={6} md={4} key={item.id}>
+                    <Grid item xs={12} sm={6} md={2} key={item.id}>
                         <RecommendationItem item={item} />
                     </Grid>
                 ))}
