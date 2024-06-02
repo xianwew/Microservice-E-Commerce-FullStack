@@ -27,11 +27,10 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/api/item/**").authenticated()
                         .pathMatchers("/api/user/{id}").authenticated()
                         .pathMatchers("/api/cart/{id}").authenticated()
-                        .anyExchange().authenticated()
+                        .anyExchange().permitAll()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(grantedAuthoritiesExtractor()))
-                );
+                .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+                        .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor())));
         serverHttpSecurity.csrf(csrf -> csrf.disable());
         return serverHttpSecurity.build();
     }
