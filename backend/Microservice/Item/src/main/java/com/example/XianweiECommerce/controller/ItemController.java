@@ -35,6 +35,13 @@ public class ItemController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    // New endpoint to fetch items by seller ID
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<ItemDTO>> getItemsBySellerId(@PathVariable String sellerId) {
+        List<ItemDTO> items = itemService.getItemsByUserId(sellerId);
+        return ResponseEntity.ok(items);
+    }
+
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ItemDTO> createItem(@Valid @RequestPart("item") String itemJson,
                                               @RequestPart("imageFile") MultipartFile imageFile,

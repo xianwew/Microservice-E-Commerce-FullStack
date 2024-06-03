@@ -1,5 +1,5 @@
 -- Create Items table
-CREATE TABLE items (
+CREATE TABLE IF NOT EXISTS items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     seller_id VARCHAR(36) NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE items (
 );
 
 -- Create MainCategories table
-CREATE TABLE main_categories (
+CREATE TABLE IF NOT EXISTS main_categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +33,7 @@ CREATE TABLE main_categories (
 );
 
 -- Create SubCategories table
-CREATE TABLE sub_categories (
+CREATE TABLE IF NOT EXISTS sub_categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     main_category_id BIGINT NOT NULL,
     image_url VARCHAR(255) NOT NULL,

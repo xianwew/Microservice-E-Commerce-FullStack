@@ -22,10 +22,10 @@ public class FeedbackMapper {
         return dto;
     }
 
-    public Feedback toEntity(FeedbackDTO dto, User user, String sellerId) {
+    public Feedback toEntity(FeedbackDTO dto, User user, Item item) {
         Feedback feedback = new Feedback();
-        feedback.setItemId(dto.getItemId());
-        feedback.setSellerId(sellerId);
+        feedback.setItemId(item.getId());
+        feedback.setSellerId(item.getSellerId());
         feedback.setUser(user);
         feedback.setRating(dto.getRating());
         feedback.setComment(dto.getComment());

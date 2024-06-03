@@ -1,5 +1,5 @@
 -- Create Users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -15,7 +15,7 @@ CREATE TABLE users (
 );
 
 -- Create Addresses table
-CREATE TABLE addresses (
+CREATE TABLE IF NOT EXISTS addresses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     street VARCHAR(255) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE addresses (
 );
 
 -- Create Cards table
-CREATE TABLE cards (
+CREATE TABLE IF NOT EXISTS cards (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     type VARCHAR(50) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE cards (
 );
 
 -- Create Carts table
-CREATE TABLE carts (
+CREATE TABLE IF NOT EXISTS carts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -52,7 +52,7 @@ CREATE TABLE carts (
 );
 
 -- Create CartItems table
-CREATE TABLE cart_items (
+CREATE TABLE IF NOT EXISTS cart_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     cart_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE cart_items (
 );
 
 -- Create Feedback table
-CREATE TABLE feedback (
+CREATE TABLE IF NOT EXISTS feedback (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     item_id BIGINT NOT NULL,
     user_id VARCHAR(36) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE feedback (
 );
 
 -- Create Ratings table
-CREATE TABLE ratings (
+CREATE TABLE IF NOT EXISTS ratings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     entity_id VARCHAR(255) NOT NULL,
     entity_type ENUM('PRODUCT', 'SELLER') NOT NULL,

@@ -36,7 +36,7 @@ export const fetchSellerFeedbacks = async (sellerId) => {
 export const submitFeedback = async (itemId, feedback) => {
     const state = store.getState();
     const token = state.auth.user.token;
-
+    console.log(feedback);
     try {
         const response = await axiosInstance.post(`/api/feedback/item/${itemId}`, feedback, {
             headers: {

@@ -62,7 +62,7 @@ public class FeedbackService {
 
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
         Item item = getItemById(itemId);
-
+        log.info("itemId: " + item.getId());
         if (item.isDeleted()) {
             throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
         }
@@ -78,7 +78,7 @@ public class FeedbackService {
             throw new IllegalArgumentException("User has already provided feedback for this item");
         }
 
-        Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item.getSellerId());
+        Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item);
         Feedback savedFeedback = feedbackRepository.save(feedback);
 
         updateItemRating(itemId);

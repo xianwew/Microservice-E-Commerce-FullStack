@@ -1,5 +1,5 @@
 -- Create Orders table
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE orders (
 );
 
 -- Create OrderItems table
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE order_items (
 );
 
 -- Create ShippingMethods table
-CREATE TABLE shipping_methods (
+CREATE TABLE IF NOT EXISTS shipping_methods (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
