@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -116,7 +117,7 @@ public class ItemService {
     }
 
     public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
-        log.info("saving new listing!");
+        log.info("Saving new listing!");
         User seller = getUserById(itemDTO.getSellerId());
         MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
                 () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
@@ -159,7 +160,7 @@ public class ItemService {
         }
 
         Item savedItem = itemRepository.save(item);
-        log.info("listing saved");
+        log.info("Listing saved");
 
         // Create an empty rating for the new product
         RatingDTO productRating = new RatingDTO();
@@ -357,42 +358,35 @@ public class ItemService {
     }
 
     private User getUserById(String userId) {
-        String url = String.format("%s/%s", userServiceUrl, userId);
-        ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class);
-        User user = userResponse.getBody();
-        if (user == null) {
+        try {
+            String url = String.format("%s/%s", userServiceUrl, userId);
+            ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class);
+            return userResponse.getBody();
+        } catch (HttpServerErrorException e) {
+            log.error("Error fetching user with id {}: {}", userId, e.getMessage());
             throw new ResourceNotFoundException("User", "id", userId);
         }
-        return user;
     }
 
     private Rating getRatingById(Long ratingId) {
-        String url = String.format("%s/%s", ratingServiceUrl, ratingId);
-        ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
-        Rating rating = ratingResponse.getBody();
-        if (rating == null) {
+        try {
+            String url = String.format("%s/%s", ratingServiceUrl, ratingId);
+            ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
+            return ratingResponse.getBody();
+        } catch (HttpServerErrorException e) {
+            log.error("Error fetching rating with id {}: {}", ratingId, e.getMessage());
             throw new ResourceNotFoundException("Rating", "id", ratingId.toString());
         }
-        return rating;
     }
 
     private RatingDTO createRating(RatingDTO ratingDTO) {
-        String url = String.format("%s", ratingServiceUrl);
-        ResponseEntity<RatingDTO> ratingResponse = restTemplate.postForEntity(url, ratingDTO, RatingDTO.class);
-        RatingDTO savedRating = ratingResponse.getBody();
-        if (savedRating == null) {
+        try {
+            String url = String.format("%s", ratingServiceUrl);
+            ResponseEntity<RatingDTO> ratingResponse = restTemplate.postForEntity(url, ratingDTO, RatingDTO.class);
+            return ratingResponse.getBody();
+        } catch (HttpServerErrorException e) {
+            log.error("Error creating rating: {}", e.getMessage());
             throw new RuntimeException("Failed to create rating");
         }
-        return savedRating;
     }
-
-//    private List<OrderItem> getOrderItemsByItemId(Long itemId) {
-//        String url = String.format("%s/item/%s", orderServiceUrl, itemId);
-//        ResponseEntity<OrderItem[]> orderItemResponse = restTemplate.getForEntity(url, OrderItem[].class);
-//        OrderItem[] orderItems = orderItemResponse.getBody();
-//        if (orderItems == null) {
-//            throw new ResourceNotFoundException("OrderItems", "itemId", itemId.toString());
-//        }
-//        return List.of(orderItems);
-//    }
 }

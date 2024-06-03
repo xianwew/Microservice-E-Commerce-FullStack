@@ -45,4 +45,4 @@ cloudinary:
   avatar-upload-folder: XianweiECommerce/UserAvatar
 
 itemservice:
-  url: http://localhost:8040/api/items
+  url: http://localhost:8040/api/item

@@ -52,10 +52,10 @@ payment:
       http://localhost:8060/api/payment
 
 itemservice:
-  url: http://localhost:8040/api/items
+  url: http://localhost:8040/api/item
 
 userservice:
-  url: http://localhost:8070/api/users
+  url: http://localhost:8070/api/user
 
 cardservice:
   url: http://localhost:8070/api/cards
