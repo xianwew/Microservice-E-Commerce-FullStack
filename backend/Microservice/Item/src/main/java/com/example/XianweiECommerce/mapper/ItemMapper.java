@@ -2,8 +2,6 @@ package com.example.XianweiECommerce.mapper;
 
 import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.model.*;
-import com.example.XianweiECommerce.pojoClass.Rating;
-import com.example.XianweiECommerce.pojoClass.User;
 import org.springframework.stereotype.Component;
 
 @Component

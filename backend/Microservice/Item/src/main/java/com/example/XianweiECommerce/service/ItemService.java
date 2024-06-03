@@ -119,7 +119,6 @@ public class ItemService {
 
     public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
         log.info("Saving new listing!");
-        User seller = getUserById(itemDTO.getSellerId());
         MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
                 () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
         );
@@ -340,7 +339,6 @@ public class ItemService {
                     log.info("seller: " + seller.toString());
                     log.info("Seller's username: " + seller.getUsername());
                     itemDTO.setUsername(seller.getUsername());
-                    Rating rating = getRatingById(item.getRatingId());
                 }
                 else{
                     log.warn("Seller invalid!");
@@ -349,13 +347,14 @@ public class ItemService {
             }).collect(Collectors.toList());
         }
 
+        log.info("debugging!!!");
         List<Item> items = itemRepository.findAll(spec);
         log.info("Found {} items matching criteria", items.size());
 
         return items.stream().map(item -> {
             ItemDTO itemDTO = ItemMapper.toDTO(item);
             User seller = getUserById(item.getSellerId());
-            log.info("Seller username: " + seller.getUsername());
+            log.info("Seller: " + seller.toString());
             if (seller != null) {
                 itemDTO.setUsername(seller.getUsername());
                 Rating rating = getRatingById(item.getRatingId());
