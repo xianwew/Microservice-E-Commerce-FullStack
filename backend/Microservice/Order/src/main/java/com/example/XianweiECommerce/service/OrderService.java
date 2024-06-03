@@ -9,17 +9,24 @@ import com.example.XianweiECommerce.pojoClass.Cart;
 import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.repository.OrderRepository;
 import com.example.XianweiECommerce.repository.ShippingMethodRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrderService {
 
     private final ShippingMethodRepository shippingMethodsRepository;
@@ -35,6 +42,9 @@ public class OrderService {
 
     @Value("${itemservice.url}")
     private String itemServiceUrl;
+
+    @Value("${cartservice.url}")
+    private String cartServiceUrl;
 
     @Autowired
     public OrderService(ShippingMethodRepository shippingMethodsRepository, OrderRepository orderRepository,
@@ -58,16 +68,16 @@ public class OrderService {
     }
 
     @Transactional
-    public Long createOrder(Long cartId, Long shippingMethodId, Long cardId) {
-        Cart cart = getCartById(cartId);
+    public Long createOrder(Long cartId, Long shippingMethodId, Long cardId, String token) {
+        Cart cart = getCartById(cartId, token);
         ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
-        Card card = getCardById(cardId);
+        Card card = getCardById(cardId, token);
 
         // Calculate the total amount
         double itemsTotal = cart.getCartItems().stream()
                 .mapToDouble(cartItem -> {
-                    Item item = getItemById(cartItem.getItemId());
+                    Item item = getItemById(cartItem.getItemId(), token);
                     return cartItem.getQuantity() * item.getPrice();
                 })
                 .sum();
@@ -81,6 +91,7 @@ public class OrderService {
         );
 
         if (paymentSuccessful) {
+            log.info("Payment successful!");
             Order order = new Order();
             order.setUserId(cart.getUserId());
             order.setTotalAmount(totalAmount);
@@ -96,7 +107,7 @@ public class OrderService {
                         orderItem.setOrder(order);
                         orderItem.setItemId(cartItem.getItemId());
                         orderItem.setQuantity(cartItem.getQuantity());
-                        Item item = getItemById(cartItem.getItemId());
+                        Item item = getItemById(cartItem.getItemId(), token);
                         orderItem.setPrice(item.getPrice());
                         return orderItem;
                     })
@@ -106,7 +117,7 @@ public class OrderService {
             Order savedOrder = orderRepository.save(order);
 
             // Clear the cart after the order is successfully created
-            clearCart(cartId);
+            clearCart(cartId, token);
 
             return savedOrder.getId();
         } else {
@@ -114,19 +125,32 @@ public class OrderService {
         }
     }
 
-    private Cart getCartById(Long cartId) {
-        String url = String.format("%s/carts/%s", userServiceUrl, cartId);
-        ResponseEntity<Cart> cartResponse = restTemplate.getForEntity(url, Cart.class);
+    private Cart getCartById(Long cartId, String token) {
+        String url = String.format("%s/cartId/%s", cartServiceUrl, cartId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<Cart> cartResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Cart.class);
         Cart cart = cartResponse.getBody();
         if (cart == null) {
             throw new ResourceNotFoundException("Cart", "id", cartId.toString());
         }
+        if (cart.getCartItems() == null) {
+            cart.setCartItems(new ArrayList<>());
+        }
         return cart;
     }
 
-    private Card getCardById(Long cardId) {
-        String url = String.format("%s/cards/%s", userServiceUrl, cardId);
-        ResponseEntity<Card> cardResponse = restTemplate.getForEntity(url, Card.class);
+    private Card getCardById(Long cardId, String token) {
+        String url = String.format("%s/card/%s", userServiceUrl, cardId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<Card> cardResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Card.class);
         Card card = cardResponse.getBody();
         if (card == null) {
             throw new ResourceNotFoundException("Card", "id", cardId.toString());
@@ -134,9 +158,14 @@ public class OrderService {
         return card;
     }
 
-    private Item getItemById(Long itemId) {
+    private Item getItemById(Long itemId, String token) {
         String url = String.format("%s/%s", itemServiceUrl, itemId);
-        ResponseEntity<Item> itemResponse = restTemplate.getForEntity(url, Item.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<Item> itemResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Item.class);
         Item item = itemResponse.getBody();
         if (item == null) {
             throw new ResourceNotFoundException("Item", "id", itemId.toString());
@@ -144,9 +173,14 @@ public class OrderService {
         return item;
     }
 
-    private void clearCart(Long cartId) {
-        String url = String.format("%s/carts/%s/clear", userServiceUrl, cartId);
-        restTemplate.postForEntity(url, null, Void.class);
+    private void clearCart(Long cartId, String token) {
+        String url = String.format("%s/clear/%s", cartServiceUrl, cartId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
     }
 }
 

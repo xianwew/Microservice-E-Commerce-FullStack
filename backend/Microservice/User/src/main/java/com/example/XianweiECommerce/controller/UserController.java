@@ -101,6 +101,12 @@ public class UserController {
     }
 
     //card related
+    @GetMapping("/card/{cardId}")
+    public ResponseEntity<CardDTO> getCardById(@PathVariable Long cardId) {
+        CardDTO cardDTO = userService.getCardById(cardId);
+        return ResponseEntity.ok(cardDTO);
+    }
+
     @GetMapping("/{id}/card")
     public ResponseEntity<List<CardDTO>> getAllCards(@PathVariable String id) {
         List<CardDTO> cards = userService.getCardsByUserId(id);

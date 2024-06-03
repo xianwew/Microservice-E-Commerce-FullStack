@@ -123,6 +123,13 @@ public class CartService {
         cartItem = cartItemRepository.save(cartItem);
         return CartItemMapper.toOutputDTO(cartItem);
     }
+
+    public void clearCart(Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", cartId.toString()));
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+    }
 }
 
 

@@ -41,8 +41,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createOrder(@RequestBody CreateOrderRequestDTO request) {
-        Long orderId = orderService.createOrder(request.getCartId(), request.getShippingMethodId(), request.getCardId());
+    public ResponseEntity<Long> createOrder(@RequestBody CreateOrderRequestDTO request, @RequestHeader("Authorization") String token) {
+        Long orderId = orderService.createOrder(request.getCartId(), request.getShippingMethodId(), request.getCardId(), token);
         return ResponseEntity.ok(orderId);
     }
 }

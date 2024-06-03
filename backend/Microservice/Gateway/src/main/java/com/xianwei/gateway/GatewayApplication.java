@@ -30,28 +30,19 @@ public class GatewayApplication {
 		return routeLocatorBuilder.routes()
 				.route(p -> p
 						.path("/api/user/**", "/api/cart/**", "/api/feedback/**", "/api/ratings/**")
-//						.filters(f -> f.rewritePath("/api/(?<segment>.*)", "/${segment}")
-//								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-//								.circuitBreaker(config -> config.setName("userCircuitBreaker")
-//										.setFallbackUri("forward:/fallback/userFallback")))
+						.filters(f -> f.addRequestHeader("Authorization", "#{request.headers.Authorization}"))
 						.uri("lb://USER"))
 				.route(p -> p
 						.path("/api/item/**", "/api/categories/**", "/api/admin/**")
-//						.filters(f -> f.rewritePath("/api/(?<segment>.*)", "/${segment}")
-//								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-//								.retry(retryConfig -> retryConfig.setRetries(3)
-//										.setMethods(HttpMethod.GET)
-//										.setBackoff(Duration.ofMillis(100), Duration.ofMillis(1000), 2, true)))
+						.filters(f -> f.addRequestHeader("Authorization", "#{request.headers.Authorization}"))
 						.uri("lb://ITEM"))
 				.route(p -> p
 						.path("/api/orders/**")
-//						.filters(f -> f.rewritePath("/api/orders/(?<segment>.*)", "/${segment}")
-//								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+						.filters(f -> f.addRequestHeader("Authorization", "#{request.headers.Authorization}"))
 						.uri("lb://ORDER"))
 				.route(p -> p
 						.path("/api/payment/**")
-//						.filters(f -> f.rewritePath("/api/payment/(?<segment>.*)", "/${segment}")
-//								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+						.filters(f -> f.addRequestHeader("Authorization", "#{request.headers.Authorization}"))
 						.uri("lb://PAYMENT"))
 				.build();
 	}

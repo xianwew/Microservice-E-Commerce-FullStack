@@ -62,3 +62,6 @@ cardservice:
 
 orderservice:
   url: http://localhost:8050/api/orders
+
+cartservice:
+  url: http://localhost:8070/api/cart

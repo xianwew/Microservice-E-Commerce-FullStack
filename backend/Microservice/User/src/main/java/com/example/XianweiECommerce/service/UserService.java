@@ -172,6 +172,12 @@ public class UserService {
     }
 
     //cards related
+    public CardDTO getCardById(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "id", cardId.toString()));
+        return CardMapper.toDTO(card);
+    }
+
     public List<CardDTO> getCardsByUserId(String userId) {
         List<Card> cards = cardRepository.findByUserId(userId);
         return cards.stream().map(CardMapper::toDTO).collect(Collectors.toList());

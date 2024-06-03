@@ -55,6 +55,12 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
+    @GetMapping("/cartId/{id}")
+    public ResponseEntity<CartDTO> getCartById(@PathVariable Long id) {
+        CartDTO cart = cartService.getCart(id);
+        return ResponseEntity.ok(cart);
+    }
+
     @PutMapping("/{userId}")
     public ResponseEntity<CartDTO> updateCart(@PathVariable String userId, @RequestBody CartDTO cartDTO, @RequestHeader("Authorization") String token) {
         String tokenUserId = jwtTokenProvider.extractUserIdFromToken(token.replace("Bearer ", ""));
@@ -105,6 +111,12 @@ public class CartController {
 
         CartItemOutputDTO createdCartItem = cartService.addItemToCart(cartItemDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCartItem);
+    }
+
+    @PostMapping("/clear/{cartId}")
+    public ResponseEntity<Void> clearCart(@PathVariable Long cartId, @RequestHeader("Authorization") String token) {
+        cartService.clearCart(cartId);
+        return ResponseEntity.noContent().build();
     }
 }
 
