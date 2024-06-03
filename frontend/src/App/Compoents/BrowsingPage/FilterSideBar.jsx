@@ -32,17 +32,36 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
         } else {
             params.delete('mainCategory'); // Remove the mainCategory parameter
         }
-        
+
         if (debouncedSubCategorySelection !== 'all') {
             params.set('subCategory', debouncedSubCategorySelection);
         } else {
             params.delete('subCategory'); // Optionally, you might want to handle subCategory similarly
         }
-        
-        if (debouncedPriceRange.min) params.set('minPrice', debouncedPriceRange.min);
-        if (debouncedPriceRange.max) params.set('maxPrice', debouncedPriceRange.max);
-        if (debouncedLocationFilter.state) params.set('state', debouncedLocationFilter.state);
-        if (debouncedLocationFilter.country) params.set('country', debouncedLocationFilter.country);
+
+        if (debouncedPriceRange.min) {
+            params.set('minPrice', debouncedPriceRange.min);
+        } else {
+            params.delete('minPrice'); // Optionally, clear minPrice if not set
+        }
+
+        if (debouncedPriceRange.max) {
+            params.set('maxPrice', debouncedPriceRange.max);
+        } else {
+            params.delete('maxPrice'); // Optionally, clear maxPrice if not set
+        }
+
+        if (debouncedLocationFilter.state) {
+            params.set('state', debouncedLocationFilter.state);
+        } else {
+            params.delete('state'); // Optionally, clear state if not set
+        }
+
+        if (debouncedLocationFilter.country) {
+            params.set('country', debouncedLocationFilter.country);
+        } else {
+            params.delete('country'); // Optionally, clear country if not set
+        }
         navigate({ search: params.toString() });
         // navigate(`/browse?${searchParams.toString()}`);
     };
