@@ -21,6 +21,7 @@ const SellPage = () => {
         const loadCategories = async () => {
             const categories = await fetchMainCategories();
             setMainCategories(categories);
+            console.log(categories);
         };
 
         loadCategories();
@@ -28,6 +29,7 @@ const SellPage = () => {
 
     const handleMainCategoryChange = async (mainCategoryId) => {
         setSelectedMainCategory(mainCategoryId);
+        console.log("main cat changed to: " + mainCategoryId);
         const subCategories = await fetchSubCategories(mainCategoryId);
         setSubCategories(subCategories);
     };
