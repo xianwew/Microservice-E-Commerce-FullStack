@@ -7,11 +7,8 @@ spring:
   cloud:
     config:
       server:
-        # native:
-          # search-locations: "classpath:/config"
-          # search-locations: "file:///Users//eazybytes//Documents//config"
         git:
-          uri: "https://github.com/eazybytes/eazybytes-config.git"
+          uri: "https://github.com/xianwew/XianweiECommerce-Config.git"
           default-label: main
           timeout: 5
           clone-on-start: true
@@ -39,7 +36,7 @@ encrypt:
   key: "45D81EC1EF61DF9AD8D3E5BB397F9"
 
 server:
-  port: 8071
+  port: 8090
 
 logging:
   pattern:

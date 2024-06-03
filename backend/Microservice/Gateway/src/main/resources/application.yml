@@ -1,15 +1,3 @@
-server:
-  port: 8080
-
-eureka:
-  instance:
-    preferIpAddress: true
-  client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl:
-      defaultZone: "http://localhost:8075/eureka/"
-
 spring:
   application:
     name: "Gateway"
@@ -22,9 +10,8 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 10s
-    config:
-      import-check:
-        enabled: false
+  config:
+    import: "optional:configserver:http://localhost:8090/"
 
   data:
     redis:
