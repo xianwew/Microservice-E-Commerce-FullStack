@@ -18,4 +18,22 @@ public class User {
     private String profilePictureUrl;
     private String createdAt;
     private String updatedAt;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", addressId='" + addressId + '\'' +
+                ", ratingId='" + ratingId + '\'' +
+                ", cartId='" + cartId + '\'' +
+                ", profilePictureUrl='" + profilePictureUrl + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                '}';
+    }
 }

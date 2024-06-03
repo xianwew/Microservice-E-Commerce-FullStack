@@ -14,6 +14,7 @@ public class UserDTO {
     private RatingDTO rating;
     private String password;
     private Long cartId; // New field for cartId
+    
 }
 
 

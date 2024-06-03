@@ -336,7 +336,7 @@ public class ItemService {
                 ItemDTO itemDTO = ItemMapper.toDTO(item);
                 User seller = getUserById(item.getSellerId());
                 if (seller != null) {
-                    log.info("Seller: : " + seller.getId());
+                    log.info("seller: " + seller.toString());
                     log.info("Seller's username: " + seller.getUsername());
                     itemDTO.setUsername(seller.getUsername());
                     Rating rating = getRatingById(item.getRatingId());
@@ -354,6 +354,7 @@ public class ItemService {
         return items.stream().map(item -> {
             ItemDTO itemDTO = ItemMapper.toDTO(item);
             User seller = getUserById(item.getSellerId());
+            log.info("Seller username: " + seller.getUsername());
             if (seller != null) {
                 itemDTO.setUsername(seller.getUsername());
                 Rating rating = getRatingById(item.getRatingId());
