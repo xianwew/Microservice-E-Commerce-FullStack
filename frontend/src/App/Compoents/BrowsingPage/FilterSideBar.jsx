@@ -27,8 +27,18 @@ const FilterSidebar = ({ mainCategories, subCategories, setSubCategories, fetchS
 
     const updateQueryParams = () => {
         const params = new URLSearchParams(location.search);
-        if (debouncedMainCategorySelection !== 'all') params.set('mainCategory', debouncedMainCategorySelection);
-        if (debouncedSubCategorySelection !== 'all') params.set('subCategory', debouncedSubCategorySelection);
+        if (debouncedMainCategorySelection !== 'all') {
+            params.set('mainCategory', debouncedMainCategorySelection);
+        } else {
+            params.delete('mainCategory'); // Remove the mainCategory parameter
+        }
+        
+        if (debouncedSubCategorySelection !== 'all') {
+            params.set('subCategory', debouncedSubCategorySelection);
+        } else {
+            params.delete('subCategory'); // Optionally, you might want to handle subCategory similarly
+        }
+        
         if (debouncedPriceRange.min) params.set('minPrice', debouncedPriceRange.min);
         if (debouncedPriceRange.max) params.set('maxPrice', debouncedPriceRange.max);
         if (debouncedLocationFilter.state) params.set('state', debouncedLocationFilter.state);
