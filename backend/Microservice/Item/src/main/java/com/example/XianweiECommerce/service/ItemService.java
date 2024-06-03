@@ -7,6 +7,7 @@ import com.example.XianweiECommerce.mapper.ItemMapper;
 import com.example.XianweiECommerce.model.*;
 import com.example.XianweiECommerce.pojoClass.Rating;
 import com.example.XianweiECommerce.pojoClass.User;
+import com.example.XianweiECommerce.pojoClass.UserResponse;
 import com.example.XianweiECommerce.repository.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -366,8 +367,12 @@ public class ItemService {
     private User getUserById(String userId) {
         try {
             String url = String.format("%s/%s", userServiceUrl, userId);
-            ResponseEntity<User> userResponse = restTemplate.getForEntity(url, User.class);
-            return userResponse.getBody();
+            ResponseEntity<UserResponse> userResponse = restTemplate.getForEntity(url, UserResponse.class);
+            UserResponse response = userResponse.getBody();
+            if (response == null || response.getUser() == null) {
+                throw new ResourceNotFoundException("User", "id", userId);
+            }
+            return response.getUser();
         } catch (HttpServerErrorException e) {
             log.error("Error fetching user with id {}: {}", userId, e.getMessage());
             throw new ResourceNotFoundException("User", "id", userId);

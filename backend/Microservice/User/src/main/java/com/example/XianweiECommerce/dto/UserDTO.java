@@ -14,7 +14,8 @@ public class UserDTO {
     private RatingDTO rating;
     private String password;
     private Long cartId; // New field for cartId
-    
+    private String createdAt; // Add these if they are part of your DTO
+    private String updatedAt; // Add these if they are part of your DTO
 }
 
 

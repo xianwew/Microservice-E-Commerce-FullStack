@@ -1,5 +1,6 @@
 package com.example.XianweiECommerce.pojoClass;
 
+import com.example.XianweiECommerce.dto.RatingDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,15 +10,16 @@ public class User {
     private String id;
     private String username;
     private String email;
+    private String profilePictureUrl;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String addressId;
-    private String ratingId;
-    private String cartId;
-    private String profilePictureUrl;
-    private String createdAt;
-    private String updatedAt;
+    private long address;
+    private long rating;
+    private String password;
+    private Long cartId; // New field for cartId
+    private String createdAt; // Add these if they are part of your DTO
+    private String updatedAt; // Add these if they are part of your DTO
 
     @Override
     public String toString() {
@@ -28,8 +30,8 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", addressId='" + addressId + '\'' +
-                ", ratingId='" + ratingId + '\'' +
+                ", addressId='" + address + '\'' +
+                ", ratingId='" + rating + '\'' +
                 ", cartId='" + cartId + '\'' +
                 ", profilePictureUrl='" + profilePictureUrl + '\'' +
                 ", createdAt='" + createdAt + '\'' +
