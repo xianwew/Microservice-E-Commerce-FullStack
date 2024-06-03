@@ -13,10 +13,13 @@ import com.example.XianweiECommerce.pojoClass.Item;
 import com.example.XianweiECommerce.repository.CartItemRepository;
 import com.example.XianweiECommerce.repository.CartRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -47,10 +51,16 @@ public class CartService {
         return CartMapper.toDTO(cart);
     }
 
+    @Transactional(readOnly = true)
     public CartDTO getCart(Long id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", id.toString()));
-        return CartMapper.toDTO(cart);
+
+        Hibernate.initialize(cart.getCartItems());
+
+        CartDTO cartDTO = CartMapper.toDTO(cart);
+        log.info("cart items size: " + cartDTO.getCartItemsOutput().size());
+        return cartDTO;
     }
 
     public CartDTO updateCart(CartDTO cartDTO) {

@@ -55,6 +55,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDto> fetchUserById(@PathVariable String id) {
         UserDTO userDTO = userService.getUserById(id);
+        log.info("fetched user's username: " + userDTO.getUsername());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseDto("200", "User fetched successfully", null, userDTO));
     }

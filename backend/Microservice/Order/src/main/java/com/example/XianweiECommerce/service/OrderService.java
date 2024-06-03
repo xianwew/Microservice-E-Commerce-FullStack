@@ -64,6 +64,7 @@ public class OrderService {
     }
 
     public List<OrderDTO> getOrdersByUser(String userId) {
+        log.info("getting uer order!");
         return orderRepository.findByUserId(userId).stream().map(orderMapper::toDTO).collect(Collectors.toList());
     }
 
@@ -74,10 +75,12 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
         Card card = getCardById(cardId, token);
 
+        log.info("order items length: ", cart.getCartItemsOutput().size());
         // Calculate the total amount
-        double itemsTotal = cart.getCartItems().stream()
+        double itemsTotal = cart.getCartItemsOutput().stream()
                 .mapToDouble(cartItem -> {
                     Item item = getItemById(cartItem.getItemId(), token);
+                    log.info("Getting order item by id! " + item.getId());
                     return cartItem.getQuantity() * item.getPrice();
                 })
                 .sum();
@@ -101,7 +104,7 @@ public class OrderService {
             order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
 
             // Convert CartItems to OrderItems
-            List<OrderItem> orderItems = cart.getCartItems().stream()
+            List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
                     .map(cartItem -> {
                         OrderItem orderItem = new OrderItem();
                         orderItem.setOrder(order);
@@ -137,9 +140,10 @@ public class OrderService {
         if (cart == null) {
             throw new ResourceNotFoundException("Cart", "id", cartId.toString());
         }
-        if (cart.getCartItems() == null) {
-            cart.setCartItems(new ArrayList<>());
-        }
+//        if (cart.getCartItemsOutput() == null) {
+//            cart.getCartItemsOutput(new ArrayList<>());
+//            throw new RuntimeException("No cart items found!");
+//        }
         return cart;
     }
 
@@ -170,6 +174,7 @@ public class OrderService {
         if (item == null) {
             throw new ResourceNotFoundException("Item", "id", itemId.toString());
         }
+        log.info("order item id: " + item.getId());
         return item;
     }
 

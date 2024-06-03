@@ -11,5 +11,6 @@ import java.util.List;
 public class Cart {
     private Long id;
     private String userId;
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<CartItem> cartItemsInput = new ArrayList<>();
+    private List<CartItem> cartItemsOutput = new ArrayList<>();
 }

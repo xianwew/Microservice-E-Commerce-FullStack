@@ -336,8 +336,13 @@ public class ItemService {
                 ItemDTO itemDTO = ItemMapper.toDTO(item);
                 User seller = getUserById(item.getSellerId());
                 if (seller != null) {
+                    log.info("Seller: : " + seller.getId());
+                    log.info("Seller's username: " + seller.getUsername());
                     itemDTO.setUsername(seller.getUsername());
                     Rating rating = getRatingById(item.getRatingId());
+                }
+                else{
+                    log.warn("Seller invalid!");
                 }
                 return itemDTO;
             }).collect(Collectors.toList());

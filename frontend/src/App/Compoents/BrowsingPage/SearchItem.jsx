@@ -8,6 +8,7 @@ import { decodeToken } from '../../Auth/JwtUtils';
 import { useSelector } from 'react-redux';
 import { fetchItemRating } from '../../service/RatingSerivce';
 
+
 const SearchItem = ({ result }) => {
     const navigate = useNavigate();
     const token = useSelector((state) => state.auth.token);
@@ -57,6 +58,8 @@ const SearchItem = ({ result }) => {
         }
         return stars;
     };
+
+
 
     return (
         <Grid item xs={12}>
