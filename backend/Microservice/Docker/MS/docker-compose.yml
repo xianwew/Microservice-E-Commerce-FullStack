@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  userservice-master:
+    image: mysql:latest
+    container_name: userservice-master
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: userservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - userservice_master_data:/var/lib/mysql
+      - ./init-scripts/userservice:/docker-entrypoint-initdb.d
+    command: >
+      sh -c "echo 'CREATE DATABASE IF NOT EXISTS userservice;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+  userservice-slave:
+    image: mysql:latest
+    container_name: userservice-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: userservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - userservice_slave_data:/var/lib/mysql
+    depends_on:
+      - userservice-master
+    command: >
+      sh -c "echo 'CHANGE MASTER TO MASTER_HOST=\"userservice-master\",MASTER_USER=\"repl\",MASTER_PASSWORD=\"repl_password\",MASTER_AUTO_POSITION=1; START SLAVE;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+  orderservice-master:
+    image: mysql:latest
+    container_name: orderservice-master
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: orderservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3308:3306"
+    volumes:
+      - orderservice_master_data:/var/lib/mysql
+      - ./init-scripts/orderservice:/docker-entrypoint-initdb.d
+    command: >
+      sh -c "echo 'CREATE DATABASE IF NOT EXISTS orderservice;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+  orderservice-slave:
+    image: mysql:latest
+    container_name: orderservice-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: orderservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3309:3306"
+    volumes:
+      - orderservice_slave_data:/var/lib/mysql
+    depends_on:
+      - orderservice-master
+    command: >
+      sh -c "echo 'CHANGE MASTER TO MASTER_HOST=\"orderservice-master\",MASTER_USER=\"repl\",MASTER_PASSWORD=\"repl_password\",MASTER_AUTO_POSITION=1; START SLAVE;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+  itemservice-master:
+    image: mysql:latest
+    container_name: itemservice-master
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: itemservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3310:3306"
+    volumes:
+      - itemservice_master_data:/var/lib/mysql
+      - ./init-scripts/itemservice:/docker-entrypoint-initdb.d
+    command: >
+      sh -c "echo 'CREATE DATABASE IF NOT EXISTS itemservice;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+  itemservice-slave:
+    image: mysql:latest
+    container_name: itemservice-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: itemservice
+      MYSQL_REPLICATION_USER: repl
+      MYSQL_REPLICATION_PASSWORD: repl_password
+    ports:
+      - "3311:3306"
+    volumes:
+      - itemservice_slave_data:/var/lib/mysql
+    depends_on:
+      - itemservice-master
+    command: >
+      sh -c "echo 'CHANGE MASTER TO MASTER_HOST=\"itemservice-master\",MASTER_USER=\"repl\",MASTER_PASSWORD=\"repl_password\",MASTER_AUTO_POSITION=1; START SLAVE;' > /docker-entrypoint-initdb.d/init.sql && docker-entrypoint.sh mysqld"
+
+volumes:
+  userservice_master_data:
+  userservice_slave_data:
+  orderservice_master_data:
+  orderservice_slave_data:
+  itemservice_master_data:
+  itemservice_slave_data:

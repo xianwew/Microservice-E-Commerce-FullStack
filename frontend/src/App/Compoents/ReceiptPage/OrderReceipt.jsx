@@ -56,9 +56,35 @@ const OrderReceipt = ({ order }) => {
                                         <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px', marginBottom: '20px' }}>
                                             <Button variant="contained" color="primary" onClick={() => navigate(`/item/${item.itemId}/0`)} >View Details</Button>
                                             {hasFeedback(item.itemId) ? (
-                                                <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => navigate(`/item/${item.itemId}/1`)}>View Feedback</Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    sx={{
+                                                        backgroundColor: '#B947FF',
+                                                        marginLeft: '20px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#A511FF'
+                                                        }
+                                                    }}
+                                                    onClick={() => navigate(`/item/${item.itemId}/1`)}
+                                                >
+                                                    View Feedback
+                                                </Button>
                                             ) : (
-                                                <Button variant="contained" color="primary" sx={{ backgroundColor: 'blue', marginLeft: '20px' }} onClick={() => handleLeaveFeedback(item)}>Leave Feedback</Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    sx={{
+                                                        backgroundColor: '#B947FF',
+                                                        marginLeft: '20px',
+                                                        '&:hover': {
+                                                            backgroundColor: '#A511FF'
+                                                        }
+                                                    }}
+                                                    onClick={() => handleLeaveFeedback(item)}
+                                                >
+                                                    Leave Feedback
+                                                </Button>
                                             )}
                                         </div>
                                         <hr />
@@ -96,7 +122,7 @@ const OrderReceipt = ({ order }) => {
                     onClose={() => setFeedbackDialogOpen(false)}
                     itemName={selectedItem.itemName}
                     itemId={selectedItem.itemId}
-                    userId={order.userId} 
+                    userId={order.userId}
                 />
             )}
         </Box>

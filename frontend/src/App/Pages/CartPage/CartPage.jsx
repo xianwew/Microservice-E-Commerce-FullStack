@@ -41,7 +41,8 @@ const Cart = () => {
         const fetchRecommendations = async () => {
             try {
                 const recommendations = await fetchTrendingTodayItems();
-                setSampleRecommendations(recommendations);
+                const firstFiveRecommendations = recommendations.slice(0, 5);
+                setSampleRecommendations(firstFiveRecommendations);
             } catch (error) {
                 console.error('Error fetching recommendations:', error);
             }
@@ -90,13 +91,13 @@ const Cart = () => {
             </div>
             <Divider sx={{ my: 4 }} />
             <Typography variant="h5" mb={2}>Recommended for you</Typography>
-            <Grid container spacing={2}>
+            <Box display="flex" flexWrap="wrap" justifyContent="space-between" mb={5}>
                 {sampleRecommendations.map(item => (
-                    <Grid item xs={12} sm={6} md={2} key={item.id}>
+                    <Box key={item.id}  m={1} width="250px">
                         <RecommendationItem item={item} />
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Box>
         </div>
     );
 };

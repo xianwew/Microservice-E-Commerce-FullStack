@@ -26,7 +26,7 @@ const SellerProfileHeader = ({ seller }) => {
             <Box>
                 <Typography variant="h5" fontWeight="bold">{seller.username}</Typography>
                 <Box display="flex" alignItems="center">
-                    <Rating value={rating} readOnly precision={0.5} />
+                    <Rating value={rating} readOnly precision={0.1} />
                     {numRatings > 0 && (
                         <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>
                             ({rating.toFixed(1)} / {numRatings} ratings)

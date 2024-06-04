@@ -97,7 +97,7 @@ const UserProfileHeader = () => {
                         <Box>
                             <Typography  variant="h5" fontWeight="bold">{username}</Typography>
                             <Box display="flex" alignItems="center">
-                                <Rating value={rating} readOnly />
+                                <Rating value={rating} readOnly precision={0.1}/>
                                 <Typography variant="body2" color="textSecondary" ml={1}>
                                     ({rating.toFixed(1)} / {numRatings} ratings)
                                 </Typography>

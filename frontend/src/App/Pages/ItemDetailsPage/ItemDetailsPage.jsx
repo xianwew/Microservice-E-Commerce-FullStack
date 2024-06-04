@@ -22,6 +22,10 @@ const ItemDetailsPage = () => {
     const currentUserId = useSelector((state) => state.auth.user?.id);
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
+    const [ratingSeller, setRatingSeller] = useState(0);
+    const [numRatingsSeller, setNumRatingsSeller] = useState(0);
+    const [ratingItem, setRatingItem] = useState(0);
+    const [numRatingsItem, setNumRatingsItem] = useState(0);
 
     useEffect(() => {
         const getItem = async () => {
@@ -34,6 +38,11 @@ const ItemDetailsPage = () => {
 
                 const itemRating = await fetchItemRating(id);
                 const sellerRating = await fetchUserRating(data.sellerId);
+
+                setRatingSeller(sellerRating.totalRating / sellerRating.numRatings);
+                setNumRatingsSeller(sellerRating.numRatings);
+                setRatingItem(itemRating.totalRating / itemRating.numRatings);
+                setNumRatingsItem(itemRating.numRatings);
 
                 setItem(prevItem => ({
                     ...prevItem,
@@ -81,9 +90,7 @@ const ItemDetailsPage = () => {
         }
     };
 
-    const itemRating = item.numRatings > 0 ? (item.totalRating / item.numRatings).toFixed(1) : 'No ratings yet';
-    const sellerRating = seller && seller.numRatings > 0 ? (seller.totalRating / seller.numRatings).toFixed(1) : 'No ratings yet';
-
+ 
     const handleQuantityChange = (event) => {
         setQuantity(event.target.value);
     };
@@ -95,8 +102,8 @@ const ItemDetailsPage = () => {
                 quantity: parseInt(quantity, 10),
             };
             await addItemToCart(cartItem);
-            dispatch(showSnackbar({ open: true, message: 'Item added to cart', severity: 'success' })); 
-        } 
+            dispatch(showSnackbar({ open: true, message: 'Item added to cart', severity: 'success' }));
+        }
         catch (error) {
             console.error('Error adding item to cart:', error);
             let message = 'Failed to add item to cart! ';
@@ -128,19 +135,23 @@ const ItemDetailsPage = () => {
                             <Button onClick={handleSellerClick} sx={{ padding: '10px 0px' }}>
                                 {seller.username}
                             </Button>
-                            <Box display="flex" alignItems="center" ml={2}>
-                                <Rating value={Number(sellerRating)} readOnly precision={0.1} />
-                                <Typography variant="body2" ml={1}>
-                                    ({seller?.numRatings ? seller.numRatings : 0} ratings)
-                                </Typography>
+                            <Box display="flex" alignItems="center" sx={{marginLeft: '13px'}}>
+                                <Rating value={ratingSeller} readOnly precision={0.1} />
+                                {numRatingsSeller > 0 && (
+                                    <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>
+                                        ({ratingSeller.toFixed(1)} / {numRatingsSeller} ratings)
+                                    </Typography>
+                                )}
                             </Box>
                         </Box>
                         <Box display="flex" alignItems="center" mb={2} sx={{ paddingTop: '10px' }}>
                             <Typography variant="body2" mr={1}>Item Rating</Typography>
-                            <Rating value={Number(itemRating)} readOnly precision={0.1} />
-                            <Typography variant="body2" ml={1}>
-                                ({item.numRatings} ratings)
-                            </Typography>
+                            <Rating value={ratingItem} readOnly precision={0.1} />
+                            {numRatingsItem > 0 && (
+                                <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>
+                                    ({ratingItem.toFixed(1)} / {numRatingsItem} ratings)
+                                </Typography>
+                            )}
                         </Box>
                         <Divider sx={{ my: 2 }} />
                         <Typography variant="h4" color="primary" mt={2}>${item.price}</Typography>

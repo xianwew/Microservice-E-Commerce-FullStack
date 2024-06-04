@@ -40,7 +40,7 @@ const BrowseCategory = ({ mainCategoryId }) => {
             }}
         >
             {subCategories.map((subCategory) => (
-                <Box key={subCategory.id} sx={{ maxWidth: 'calc(33.333% - 16px)' }}>
+                <Box key={subCategory.id} >
                     <CategoryItemCard
                         item={{ image: subCategory.imageUrl, title: subCategory.name, subtitle: '' }}
                         onClick={() => handleCategoryClick(subCategory.id)}
