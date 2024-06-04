@@ -12,7 +12,6 @@ import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import { fetchUserRating, fetchItemRating } from '../../service/RatingSerivce';
 
-
 const ItemDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -82,8 +81,8 @@ const ItemDetailsPage = () => {
         }
     };
 
-    const itemRating = item.numRatings > 0 ? item.totalRating / item.numRatings : 0;
-    const sellerRating = seller && seller.numRatings > 0 ? seller.totalRating / seller.numRatings : 0;
+    const itemRating = item.numRatings > 0 ? (item.totalRating / item.numRatings).toFixed(1) : 'No ratings yet';
+    const sellerRating = seller && seller.numRatings > 0 ? (seller.totalRating / seller.numRatings).toFixed(1) : 'No ratings yet';
 
     const handleQuantityChange = (event) => {
         setQuantity(event.target.value);
@@ -96,16 +95,15 @@ const ItemDetailsPage = () => {
                 quantity: parseInt(quantity, 10),
             };
             await addItemToCart(cartItem);
-            dispatch(showSnackbar({ open: true, message: 'Item added to cart', severity:'success' })); 
+            dispatch(showSnackbar({ open: true, message: 'Item added to cart', severity: 'success' })); 
         } 
         catch (error) {
             console.error('Error adding item to cart:', error);
-            let message = 'Failed to add item to cart!';
-            if(error.response.status === 401){
-                message = 'Please login and try again!'
-            }
-            else{
-                message += error.message;
+            let message = 'Failed to add item to cart! ';
+            if (error.response && error.response.status === 401) {
+                message = 'Please login and try again!';
+            } else {
+                message += error.response ? error.response.data : error.message;
             }
             dispatch(showSnackbar({ open: true, message, severity: 'error' }));
         }
@@ -127,11 +125,11 @@ const ItemDetailsPage = () => {
                             <Typography variant="h3" fontWeight="bold">{item.title}</Typography>
                         </Box>
                         <Box display="flex" alignItems="center" mb={2} >
-                            <Button onClick={handleSellerClick} sx={{padding: '10px 0px'}}>
-                                {item.username}
+                            <Button onClick={handleSellerClick} sx={{ padding: '10px 0px' }}>
+                                {seller.username}
                             </Button>
                             <Box display="flex" alignItems="center" ml={2}>
-                                <Rating value={sellerRating} readOnly />
+                                <Rating value={Number(sellerRating)} readOnly precision={0.1} />
                                 <Typography variant="body2" ml={1}>
                                     ({seller?.numRatings ? seller.numRatings : 0} ratings)
                                 </Typography>
@@ -139,14 +137,14 @@ const ItemDetailsPage = () => {
                         </Box>
                         <Box display="flex" alignItems="center" mb={2} sx={{ paddingTop: '10px' }}>
                             <Typography variant="body2" mr={1}>Item Rating</Typography>
-                            <Rating value={itemRating} readOnly />
+                            <Rating value={Number(itemRating)} readOnly precision={0.1} />
                             <Typography variant="body2" ml={1}>
                                 ({item.numRatings} ratings)
                             </Typography>
                         </Box>
                         <Divider sx={{ my: 2 }} />
                         <Typography variant="h4" color="primary" mt={2}>${item.price}</Typography>
-                        <Typography variant="body2" sx={{paddingTop: '30px'}}>Quantity left: {item.quantity}</Typography>
+                        <Typography variant="body2" sx={{ paddingTop: '30px' }}>Quantity left: {item.quantity}</Typography>
                         <Box display="flex" alignItems="center" mt={2} mb={2} gap={2}>
                             <TextField
                                 type="number"
@@ -156,12 +154,12 @@ const ItemDetailsPage = () => {
                                 inputProps={{ min: 1, max: item.quantity }}
                                 sx={{ width: '100px' }}
                             />
-                            <Button variant="contained" color="primary" sx={{height: '55px'}} onClick={handleAddToCart}>
+                            <Button variant="contained" color="primary" sx={{ height: '55px' }} onClick={handleAddToCart}>
                                 Add to Cart
                             </Button>
                         </Box>
                         <Divider sx={{ my: 2 }} />
-                        <Typography sx={{fontWeight: 'bold', fontSize: '20px'}} mt={2}>Description</Typography>
+                        <Typography sx={{ fontWeight: 'bold', fontSize: '20px' }} mt={2}>Description</Typography>
                         <Typography variant="body1" mt={2}>{item.shortDescription}</Typography>
                     </Box>
                 </Box>

@@ -7,7 +7,8 @@ import StarHalfIcon from '@mui/icons-material/StarHalf';
 import { decodeToken } from '../../Auth/JwtUtils';
 import { useSelector } from 'react-redux';
 import { fetchItemRating } from '../../service/RatingSerivce';
-
+import { fetchSeller } from '../../service/UserService';
+import { fetchUserRating } from '../../service/RatingSerivce';
 
 const SearchItem = ({ result }) => {
     const navigate = useNavigate();
@@ -17,6 +18,9 @@ const SearchItem = ({ result }) => {
 
     const [rating, setRating] = useState(null);
     const [numRatings, setNumRatings] = useState(0);
+    const [seller, setSeller] = useState(null);
+    const [sellerRating, setSellerRating] = useState(null);
+    const [numRatingsSeller, setNumRatingsSeller] = useState(0);
 
     useEffect(() => {
         const getItemRating = async () => {
@@ -29,8 +33,21 @@ const SearchItem = ({ result }) => {
             }
         };
 
+        const getSellerData = async () => {
+            try {
+                const sellerData = await fetchSeller(result.sellerId);
+                setSeller(sellerData);
+                const sellerRatingData = await fetchUserRating(sellerData.id);
+                setSellerRating(sellerRatingData.totalRating / sellerRatingData.numRatings);
+                setNumRatingsSeller(sellerRatingData.numRatings);
+            } catch (error) {
+                console.error('Error fetching seller data:', error);
+            }
+        };
+
         getItemRating();
-    }, [result.id]);
+        getSellerData();
+    }, [result.id, result.sellerId]);
 
     const handleSellerClick = () => {
         if (result.sellerId === currentUserId) {
@@ -45,7 +62,11 @@ const SearchItem = ({ result }) => {
     };
 
     const renderStars = (averageRating) => {
-        if (numRatings === 0) return "No ratings yet";
+        if (!averageRating) return (
+            <div style={{transform:'translateY(-2.5px)'}}>
+                No ratings yet
+            </div>
+        );
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             if (i <= averageRating) {
@@ -58,8 +79,6 @@ const SearchItem = ({ result }) => {
         }
         return stars;
     };
-
-
 
     return (
         <Grid item xs={12}>
@@ -81,25 +100,32 @@ const SearchItem = ({ result }) => {
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: '1', paddingBottom: '5px' }}>
                             <div>
                                 <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{result.title}</Typography>
-                                <Typography variant="body1" color="textSecondary" sx={{ fontSize: '18px' }}>{result.shortDescription}</Typography>
-                                <Typography variant="h6" color="primary" >${result.price}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    {renderStars(rating)}
+                                    {numRatings > 0 && (
+                                        <Typography variant="body2" color="textSecondary" sx={{ marginLeft: 1 }}>
+                                            ({rating.toFixed(1)} / {numRatings} ratings)
+                                        </Typography>
+                                    )}
+                                </Box>
                             </div>
                             <div>
+                                <Typography sx={{ fontSize: '22px' }} color="primary" >${result.price}</Typography>
                                 <Typography variant="body2" color="textSecondary">{result.city}, {result.state}, {result.country}</Typography>
                                 <div style={{ display: 'flex', alignItems: 'center', minHeight: '30px' }} >
                                     <Button
                                         size="small"
                                         color="primary"
                                         onClick={handleSellerClick}
-                                        sx={{ transform: 'translateY(3px)', marginRight: '20px', paddingLeft: '0px' }}
+                                        sx={{ transform: 'translateY(3px)', marginRight: '10px', paddingLeft: '0px' }}
                                     >
                                         {result.username}
                                     </Button>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {renderStars(rating)}
-                                        {numRatings > 0 && (
+                                    <Box sx={{ display: 'flex', transform: 'translateY(3.5px)' }}>
+                                        {renderStars(sellerRating)}
+                                        {numRatingsSeller > 0 && (
                                             <Typography variant="body2" color="textSecondary" sx={{ marginLeft: 1 }}>
-                                                ({rating.toFixed(1)} / {numRatings} ratings)
+                                                ({sellerRating.toFixed(1)} / {numRatingsSeller} ratings)
                                             </Typography>
                                         )}
                                     </Box>
