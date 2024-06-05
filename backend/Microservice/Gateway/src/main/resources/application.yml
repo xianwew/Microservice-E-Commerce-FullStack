@@ -11,7 +11,7 @@ spring:
         connect-timeout: 1000
         response-timeout: 10s
   config:
-    import: "optional:configserver:http://localhost:8090/"
+    import: "optional:config:http://localhost:8090/"
 
   data:
     redis:

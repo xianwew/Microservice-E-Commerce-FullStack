@@ -8,11 +8,11 @@
 		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.eazybytes</groupId>
-	<artifactId>Gateway</artifactId>
+	<groupId>com.example</groupId>
+	<artifactId>gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gatewayserver</name>
-	<description>Edge Server for Eazy Bank microservices</description>
+	<name>Gateway</name>
+	<description>Gateway Server</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.0</spring-cloud.version>
@@ -102,8 +102,11 @@
 				<version>3.4.1</version>
 				<configuration>
 					<to>
-						<image>eazybytes/${project.artifactId}:s12</image>
+						<image>xianwei/${project.artifactId}:v1</image>
 					</to>
+					<container>
+						<mainClass>com.xianwei.gateway.GatewayApplicationate</mainClass>
+					</container>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,4 +1,6 @@
 package com.example.XianweiECommerce.service;
+import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.FeedbackDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.FeedbackMapper;
@@ -43,114 +45,154 @@ public class FeedbackService {
     }
 
     public List<FeedbackDTO> getFeedbacksByItemId(Long itemId) {
-        return feedbackRepository.findByItemId(itemId).stream()
-                .map(feedbackMapper::toDTO)
-                .collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            return feedbackRepository.findByItemId(itemId).stream()
+                    .map(feedbackMapper::toDTO)
+                    .collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public List<FeedbackDTO> getFeedbacksByUserId(String userId) {
-        return feedbackRepository.findByUserId(userId).stream()
-                .map(feedbackMapper::toDTO)
-                .collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            return feedbackRepository.findByUserId(userId).stream()
+                    .map(feedbackMapper::toDTO)
+                    .collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public List<FeedbackDTO> getFeedbacksBySellerId(String sellerId) {
-        return feedbackRepository.findBySellerId(sellerId).stream()
-                .map(feedbackMapper::toDTO)
-                .collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            return feedbackRepository.findBySellerId(sellerId).stream()
+                    .map(feedbackMapper::toDTO)
+                    .collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public FeedbackDTO createFeedback(Long itemId, FeedbackDTO feedbackDTO, String userId) {
-        Item item = getItemById(itemId);
-        log.info("itemId: " + item.getId());
-        if (item.isDeleted()) {
-            throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Item item = getItemById(itemId);
+            log.info("itemId: " + item.getId());
+            if (item.isDeleted()) {
+                throw new InvalidDataAccessApiUsageException("Cannot provide feedback for a deleted item");
+            }
+
+            if (item.getSellerId().equals(userId)) {
+                throw new InvalidDataAccessApiUsageException("Users cannot comment on their own items");
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+            if (feedbackRepository.existsByItemIdAndUserId(itemId, userId)) {
+                throw new IllegalArgumentException("User has already provided feedback for this item");
+            }
+
+            Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item);
+            Feedback savedFeedback = feedbackRepository.save(feedback);
+
+            updateItemRating(itemId);
+            updateUserRating(item.getSellerId());
+
+            return feedbackMapper.toDTO(savedFeedback);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
-
-        if (item.getSellerId().equals(userId)) {
-            throw new InvalidDataAccessApiUsageException("Users cannot comment on their own items");
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-
-        if (feedbackRepository.existsByItemIdAndUserId(itemId, userId)) {
-            throw new IllegalArgumentException("User has already provided feedback for this item");
-        }
-
-        Feedback feedback = feedbackMapper.toEntity(feedbackDTO, user, item);
-        Feedback savedFeedback = feedbackRepository.save(feedback);
-
-        updateItemRating(itemId);
-        updateUserRating(item.getSellerId());
-
-        return feedbackMapper.toDTO(savedFeedback);
     }
 
     public FeedbackDTO updateFeedback(Long feedbackId, FeedbackDTO feedbackDTO, String userId) {
-        Feedback feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Feedback feedback = feedbackRepository.findById(feedbackId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
 
-        if (!feedback.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Users can only update their own feedback");
+            if (!feedback.getUser().getId().equals(userId)) {
+                throw new RuntimeException("Users can only update their own feedback");
+            }
+
+            feedback.setRating(feedbackDTO.getRating());
+            feedback.setComment(feedbackDTO.getComment());
+            Feedback updatedFeedback = feedbackRepository.save(feedback);
+
+            updateItemRating(feedback.getItemId());
+            updateUserRating(feedback.getSellerId());
+
+            return feedbackMapper.toDTO(updatedFeedback);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
-
-        feedback.setRating(feedbackDTO.getRating());
-        feedback.setComment(feedbackDTO.getComment());
-        Feedback updatedFeedback = feedbackRepository.save(feedback);
-
-        updateItemRating(feedback.getItemId());
-        updateUserRating(feedback.getSellerId());
-
-        return feedbackMapper.toDTO(updatedFeedback);
     }
 
     public void deleteFeedback(Long feedbackId, String userId) {
-        Feedback feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Feedback feedback = feedbackRepository.findById(feedbackId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", feedbackId.toString()));
 
-        if (!feedback.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Users can only delete their own feedback");
+            if (!feedback.getUser().getId().equals(userId)) {
+                throw new RuntimeException("Users can only delete their own feedback");
+            }
+
+            feedbackRepository.delete(feedback);
+
+            updateItemRating(feedback.getItemId());
+            updateUserRating(feedback.getSellerId());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
-
-        feedbackRepository.delete(feedback);
-
-        updateItemRating(feedback.getItemId());
-        updateUserRating(feedback.getSellerId());
     }
 
     private void updateItemRating(Long itemId) {
-        List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
-        int totalRating = feedbacks.stream().mapToInt(Feedback::getRating).sum();
-        int numRatings = feedbacks.size();
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            List<Feedback> feedbacks = feedbackRepository.findByItemId(itemId);
+            int totalRating = feedbacks.stream().mapToInt(Feedback::getRating).sum();
+            int numRatings = feedbacks.size();
 
-        Rating itemRating = ratingRepository.findByEntityIdAndEntityType(itemId.toString(), Rating.EntityType.PRODUCT)
-                .orElse(new Rating(itemId.toString(), Rating.EntityType.PRODUCT));
+            Rating itemRating = ratingRepository.findByEntityIdAndEntityType(itemId.toString(), Rating.EntityType.PRODUCT)
+                    .orElse(new Rating(itemId.toString(), Rating.EntityType.PRODUCT));
 
-        itemRating.setTotalRating(totalRating);
-        itemRating.setNumRatings(numRatings);
+            itemRating.setTotalRating(totalRating);
+            itemRating.setNumRatings(numRatings);
 
-        ratingRepository.save(itemRating);
+            ratingRepository.save(itemRating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     private void updateUserRating(String userId) {
-        List<Item> items = getItemsBySellerId(userId);
-        int totalRating = 0;
-        int numRatings = 0;
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            List<Item> items = getItemsBySellerId(userId);
+            int totalRating = 0;
+            int numRatings = 0;
 
-        for (Item item : items) {
-            List<Feedback> feedbacks = feedbackRepository.findByItemId(item.getId());
-            totalRating += feedbacks.stream().mapToInt(Feedback::getRating).sum();
-            numRatings += feedbacks.size();
+            for (Item item : items) {
+                List<Feedback> feedbacks = feedbackRepository.findByItemId(item.getId());
+                totalRating += feedbacks.stream().mapToInt(Feedback::getRating).sum();
+                numRatings += feedbacks.size();
+            }
+
+            Rating userRating = ratingRepository.findByEntityIdAndEntityType(userId, Rating.EntityType.SELLER)
+                    .orElse(new Rating(userId, Rating.EntityType.SELLER));
+
+            userRating.setTotalRating(totalRating);
+            userRating.setNumRatings(numRatings);
+
+            ratingRepository.save(userRating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
-
-        Rating userRating = ratingRepository.findByEntityIdAndEntityType(userId, Rating.EntityType.SELLER)
-                .orElse(new Rating(userId, Rating.EntityType.SELLER));
-
-        userRating.setTotalRating(totalRating);
-        userRating.setNumRatings(numRatings);
-
-        ratingRepository.save(userRating);
     }
 
     private Item getItemById(Long itemId) {

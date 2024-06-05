@@ -1,5 +1,7 @@
 package com.example.XianweiECommerce.service;
 
+import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.MainCategoryDTO;
 import com.example.XianweiECommerce.dto.SubCategoryDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
@@ -12,6 +14,7 @@ import com.example.XianweiECommerce.repository.SubCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,98 +43,153 @@ public class AdminService {
 
     // MainCategory methods
 
+    @Transactional(readOnly = true)
     public List<MainCategoryDTO> getAllMainCategories() {
-        List<MainCategory> mainCategories = mainCategoryRepository.findAll();
-        return mainCategories.stream().map(MainCategoryMapper::toDTO).collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            List<MainCategory> mainCategories = mainCategoryRepository.findAll();
+            return mainCategories.stream().map(MainCategoryMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional(readOnly = true)
     public MainCategoryDTO getMainCategoryById(Long id) {
-        MainCategory mainCategory = mainCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
-        return MainCategoryMapper.toDTO(mainCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            MainCategory mainCategory = mainCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
+            return MainCategoryMapper.toDTO(mainCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional
     public MainCategoryDTO createMainCategory(MainCategoryDTO mainCategoryDTO) {
-        MainCategory mainCategory = MainCategoryMapper.toEntity(mainCategoryDTO);
-        MainCategory savedMainCategory = mainCategoryRepository.save(mainCategory);
-        return MainCategoryMapper.toDTO(savedMainCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            MainCategory mainCategory = MainCategoryMapper.toEntity(mainCategoryDTO);
+            MainCategory savedMainCategory = mainCategoryRepository.save(mainCategory);
+            return MainCategoryMapper.toDTO(savedMainCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional
     public MainCategoryDTO updateMainCategory(Long id, MainCategoryDTO mainCategoryDTO) {
-        MainCategory existingMainCategory = mainCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
-        MainCategoryMapper.updateEntityFromDTO(mainCategoryDTO, existingMainCategory);
-        MainCategory updatedMainCategory = mainCategoryRepository.save(existingMainCategory);
-        return MainCategoryMapper.toDTO(updatedMainCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            MainCategory existingMainCategory = mainCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
+            MainCategoryMapper.updateEntityFromDTO(mainCategoryDTO, existingMainCategory);
+            MainCategory updatedMainCategory = mainCategoryRepository.save(existingMainCategory);
+            return MainCategoryMapper.toDTO(updatedMainCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional
     public void deleteMainCategory(Long id) {
-        MainCategory existingMainCategory = mainCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
-        mainCategoryRepository.delete(existingMainCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            MainCategory existingMainCategory = mainCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", id.toString()));
+            mainCategoryRepository.delete(existingMainCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     // SubCategory methods
 
+    @Transactional(readOnly = true)
     public List<SubCategoryDTO> getAllSubCategories() {
-        List<SubCategory> subCategories = subCategoryRepository.findAll();
-        return subCategories.stream().map(SubCategoryMapper::toDTO).collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            List<SubCategory> subCategories = subCategoryRepository.findAll();
+            return subCategories.stream().map(SubCategoryMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional(readOnly = true)
     public SubCategoryDTO getSubCategoryById(Long id) {
-        SubCategory subCategory = subCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
-        return SubCategoryMapper.toDTO(subCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            SubCategory subCategory = subCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
+            return SubCategoryMapper.toDTO(subCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional
     public SubCategoryDTO createSubCategory(SubCategoryDTO subCategoryDTO, MultipartFile imageFile) throws IOException {
-        MainCategory mainCategory = mainCategoryRepository.findById(subCategoryDTO.getMainCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", subCategoryDTO.getMainCategoryId().toString()));
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            MainCategory mainCategory = mainCategoryRepository.findById(subCategoryDTO.getMainCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", subCategoryDTO.getMainCategoryId().toString()));
 
-        SubCategory subCategory = SubCategoryMapper.toEntity(subCategoryDTO);
-        subCategory.setMainCategory(mainCategory);
+            SubCategory subCategory = SubCategoryMapper.toEntity(subCategoryDTO);
+            subCategory.setMainCategory(mainCategory);
 
-        if (imageFile != null && !imageFile.isEmpty()) {
-            Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
-            subCategory.setImageUrl((String) uploadResult.get("url"));
-        }
-
-        SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
-        return SubCategoryMapper.toDTO(savedSubCategory);
-    }
-
-    public SubCategoryDTO updateSubCategory(Long id, SubCategoryDTO subCategoryDTO, MultipartFile imageFile) throws IOException {
-        SubCategory existingSubCategory = subCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
-
-        MainCategory mainCategory = mainCategoryRepository.findById(subCategoryDTO.getMainCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", subCategoryDTO.getMainCategoryId().toString()));
-
-        SubCategoryMapper.updateEntityFromDTO(subCategoryDTO, existingSubCategory);
-        existingSubCategory.setMainCategory(mainCategory);
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            if (existingSubCategory.getImageUrl() != null && !existingSubCategory.getImageUrl().isEmpty()) {
-                String publicId = cloudinaryService.extractPublicIdFromUrl(existingSubCategory.getImageUrl());
-                cloudinaryService.deleteFile(publicId, imageFolder);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
+                subCategory.setImageUrl((String) uploadResult.get("url"));
             }
-            Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
-            existingSubCategory.setImageUrl((String) uploadResult.get("url"));
-        }
 
-        // Ensure that the imageUrl is only updated if it's not null in subCategoryDTO
-        if (subCategoryDTO.getImageUrl() != null) {
-            existingSubCategory.setImageUrl(subCategoryDTO.getImageUrl());
+            SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
+            return SubCategoryMapper.toDTO(savedSubCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
-
-        SubCategory updatedSubCategory = subCategoryRepository.save(existingSubCategory);
-        return SubCategoryMapper.toDTO(updatedSubCategory);
     }
 
+    @Transactional
+    public SubCategoryDTO updateSubCategory(Long id, SubCategoryDTO subCategoryDTO, MultipartFile imageFile) throws IOException {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            SubCategory existingSubCategory = subCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
+
+            MainCategory mainCategory = mainCategoryRepository.findById(subCategoryDTO.getMainCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("MainCategory", "id", subCategoryDTO.getMainCategoryId().toString()));
+
+            SubCategoryMapper.updateEntityFromDTO(subCategoryDTO, existingSubCategory);
+            existingSubCategory.setMainCategory(mainCategory);
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                if (existingSubCategory.getImageUrl() != null && !existingSubCategory.getImageUrl().isEmpty()) {
+                    String publicId = cloudinaryService.extractPublicIdFromUrl(existingSubCategory.getImageUrl());
+                    cloudinaryService.deleteFile(publicId, imageFolder);
+                }
+                Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
+                existingSubCategory.setImageUrl((String) uploadResult.get("url"));
+            }
+
+            SubCategory updatedSubCategory = subCategoryRepository.save(existingSubCategory);
+            return SubCategoryMapper.toDTO(updatedSubCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional
     public void deleteSubCategory(Long id) {
-        SubCategory existingSubCategory = subCategoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
-        subCategoryRepository.delete(existingSubCategory);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            SubCategory existingSubCategory = subCategoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("SubCategory", "id", id.toString()));
+            subCategoryRepository.delete(existingSubCategory);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 }
 

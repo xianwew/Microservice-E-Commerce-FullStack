@@ -1,5 +1,7 @@
 package com.example.XianweiECommerce.service;
 
+import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.OrderDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.OrderMapper;
@@ -60,71 +62,86 @@ public class OrderService {
     }
 
     public Optional<OrderDTO> getOrder(Long orderId) {
-        return orderRepository.findById(orderId).map(orderMapper::toDTO);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            return orderRepository.findById(orderId).map(orderMapper::toDTO);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public List<OrderDTO> getOrdersByUser(String userId) {
-        log.info("getting uer order!");
-        return orderRepository.findByUserId(userId).stream().map(orderMapper::toDTO).collect(Collectors.toList());
+        log.info("Getting user orders!");
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            return orderRepository.findByUserId(userId).stream().map(orderMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     @Transactional
     public Long createOrder(Long cartId, Long shippingMethodId, Long cardId, String token) {
-        Cart cart = getCartById(cartId, token);
-        ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId)
-                .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
-        Card card = getCardById(cardId, token);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Cart cart = getCartById(cartId, token);
+            ShippingMethod shippingMethod = shippingMethodsRepository.findById(shippingMethodId)
+                    .orElseThrow(() -> new ResourceNotFoundException("ShippingMethod", "id", shippingMethodId.toString()));
+            Card card = getCardById(cardId, token);
 
-        log.info("order items length: ", cart.getCartItemsOutput().size());
-        // Calculate the total amount
-        double itemsTotal = cart.getCartItemsOutput().stream()
-                .mapToDouble(cartItem -> {
-                    Item item = getItemById(cartItem.getItemId(), token);
-                    log.info("Getting order item by id! " + item.getId());
-                    return cartItem.getQuantity() * item.getPrice();
-                })
-                .sum();
-        double shippingCost = shippingMethod.getPrice();
-        double tax = (itemsTotal + shippingCost) * 0.06;
-        double totalAmount = itemsTotal + shippingCost + tax;
-
-        // Simulate payment processing
-        boolean paymentSuccessful = Boolean.TRUE.equals(
-                restTemplate.postForObject(paymentServiceUrl, totalAmount, Boolean.class)
-        );
-
-        if (paymentSuccessful) {
-            log.info("Payment successful!");
-            Order order = new Order();
-            order.setUserId(cart.getUserId());
-            order.setTotalAmount(totalAmount);
-            order.setStatus("COMPLETED");
-            order.setShippingMethod(shippingMethod);
-            order.setCardType(card.getType());
-            order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
-
-            // Convert CartItems to OrderItems
-            List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
-                    .map(cartItem -> {
-                        OrderItem orderItem = new OrderItem();
-                        orderItem.setOrder(order);
-                        orderItem.setItemId(cartItem.getItemId());
-                        orderItem.setQuantity(cartItem.getQuantity());
+            log.info("Order items length: " + cart.getCartItemsOutput().size());
+            // Calculate the total amount
+            double itemsTotal = cart.getCartItemsOutput().stream()
+                    .mapToDouble(cartItem -> {
                         Item item = getItemById(cartItem.getItemId(), token);
-                        orderItem.setPrice(item.getPrice());
-                        return orderItem;
+                        log.info("Getting order item by id: " + item.getId());
+                        return cartItem.getQuantity() * item.getPrice();
                     })
-                    .collect(Collectors.toList());
-            order.setOrderItems(orderItems);
+                    .sum();
+            double shippingCost = shippingMethod.getPrice();
+            double tax = (itemsTotal + shippingCost) * 0.06;
+            double totalAmount = itemsTotal + shippingCost + tax;
 
-            Order savedOrder = orderRepository.save(order);
+            // Simulate payment processing
+            boolean paymentSuccessful = Boolean.TRUE.equals(
+                    restTemplate.postForObject(paymentServiceUrl, totalAmount, Boolean.class)
+            );
 
-            // Clear the cart after the order is successfully created
-            clearCart(cartId, token);
+            if (paymentSuccessful) {
+                log.info("Payment successful!");
+                Order order = new Order();
+                order.setUserId(cart.getUserId());
+                order.setTotalAmount(totalAmount);
+                order.setStatus("COMPLETED");
+                order.setShippingMethod(shippingMethod);
+                order.setCardType(card.getType());
+                order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
 
-            return savedOrder.getId();
-        } else {
-            throw new RuntimeException("Payment failed");
+                // Convert CartItems to OrderItems
+                List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
+                        .map(cartItem -> {
+                            OrderItem orderItem = new OrderItem();
+                            orderItem.setOrder(order);
+                            orderItem.setItemId(cartItem.getItemId());
+                            orderItem.setQuantity(cartItem.getQuantity());
+                            Item item = getItemById(cartItem.getItemId(), token);
+                            orderItem.setPrice(item.getPrice());
+                            return orderItem;
+                        })
+                        .collect(Collectors.toList());
+                order.setOrderItems(orderItems);
+
+                Order savedOrder = orderRepository.save(order);
+
+                // Clear the cart after the order is successfully created
+                clearCart(cartId, token);
+
+                return savedOrder.getId();
+            } else {
+                throw new RuntimeException("Payment failed");
+            }
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
     }
 
@@ -140,10 +157,6 @@ public class OrderService {
         if (cart == null) {
             throw new ResourceNotFoundException("Cart", "id", cartId.toString());
         }
-//        if (cart.getCartItemsOutput() == null) {
-//            cart.getCartItemsOutput(new ArrayList<>());
-//            throw new RuntimeException("No cart items found!");
-//        }
         return cart;
     }
 
@@ -174,7 +187,7 @@ public class OrderService {
         if (item == null) {
             throw new ResourceNotFoundException("Item", "id", itemId.toString());
         }
-        log.info("order item id: " + item.getId());
+        log.info("Order item id: " + item.getId());
         return item;
     }
 

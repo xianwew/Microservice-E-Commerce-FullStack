@@ -1,5 +1,7 @@
 package com.example.XianweiECommerce.service;
 
+import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.dto.RatingDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
@@ -16,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,15 +62,346 @@ public class ItemService {
         this.restTemplate = restTemplate;
     }
 
+    @Transactional(readOnly = true)
     public List<ItemDTO> getItemsByUserId(String userId) {
-        User user = getUserById(userId);
-        List<Item> items = itemRepository.findBySellerIdAndDeletedFalse(userId);
-        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            User user = getUserById(userId);
+            List<Item> items = itemRepository.findBySellerIdAndDeletedFalse(userId);
+            return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
+    @Transactional(readOnly = true)
     public List<ItemDTO> getRandomItems(int count) {
-        List<Item> items = itemRepository.findRandomItems(count);
-        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            List<Item> items = itemRepository.findRandomItems(count);
+            return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional
+    public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
+        log.info("Saving new listing!");
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
+            );
+            SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
+            );
+
+            if (itemDTO.getQuantity() <= 0) {
+                throw new RuntimeException("Quantity should be greater than 0!");
+            }
+            if (itemDTO.getPrice() <= 0) {
+                throw new RuntimeException("Price should be greater than 0!");
+            }
+
+            Item item = ItemMapper.toEntity(itemDTO, mainCategory, subCategory);
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
+                item.setImageUrl((String) uploadResult.get("url"));
+            }
+
+            if (subImageFiles != null && !subImageFiles.isEmpty()) {
+                if (subImageFiles.size() > 0) {
+                    Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(0).getBytes(), imageFolder);
+                    item.setSubImageUrl1((String) uploadResult.get("url"));
+                }
+                if (subImageFiles.size() > 1) {
+                    Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(1).getBytes(), imageFolder);
+                    item.setSubImageUrl2((String) uploadResult.get("url"));
+                }
+                if (subImageFiles.size() > 2) {
+                    Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(2).getBytes(), imageFolder);
+                    item.setSubImageUrl3((String) uploadResult.get("url"));
+                }
+                if (subImageFiles.size() > 3) {
+                    Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(3).getBytes(), imageFolder);
+                    item.setSubImageUrl4((String) uploadResult.get("url"));
+                }
+            }
+
+            Item savedItem = itemRepository.save(item);
+            log.info("Listing saved");
+
+            // Create an empty rating for the new product
+            RatingDTO productRating = new RatingDTO();
+            productRating.setEntityId(savedItem.getId().toString());
+            productRating.setEntityType("PRODUCT");
+            productRating.setTotalRating(0);
+            productRating.setNumRatings(0);
+            RatingDTO savedRating = createRating(productRating);
+
+            // Update the item with the rating ID
+            savedItem.setRatingId(savedRating.getId());
+            itemRepository.save(savedItem);
+
+            return ItemMapper.toDTO(savedItem);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional
+    public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Item existingItem = itemRepository.findById(itemId).orElseThrow(
+                    () -> new ResourceNotFoundException("Item", "id", itemId.toString())
+            );
+            MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
+            );
+            SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
+            );
+
+            ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory);
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                if (existingItem.getImageUrl() != null && !existingItem.getImageUrl().isEmpty()) {
+                    String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getImageUrl());
+                    cloudinaryService.deleteFile(publicId, imageFolder);
+                }
+                Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
+                existingItem.setImageUrl((String) uploadResult.get("url"));
+            } else if (existingItem.getImageUrl() == null || existingItem.getImageUrl().isEmpty()) {
+                throw new IllegalArgumentException("Cover image is required.");
+            }
+
+            uploadSubImages(existingItem, subImageFiles, subImageFileURLs);
+            Item updatedItem = itemRepository.save(existingItem);
+            return ItemMapper.toDTO(updatedItem);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional
+    public void deleteItem(Long itemId) throws IOException {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new ResourceNotFoundException("Item", "id", itemId.toString())
+            );
+
+            // Soft delete by setting the deleted flag to true
+            item.setDeleted(true);
+            itemRepository.save(item);
+
+            // Delete the cover image from Cloudinary
+            if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+                String publicId = cloudinaryService.extractPublicIdFromUrl(item.getImageUrl());
+                cloudinaryService.deleteFile(publicId, imageFolder);
+            }
+
+            // Delete the additional images from Cloudinary
+            if (item.getSubImageUrl1() != null && !item.getSubImageUrl1().isEmpty()) {
+                String publicId1 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl1());
+                cloudinaryService.deleteFile(publicId1, imageFolder);
+            }
+            if (item.getSubImageUrl2() != null && !item.getSubImageUrl2().isEmpty()) {
+                String publicId2 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl2());
+                cloudinaryService.deleteFile(publicId2, imageFolder);
+            }
+            if (item.getSubImageUrl3() != null && !item.getSubImageUrl3().isEmpty()) {
+                String publicId3 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl3());
+                cloudinaryService.deleteFile(publicId3, imageFolder);
+            }
+            if (item.getSubImageUrl4() != null && !item.getSubImageUrl4().isEmpty()) {
+                String publicId4 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl4());
+                cloudinaryService.deleteFile(publicId4, imageFolder);
+            }
+
+            // Save the item to persist the deleted flag
+            itemRepository.save(item);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ItemDTO getItem(Long itemId) {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new ResourceNotFoundException("Item", "id", itemId.toString())
+            );
+
+            if (item.isDeleted()) {
+                throw new ResourceNotFoundException("Item", "id", itemId.toString());
+            }
+
+            return ItemMapper.toDTO(item);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemDTO> getAllItems() {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            List<Item> items = itemRepository.findAllByDeletedFalse();
+            return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            Specification<Item> spec = Specification.where((root, query1, criteriaBuilder) ->
+                    criteriaBuilder.isFalse(root.get("deleted"))
+            );
+            boolean hasCriteria = false;
+
+            final String finalQuery = query != null ? query.trim() : "";
+            final String finalCountry = country != null ? country.trim() : "";
+            final String finalState = state != null ? state.trim() : "";
+            final Double finalMinPrice = (minPrice != null && minPrice >= 0) ? minPrice : null;
+            final Double finalMaxPrice = (maxPrice != null && maxPrice >= 0) ? maxPrice : null;
+
+            log.info("Starting search with parameters: query={}, country={}, state={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
+                    finalQuery, finalCountry, finalState, finalMinPrice, finalMaxPrice, mainCategoryId, subCategoryId);
+
+            if (!finalQuery.isEmpty() && !"all".equalsIgnoreCase(finalQuery)) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) -> {
+                    String pattern = "%" + finalQuery.toLowerCase() + "%";
+                    return criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("mainCategory").get("name")), pattern),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("subCategory").get("name")), pattern)
+                    );
+                });
+                log.info("Added query criteria");
+            }
+            if (!finalCountry.isEmpty() && !"all".equalsIgnoreCase(finalCountry)) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("country"), finalCountry));
+                log.info("Added country criteria");
+            }
+            if (!finalState.isEmpty() && !"all".equalsIgnoreCase(finalState)) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("state"), finalState));
+                log.info("Added state criteria");
+            }
+            if (finalMinPrice != null) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.greaterThanOrEqualTo(root.get("price"), finalMinPrice));
+                log.info("Added minPrice criteria");
+            }
+            if (finalMaxPrice != null) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.lessThanOrEqualTo(root.get("price"), finalMaxPrice));
+                log.info("Added maxPrice criteria");
+            }
+            if (mainCategoryId != null) {
+                hasCriteria = true;
+                List<Long> subCategoryIds = subCategoryRepository.findByMainCategoryId(mainCategoryId).stream()
+                        .map(SubCategory::getId)
+                        .collect(Collectors.toList());
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.or(
+                                criteriaBuilder.equal(root.get("mainCategory").get("id"), mainCategoryId),
+                                root.get("subCategory").get("id").in(subCategoryIds)
+                        ));
+                log.info("Added mainCategoryId criteria with subcategories: {}", subCategoryIds);
+            }
+            if (subCategoryId != null) {
+                hasCriteria = true;
+                spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("subCategory").get("id"), subCategoryId));
+                log.info("Added subCategoryId criteria");
+            }
+
+            if (!hasCriteria) {
+                log.info("No search criteria provided, fetching all items");
+                return itemRepository.findAllByDeletedFalse().stream().map(item -> {
+                    ItemDTO itemDTO = ItemMapper.toDTO(item);
+                    User seller = getUserById(item.getSellerId());
+                    if (seller != null) {
+                        log.info("seller: " + seller.toString());
+                        log.info("Seller's username: " + seller.getUsername());
+                        itemDTO.setUsername(seller.getUsername());
+                    }
+                    else{
+                        log.warn("Seller invalid!");
+                    }
+                    return itemDTO;
+                }).collect(Collectors.toList());
+            }
+
+            log.info("debugging!!!");
+            List<Item> items = itemRepository.findAll(spec);
+            log.info("Found {} items matching criteria", items.size());
+
+            return items.stream().map(item -> {
+                ItemDTO itemDTO = ItemMapper.toDTO(item);
+                User seller = getUserById(item.getSellerId());
+                log.info("Seller: " + seller.toString());
+                if (seller != null) {
+                    itemDTO.setUsername(seller.getUsername());
+                    Rating rating = getRatingById(item.getRatingId());
+                }
+                return itemDTO;
+            }).collect(Collectors.toList());
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
+    }
+
+    private User getUserById(String userId) {
+        try {
+            String url = String.format("%s/%s", userServiceUrl, userId);
+            ResponseEntity<UserResponse> userResponse = restTemplate.getForEntity(url, UserResponse.class);
+            UserResponse response = userResponse.getBody();
+            if (response == null || response.getUser() == null) {
+                throw new ResourceNotFoundException("User", "id", userId);
+            }
+            return response.getUser();
+        } catch (HttpServerErrorException e) {
+            log.error("Error fetching user with id {}: {}", userId, e.getMessage());
+            throw new ResourceNotFoundException("User", "id", userId);
+        }
+    }
+
+    private Rating getRatingById(Long ratingId) {
+        try {
+            String url = String.format("%s/%s", ratingServiceUrl, ratingId);
+            ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
+            return ratingResponse.getBody();
+        } catch (HttpServerErrorException e) {
+            log.error("Error fetching rating with id {}: {}", ratingId, e.getMessage());
+            throw new ResourceNotFoundException("Rating", "id", ratingId.toString());
+        }
+    }
+
+    private RatingDTO createRating(RatingDTO ratingDTO) {
+        try {
+            String url = String.format("%s", ratingServiceUrl);
+            ResponseEntity<RatingDTO> ratingResponse = restTemplate.postForEntity(url, ratingDTO, RatingDTO.class);
+            return ratingResponse.getBody();
+        } catch (HttpServerErrorException e) {
+            log.error("Error creating rating: {}", e.getMessage());
+            throw new RuntimeException("Failed to create rating");
+        }
     }
 
     private void uploadSubImages(Item existingItem, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
@@ -114,289 +448,6 @@ public class ItemService {
                 }
                 index++;
             }
-        }
-    }
-
-    public ItemDTO createItem(@Valid ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles) throws IOException {
-        log.info("Saving new listing!");
-        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
-        );
-        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
-        );
-
-        if (itemDTO.getQuantity() <= 0) {
-            throw new RuntimeException("Quantity should be greater than 0!");
-        }
-        if (itemDTO.getPrice() <= 0) {
-            throw new RuntimeException("Price should be greater than 0!");
-        }
-
-        Item item = ItemMapper.toEntity(itemDTO, mainCategory, subCategory);
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
-            item.setImageUrl((String) uploadResult.get("url"));
-        }
-
-        if (subImageFiles != null && !subImageFiles.isEmpty()) {
-            if (subImageFiles.size() > 0) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(0).getBytes(), imageFolder);
-                item.setSubImageUrl1((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 1) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(1).getBytes(), imageFolder);
-                item.setSubImageUrl2((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 2) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(2).getBytes(), imageFolder);
-                item.setSubImageUrl3((String) uploadResult.get("url"));
-            }
-            if (subImageFiles.size() > 3) {
-                Map<String, Object> uploadResult = cloudinaryService.uploadFile(subImageFiles.get(3).getBytes(), imageFolder);
-                item.setSubImageUrl4((String) uploadResult.get("url"));
-            }
-        }
-
-        Item savedItem = itemRepository.save(item);
-        log.info("Listing saved");
-
-        // Create an empty rating for the new product
-        RatingDTO productRating = new RatingDTO();
-        productRating.setEntityId(savedItem.getId().toString());
-        productRating.setEntityType("PRODUCT");
-        productRating.setTotalRating(0);
-        productRating.setNumRatings(0);
-        RatingDTO savedRating = createRating(productRating);
-
-        // Update the item with the rating ID
-        savedItem.setRatingId(savedRating.getId());
-        itemRepository.save(savedItem);
-
-        return ItemMapper.toDTO(savedItem);
-    }
-
-    public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
-        Item existingItem = itemRepository.findById(itemId).orElseThrow(
-                () -> new ResourceNotFoundException("Item", "id", itemId.toString())
-        );
-        MainCategory mainCategory = mainCategoryRepository.findById(itemDTO.getMainCategoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("MainCategory", "id", itemDTO.getMainCategoryId().toString())
-        );
-        SubCategory subCategory = subCategoryRepository.findById(itemDTO.getSubCategoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("SubCategory", "id", itemDTO.getSubCategoryId().toString())
-        );
-
-        ItemMapper.updateEntityFromDTO(itemDTO, existingItem, mainCategory, subCategory);
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            if (existingItem.getImageUrl() != null && !existingItem.getImageUrl().isEmpty()) {
-                String publicId = cloudinaryService.extractPublicIdFromUrl(existingItem.getImageUrl());
-                cloudinaryService.deleteFile(publicId, imageFolder);
-            }
-            Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
-            existingItem.setImageUrl((String) uploadResult.get("url"));
-        } else if (existingItem.getImageUrl() == null || existingItem.getImageUrl().isEmpty()) {
-            throw new IllegalArgumentException("Cover image is required.");
-        }
-
-        uploadSubImages(existingItem, subImageFiles, subImageFileURLs);
-        Item updatedItem = itemRepository.save(existingItem);
-        return ItemMapper.toDTO(updatedItem);
-    }
-
-    public void deleteItem(Long itemId) throws IOException {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new ResourceNotFoundException("Item", "id", itemId.toString())
-        );
-
-        // Soft delete by setting the deleted flag to true
-        item.setDeleted(true);
-        itemRepository.save(item);
-
-        // Delete the cover image from Cloudinary
-        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
-            String publicId = cloudinaryService.extractPublicIdFromUrl(item.getImageUrl());
-            cloudinaryService.deleteFile(publicId, imageFolder);
-        }
-
-        // Delete the additional images from Cloudinary
-        if (item.getSubImageUrl1() != null && !item.getSubImageUrl1().isEmpty()) {
-            String publicId1 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl1());
-            cloudinaryService.deleteFile(publicId1, imageFolder);
-        }
-        if (item.getSubImageUrl2() != null && !item.getSubImageUrl2().isEmpty()) {
-            String publicId2 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl2());
-            cloudinaryService.deleteFile(publicId2, imageFolder);
-        }
-        if (item.getSubImageUrl3() != null && !item.getSubImageUrl3().isEmpty()) {
-            String publicId3 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl3());
-            cloudinaryService.deleteFile(publicId3, imageFolder);
-        }
-        if (item.getSubImageUrl4() != null && !item.getSubImageUrl4().isEmpty()) {
-            String publicId4 = cloudinaryService.extractPublicIdFromUrl(item.getSubImageUrl4());
-            cloudinaryService.deleteFile(publicId4, imageFolder);
-        }
-
-        // Save the item to persist the deleted flag
-        itemRepository.save(item);
-    }
-
-    public ItemDTO getItem(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new ResourceNotFoundException("Item", "id", itemId.toString())
-        );
-
-        if (item.isDeleted()) {
-            throw new ResourceNotFoundException("Item", "id", itemId.toString());
-        }
-
-        return ItemMapper.toDTO(item);
-    }
-
-    public List<ItemDTO> getAllItems() {
-        List<Item> items = itemRepository.findAllByDeletedFalse();
-        return items.stream().map(ItemMapper::toDTO).collect(Collectors.toList());
-    }
-
-    public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
-        Specification<Item> spec = Specification.where((root, query1, criteriaBuilder) ->
-                criteriaBuilder.isFalse(root.get("deleted"))
-        );
-        boolean hasCriteria = false;
-
-        final String finalQuery = query != null ? query.trim() : "";
-        final String finalCountry = country != null ? country.trim() : "";
-        final String finalState = state != null ? state.trim() : "";
-        final Double finalMinPrice = (minPrice != null && minPrice >= 0) ? minPrice : null;
-        final Double finalMaxPrice = (maxPrice != null && maxPrice >= 0) ? maxPrice : null;
-
-        log.info("Starting search with parameters: query={}, country={}, state={}, minPrice={}, maxPrice={}, mainCategoryId={}, subCategoryId={}",
-                finalQuery, finalCountry, finalState, finalMinPrice, finalMaxPrice, mainCategoryId, subCategoryId);
-
-        if (!finalQuery.isEmpty() && !"all".equalsIgnoreCase(finalQuery)) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) -> {
-                String pattern = "%" + finalQuery.toLowerCase() + "%";
-                return criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("mainCategory").get("name")), pattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("subCategory").get("name")), pattern)
-                );
-            });
-            log.info("Added query criteria");
-        }
-        if (!finalCountry.isEmpty() && !"all".equalsIgnoreCase(finalCountry)) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("country"), finalCountry));
-            log.info("Added country criteria");
-        }
-        if (!finalState.isEmpty() && !"all".equalsIgnoreCase(finalState)) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("state"), finalState));
-            log.info("Added state criteria");
-        }
-        if (finalMinPrice != null) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), finalMinPrice));
-            log.info("Added minPrice criteria");
-        }
-        if (finalMaxPrice != null) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), finalMaxPrice));
-            log.info("Added maxPrice criteria");
-        }
-        if (mainCategoryId != null) {
-            hasCriteria = true;
-            List<Long> subCategoryIds = subCategoryRepository.findByMainCategoryId(mainCategoryId).stream()
-                    .map(SubCategory::getId)
-                    .collect(Collectors.toList());
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.or(
-                            criteriaBuilder.equal(root.get("mainCategory").get("id"), mainCategoryId),
-                            root.get("subCategory").get("id").in(subCategoryIds)
-                    ));
-            log.info("Added mainCategoryId criteria with subcategories: {}", subCategoryIds);
-        }
-        if (subCategoryId != null) {
-            hasCriteria = true;
-            spec = spec.and((root, criteriaQuery, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("subCategory").get("id"), subCategoryId));
-            log.info("Added subCategoryId criteria");
-        }
-
-        if (!hasCriteria) {
-            log.info("No search criteria provided, fetching all items");
-            return itemRepository.findAllByDeletedFalse().stream().map(item -> {
-                ItemDTO itemDTO = ItemMapper.toDTO(item);
-                User seller = getUserById(item.getSellerId());
-                if (seller != null) {
-                    log.info("seller: " + seller.toString());
-                    log.info("Seller's username: " + seller.getUsername());
-                    itemDTO.setUsername(seller.getUsername());
-                }
-                else{
-                    log.warn("Seller invalid!");
-                }
-                return itemDTO;
-            }).collect(Collectors.toList());
-        }
-
-        log.info("debugging!!!");
-        List<Item> items = itemRepository.findAll(spec);
-        log.info("Found {} items matching criteria", items.size());
-
-        return items.stream().map(item -> {
-            ItemDTO itemDTO = ItemMapper.toDTO(item);
-            User seller = getUserById(item.getSellerId());
-            log.info("Seller: " + seller.toString());
-            if (seller != null) {
-                itemDTO.setUsername(seller.getUsername());
-                Rating rating = getRatingById(item.getRatingId());
-            }
-            return itemDTO;
-        }).collect(Collectors.toList());
-    }
-
-    private User getUserById(String userId) {
-        try {
-            String url = String.format("%s/%s", userServiceUrl, userId);
-            ResponseEntity<UserResponse> userResponse = restTemplate.getForEntity(url, UserResponse.class);
-            UserResponse response = userResponse.getBody();
-            if (response == null || response.getUser() == null) {
-                throw new ResourceNotFoundException("User", "id", userId);
-            }
-            return response.getUser();
-        } catch (HttpServerErrorException e) {
-            log.error("Error fetching user with id {}: {}", userId, e.getMessage());
-            throw new ResourceNotFoundException("User", "id", userId);
-        }
-    }
-
-    private Rating getRatingById(Long ratingId) {
-        try {
-            String url = String.format("%s/%s", ratingServiceUrl, ratingId);
-            ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
-            return ratingResponse.getBody();
-        } catch (HttpServerErrorException e) {
-            log.error("Error fetching rating with id {}: {}", ratingId, e.getMessage());
-            throw new ResourceNotFoundException("Rating", "id", ratingId.toString());
-        }
-    }
-
-    private RatingDTO createRating(RatingDTO ratingDTO) {
-        try {
-            String url = String.format("%s", ratingServiceUrl);
-            ResponseEntity<RatingDTO> ratingResponse = restTemplate.postForEntity(url, ratingDTO, RatingDTO.class);
-            return ratingResponse.getBody();
-        } catch (HttpServerErrorException e) {
-            log.error("Error creating rating: {}", e.getMessage());
-            throw new RuntimeException("Failed to create rating");
         }
     }
 }

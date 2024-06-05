@@ -1,5 +1,7 @@
 package com.example.XianweiECommerce.service;
 
+import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.RatingDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.model.Rating;
@@ -18,38 +20,63 @@ public class RatingService {
     }
 
     public RatingDTO getRatingById(Long id) {
-        Rating rating = ratingRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
-        return toDTO(rating);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            Rating rating = ratingRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
+            return toDTO(rating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public RatingDTO getRatingByEntityIdAndType(String entityId, String entityType) {
-        Rating rating = ratingRepository.findByEntityIdAndEntityType(entityId, Rating.EntityType.valueOf(entityType))
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "entityId and entityType", entityId + " " + entityType));
-        return toDTO(rating);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
+        try {
+            Rating rating = ratingRepository.findByEntityIdAndEntityType(entityId, Rating.EntityType.valueOf(entityType))
+                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "entityId and entityType", entityId + " " + entityType));
+            return toDTO(rating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public RatingDTO createRating(RatingDTO ratingDTO) {
-        Rating rating = toEntity(ratingDTO);
-        Rating savedRating = ratingRepository.save(rating);
-        return toDTO(savedRating);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Rating rating = toEntity(ratingDTO);
+            Rating savedRating = ratingRepository.save(rating);
+            return toDTO(savedRating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public RatingDTO updateRating(Long id, RatingDTO ratingDTO) {
-        Rating existingRating = ratingRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Rating existingRating = ratingRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
 
-        existingRating.setTotalRating(ratingDTO.getTotalRating());
-        existingRating.setNumRatings(ratingDTO.getNumRatings());
+            existingRating.setTotalRating(ratingDTO.getTotalRating());
+            existingRating.setNumRatings(ratingDTO.getNumRatings());
 
-        Rating updatedRating = ratingRepository.save(existingRating);
-        return toDTO(updatedRating);
+            Rating updatedRating = ratingRepository.save(existingRating);
+            return toDTO(updatedRating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     public void deleteRating(Long id) {
-        Rating rating = ratingRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
-        ratingRepository.delete(rating);
+        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
+        try {
+            Rating rating = ratingRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Rating", "id", id.toString()));
+            ratingRepository.delete(rating);
+        } finally {
+            ReplicationRoutingDataSourceContext.clearDataSourceType();
+        }
     }
 
     private RatingDTO toDTO(Rating rating) {

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>Order</artifactId>
+	<artifactId>order</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Order</name>
 	<description>Order Service</description>
@@ -138,6 +138,19 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.1</version>
+				<configuration>
+					<to>
+						<image>xianwei/${project.artifactId}:v1</image>
+					</to>
+					<container>
+						<mainClass>com.example.XianweiECommerce.OrderApplication</mainClass>
+					</container>
 				</configuration>
 			</plugin>
 		</plugins>

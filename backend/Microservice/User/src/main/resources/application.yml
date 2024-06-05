@@ -8,21 +8,29 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://localhost:8075/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 spring:
   application:
     name: "User"
-
   datasource:
-    url: jdbc:mysql://localhost:3306/userservice
-    username: root
-    password: wxwwxw123
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    master:
+      url: jdbc:mysql://localhost:3306/userservice
+      username: root
+      password: wxwwxw123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    slave:
+      url: jdbc:mysql://localhost:3307/userservice
+      username: root
+      password: wxwwxw123
+      driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
   sql:
     init:
       mode: always
@@ -47,3 +55,9 @@ cloudinary:
 
 itemservice:
   url: http://localhost:8040/api/item
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
