@@ -33,7 +33,7 @@ spring:
     init:
       mode: always
   config:
-    import: "configserver:http://localhost:8090/"
+    import: "optional:configserver:http://localhost:8090/"
 
 cloudinary:
   cloud-name: dl7atizzb

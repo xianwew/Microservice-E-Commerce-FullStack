@@ -28,7 +28,7 @@ services:
       - "8090:8090"
     depends_on:
       keycloak:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: "curl --fail --silent http://localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 20s

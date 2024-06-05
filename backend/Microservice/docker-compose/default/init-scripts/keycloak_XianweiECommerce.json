@@ -298,7 +298,7 @@
           "attributes": {}
         }
       ],
-      "xianwei-ecommerce-monolith-client": [],
+      "xianwei-ecommerce": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -455,11 +455,11 @@
     {
       "id": "de401615-6b7a-49f7-aee1-90d512975671",
       "createdTimestamp": 1717624948269,
-      "username": "service-account-xianwei-ecommerce-monolith-client",
+      "username": "service-account-xianwei-ecommerce",
       "enabled": true,
       "totp": false,
       "emailVerified": false,
-      "serviceAccountClientId": "xianwei-ecommerce-monolith-client",
+      "serviceAccountClientId": "xianwei-ecommerce",
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -708,7 +708,7 @@
     },
     {
       "id": "d6d91841-65d0-4b13-ade8-9731b02bbef5",
-      "clientId": "xianwei-ecommerce-monolith-client",
+      "clientId": "xianwei-ecommerce",
       "rootUrl": "http://localhost:3000",
       "adminUrl": "http://localhost:3000",
       "baseUrl": "/",
