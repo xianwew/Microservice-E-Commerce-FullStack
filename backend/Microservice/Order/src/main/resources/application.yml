@@ -35,17 +35,7 @@ spring:
     init:
       mode: always
   config:
-    import: "optional:configserver:http://localhost:8090/"
-
-keycloak:
-  auth-server-url: http://localhost:7080
-  realm: XianweiECommerce
-  client-id: xianwei-ecommerce-monolith-client
-  client-secret: 4M8WYjvd1HV1WLvMGxZUhV60IKADbIxH
-  master-id: xianwei-ecommerce-monolith-client
-  master-secret: kHn11XuL8pytqXTW2eQiK6l6VlT8DYlc
-  admin-username: admin
-  admin-password: admin
+    import: "configserver:http://localhost:8090/"
 
 cloudinary:
   cloud-name: dl7atizzb
@@ -79,3 +69,15 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

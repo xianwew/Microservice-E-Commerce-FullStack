@@ -1,6 +1,8 @@
 spring:
   application:
-    name: "Gateway"
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8090/"
   cloud:
     gateway:
       discovery:
@@ -10,9 +12,6 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 10s
-  config:
-    import: "optional:config:http://localhost:8090/"
-
   data:
     redis:
       connect-timeout: 2s
@@ -41,8 +40,8 @@ management:
 
 info:
   app:
-    name: "Gateway"
-    description: "Gateway Application"
+    name: "gatewayserver"
+    description: "Gateway Server Application"
     version: "1.0.0"
 
 logging:
@@ -60,5 +59,4 @@ resilience4j.circuitbreaker:
       permittedNumberOfCallsInHalfOpenState: 2
       failureRateThreshold: 50
       waitDurationInOpenState: 10000
-
 

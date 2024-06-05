@@ -1,8 +1,7 @@
 spring:
   application:
-    name: "Config"
+    name: "configserver"
   profiles:
-    # active: native
     active: git
   cloud:
     config:
@@ -13,8 +12,6 @@ spring:
           timeout: 5
           clone-on-start: true
           force-pull: true
-      enabled: false
-      fail-fast: false
 
 management:
   endpoints:

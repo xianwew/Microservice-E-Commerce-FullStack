@@ -8,11 +8,11 @@
 		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>config</artifactId>
+	<groupId>com.eazybytes</groupId>
+	<artifactId>configserver</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Config</name>
-	<description>Config Service</description>
+	<name>configserver</name>
+	<description>Config Server</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.0</spring-cloud.version>
@@ -69,9 +69,6 @@
 					<to>
 						<image>xianwei/${project.artifactId}:v1</image>
 					</to>
-					<container>
-						<mainClass>com.xianwei.config.ConfigApplication</mainClass>
-					</container>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,0 +1,30 @@
+
+services:
+  network-deploy-service:
+    networks:
+      - XianweiECommerce
+
+  microservice-base-config:
+    extends:
+      service: network-deploy-service
+
+  microservice-configserver-config:
+    extends:
+      service: microservice-base-config
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8090/"
+
+  microservice-eureka-config:
+    extends:
+      service: microservice-configserver-config
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8761/eureka/"
+      keycloak.auth-server-url: "http://localhost:7080"
+      keycloak.realm: "XianweiECommerce"
+      keycloak.client-id: "xianwei-ecommerce-monolith-client"
+      keycloak.client-secret: "b2ZjdidtURFG8Qh7mwNJLfc2J5OdNk0U"
+      keycloak.master-id: "xianwei-ecommerce-monolith-client"
+      keycloak.master-secret: "g5HFcWL6MHBFnrAe9FO0HhlMipOHzFNZ"
+      keycloak.admin-username: "admin"
+      keycloak.admin-password: "admin"
