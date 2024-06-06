@@ -66,9 +66,6 @@ services:
   userservice-master:
     image: mysql:latest
     container_name: userservice-master
-    extends:
-      file: common-config.yml
-      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: userservice
@@ -77,10 +74,11 @@ services:
       - "3307:3306"
     volumes:
       - userservice_master_data:/var/lib/mysql
+      - ./conf.d/master/userservice:/etc/mysql/conf.d
       - ./init-scripts/userservice-master:/docker-entrypoint-initdb.d
-    command: ["--bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 30s
       retries: 10
@@ -88,24 +86,25 @@ services:
   userservice-slave:
     image: mysql:latest
     container_name: userservice-slave
-    extends:
-      file: common-config.yml
-      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: userservice
       MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - "3308:3306"
     volumes:
       - userservice_slave_data:/var/lib/mysql
+      - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/userservice-slave:/docker-entrypoint-initdb.d
-      - ./wait-for-it.sh:/wait-for-it.sh
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 30s
+      retries: 10
     depends_on:
       userservice-master:
         condition: service_healthy
-    command: >
-      sh -c "/wait-for-it.sh userservice-master:3306 -- 
-      mysql -h userservice-master -u root -pwxwwxw123 -e 'CHANGE MASTER TO MASTER_HOST=\"userservice-master\", MASTER_USER=\"root\", MASTER_PASSWORD=\"wxwwxw123\", MASTER_AUTO_POSITION=1; START SLAVE; SHOW SLAVE STATUS\G' && docker-entrypoint.sh mysqld"
 
   orderservice-master:
     image: mysql:latest
@@ -121,8 +120,9 @@ services:
       - "3309:3306"
     volumes:
       - orderservice_master_data:/var/lib/mysql
+      - ./conf.d/master/orderservice:/etc/mysql/conf.d
       - ./init-scripts/orderservice-master:/docker-entrypoint-initdb.d
-    command: ["--bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -137,19 +137,23 @@ services:
       service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: orderservice
       MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - "3310:3306"
     volumes:
       - orderservice_slave_data:/var/lib/mysql
+      - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/orderservice-slave:/docker-entrypoint-initdb.d
-      - ./wait-for-it.sh:/wait-for-it.sh
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 30s
+      retries: 10
     depends_on:
       orderservice-master:
         condition: service_healthy
-    command: >
-      sh -c "/wait-for-it.sh orderservice-master:3306 -- 
-      mysql -h orderservice-master -u root -pwxwwxw123 -e 'CHANGE MASTER TO MASTER_HOST=\"orderservice-master\", MASTER_USER=\"root\", MASTER_PASSWORD=\"wxwwxw123\", MASTER_AUTO_POSITION=1; START SLAVE; SHOW SLAVE STATUS\G' && docker-entrypoint.sh mysqld"
 
   itemservice-master:
     image: mysql:latest
@@ -165,8 +169,9 @@ services:
       - "3311:3306"
     volumes:
       - itemservice_master_data:/var/lib/mysql
+      - ./conf.d/master/itemservice:/etc/mysql/conf.d
       - ./init-scripts/itemservice-master:/docker-entrypoint-initdb.d
-    command: ["--bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -181,30 +186,37 @@ services:
       service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_DATABASE: itemservice
       MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - "3312:3306"
     volumes:
       - itemservice_slave_data:/var/lib/mysql
+      - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/itemservice-slave:/docker-entrypoint-initdb.d
-      - ./wait-for-it.sh:/wait-for-it.sh
-      - ./custom-entrypoint.sh:/custom-entrypoint.sh
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 30s
+      retries: 10
     depends_on:
       itemservice-master:
         condition: service_healthy
-    command: >
-      sh -c "/wait-for-it.sh itemservice-master:3306 -- 
-      mysql -h itemservice-master -u root -pwxwwxw123 -e 'CHANGE MASTER TO MASTER_HOST=\"itemservice-master\", MASTER_USER=\"root\", MASTER_PASSWORD=\"wxwwxw123\", MASTER_AUTO_POSITION=1; START SLAVE; SHOW SLAVE STATUS\G' && docker-entrypoint.sh mysqld"
 
   user:
     image: "xianwei/user:v1"
     container_name: user
+    ports:
+      - "8070:8070"
     depends_on:
       configserver:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
       userservice-master:
+        condition: service_healthy
+      userservice-slave:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8080/actuator/health/readiness | grep UP || exit 1"
@@ -222,12 +234,16 @@ services:
   item:
     image: "xianwei/item:v1"
     container_name: item
+    ports:
+      - "8040:8040"
     depends_on:
       configserver:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
       itemservice-master:
+        condition: service_healthy
+      itemservice-slave:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8040/actuator/health/readiness | grep UP || exit 1"
@@ -245,12 +261,16 @@ services:
   order:
     image: "xianwei/order:v1"
     container_name: order
+    ports:
+      - "8050:8050"
     depends_on:
       configserver:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
       orderservice-master:
+        condition: service_healthy
+      orderservice-slave:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8050/actuator/health/readiness | grep UP || exit 1"
@@ -268,6 +288,8 @@ services:
   payment:
     image: "xianwei/payment:v1"
     container_name: payment
+    ports:
+      - "8060:8060"
     depends_on:
       configserver:
         condition: service_healthy
