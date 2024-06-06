@@ -1,4 +1,3 @@
-
 services:
   network-deploy-service:
     networks:
@@ -12,7 +11,7 @@ services:
     extends:
       service: microservice-base-config
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: "docker"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8090/"
 
   microservice-eureka-config:
@@ -20,11 +19,11 @@ services:
       service: microservice-configserver-config
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8761/eureka/"
-      keycloak.auth-server-url: "http://localhost:7080"
-      keycloak.realm: "XianweiECommerce"
-      keycloak.client-id: "xianwei-ecommerce"
-      keycloak.client-secret: "g5HFcWL6MHBFnrAe9FO0HhlMipOHzFNZ"
-      keycloak.master-id: "admin_cli"
-      keycloak.master-secret: ""
-      keycloak.admin-username: "admin"
-      keycloak.admin-password: "admin"
+#      keycloak.auth-server-url: "keycloak:http://keycloak:7080"
+#      keycloak.realm: "XianweiECommerce"
+#      keycloak.client-id: "xianwei-ecommerce"
+#      keycloak.client-secret: "g5HFcWL6MHBFnrAe9FO0HhlMipOHzFNZ"
+#      keycloak.master-id: "admin_cli"
+#      keycloak.master-secret: ""
+#      keycloak.admin-username: "admin"
+#      keycloak.admin-password: "admin"

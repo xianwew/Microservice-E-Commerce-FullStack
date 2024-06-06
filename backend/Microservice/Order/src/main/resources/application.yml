@@ -13,17 +13,6 @@ eureka:
 spring:
   application:
     name: "Order"
-  datasource:
-    master:
-      url: jdbc:mysql://localhost:3308/orderservice
-      username: root
-      password: wxwwxw123
-      driver-class-name: com.mysql.cj.jdbc.Driver
-    slave:
-      url: jdbc:mysql://localhost:3309/orderservice
-      username: root
-      password: wxwwx123
-      driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update

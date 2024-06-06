@@ -12,7 +12,7 @@ services:
       KC_IMPORT: /opt/keycloak/data/import/realm-config.json
     command: ["start-dev", "--import-realm"]
     healthcheck:
-      test: "curl --fail --silent http://localhost:8080/realms/XianweiECommerce/.well-known/openid-configuration | grep issuer || exit 1"
+      test: ["CMD-SHELL", "curl --head -fsS http://localhost:8080/health/ready || exit 1"]
       interval: 20s
       timeout: 5s
       retries: 20
@@ -26,9 +26,6 @@ services:
     container_name: configserver
     ports:
       - "8090:8090"
-    depends_on:
-      keycloak:
-        condition: service_started
     healthcheck:
       test: "curl --fail --silent http://localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -69,6 +66,9 @@ services:
   userservice-master:
     image: mysql:latest
     container_name: userservice-master
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: userservice
@@ -77,7 +77,7 @@ services:
     volumes:
       - userservice_master_data:/var/lib/mysql
       - ./init-scripts/userservice-master:/docker-entrypoint-initdb.d
-    command: docker-entrypoint.sh mysqld
+    command: ["--bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -87,6 +87,9 @@ services:
   userservice-slave:
     image: mysql:latest
     container_name: userservice-slave
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
     ports:
@@ -105,6 +108,9 @@ services:
   orderservice-master:
     image: mysql:latest
     container_name: orderservice-master
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: orderservice
@@ -113,7 +119,7 @@ services:
     volumes:
       - orderservice_master_data:/var/lib/mysql
       - ./init-scripts/orderservice-master:/docker-entrypoint-initdb.d
-    command: docker-entrypoint.sh mysqld
+    command: ["--bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -123,6 +129,9 @@ services:
   orderservice-slave:
     image: mysql:latest
     container_name: orderservice-slave
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
     ports:
@@ -141,15 +150,20 @@ services:
   itemservice-master:
     image: mysql:latest
     container_name: itemservice-master
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
-      MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_ROOT_PASSWORD: 'wxwwxw123'
       MYSQL_DATABASE: itemservice
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     ports:
       - "3310:3306"
     volumes:
       - itemservice_master_data:/var/lib/mysql
-      - ./init-scripts/itemservice-master:/docker-entrypoint-initdb.d
-    command: docker-entrypoint.sh mysqld
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: ["--bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -159,6 +173,9 @@ services:
   itemservice-slave:
     image: mysql:latest
     container_name: itemservice-slave
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
     ports:
@@ -167,6 +184,7 @@ services:
       - itemservice_slave_data:/var/lib/mysql
       - ./init-scripts/itemservice-slave:/docker-entrypoint-initdb.d
       - ./wait-for-it.sh:/wait-for-it.sh
+      - ./custom-entrypoint.sh:/custom-entrypoint.sh
     depends_on:
       itemservice-master:
         condition: service_healthy

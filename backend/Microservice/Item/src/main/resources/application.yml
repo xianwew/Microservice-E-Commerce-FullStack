@@ -13,15 +13,6 @@ eureka:
 spring:
   application:
     name: "Item"
-  datasource:
-    master:
-      jdbc-url: jdbc:mysql://localhost:3310/itemservice
-      username: root
-      password: wxwwxw123
-    slave:
-      jdbc-url: jdbc:mysql://localhost:3311/itemservice
-      username: root
-      password: wxwwxw123
   jpa:
     hibernate:
       ddl-auto: update

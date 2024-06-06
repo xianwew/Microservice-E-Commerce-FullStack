@@ -30,6 +30,7 @@ public class JwtTokenProvider {
 
     @PostConstruct
     private void init() {
+        log.info("keycloakUrl: " + keycloakUrl);
         String jwksUri = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/certs";
         log.info("Initializing JwtTokenProvider with JWKS URI: {}", jwksUri);
         try {
@@ -75,26 +76,6 @@ public class JwtTokenProvider {
             log.error("Failed to fetch and parse public key from JWKS: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Invalid public key provided", e);
         }
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            log.error("Invalid token: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
-        return claims.getSubject();
-    }
-
-    public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
-        return claims.get("role", String.class);
     }
 
     public String extractUserIdFromToken(String token) {
