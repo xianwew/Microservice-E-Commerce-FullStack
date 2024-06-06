@@ -1,8 +1,8 @@
-CREATE USER 'root'@'%' IDENTIFIED BY 'wxwwxw123';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-
 CREATE DATABASE IF NOT EXISTS orderservice;
 
-USE orderservice;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'wxwwxw123';
+ALTER USER 'root'@'%' IDENTIFIED BY 'wxwwxw123';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+FLUSH PRIVILEGES;
+
 

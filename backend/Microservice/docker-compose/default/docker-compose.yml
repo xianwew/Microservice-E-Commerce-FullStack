@@ -72,8 +72,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: userservice
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - userservice_master_data:/var/lib/mysql
       - ./init-scripts/userservice-master:/docker-entrypoint-initdb.d
@@ -92,8 +93,9 @@ services:
       service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3307:3306"
+      - "3308:3306"
     volumes:
       - userservice_slave_data:/var/lib/mysql
       - ./init-scripts/userservice-slave:/docker-entrypoint-initdb.d
@@ -114,8 +116,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: orderservice
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3308:3306"
+      - "3309:3306"
     volumes:
       - orderservice_master_data:/var/lib/mysql
       - ./init-scripts/orderservice-master:/docker-entrypoint-initdb.d
@@ -134,8 +137,9 @@ services:
       service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3309:3306"
+      - "3310:3306"
     volumes:
       - orderservice_slave_data:/var/lib/mysql
       - ./init-scripts/orderservice-slave:/docker-entrypoint-initdb.d
@@ -154,15 +158,14 @@ services:
       file: common-config.yml
       service: microservice-base-config
     environment:
-      MYSQL_ROOT_PASSWORD: 'wxwwxw123'
+      MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: itemservice
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3310:3306"
+      - "3311:3306"
     volumes:
       - itemservice_master_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init-scripts/itemservice-master:/docker-entrypoint-initdb.d
     command: ["--bind-address=0.0.0.0"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -178,8 +181,9 @@ services:
       service: microservice-base-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
-      - "3311:3306"
+      - "3312:3306"
     volumes:
       - itemservice_slave_data:/var/lib/mysql
       - ./init-scripts/itemservice-slave:/docker-entrypoint-initdb.d
@@ -199,6 +203,8 @@ services:
       configserver:
         condition: service_healthy
       eurekaserver:
+        condition: service_healthy
+      userservice-master:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8080/actuator/health/readiness | grep UP || exit 1"
@@ -221,6 +227,8 @@ services:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
+      itemservice-master:
+        condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8040/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -241,6 +249,8 @@ services:
       configserver:
         condition: service_healthy
       eurekaserver:
+        condition: service_healthy
+      orderservice-master:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8050/actuator/health/readiness | grep UP || exit 1"
