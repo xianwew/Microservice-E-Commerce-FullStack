@@ -12,8 +12,6 @@ FLUSH PRIVILEGES;
 
 -- Enable binary logging
 SET GLOBAL server_id = 1;
-SET GLOBAL log_bin = 'mysql-bin';
-
 
 
 
