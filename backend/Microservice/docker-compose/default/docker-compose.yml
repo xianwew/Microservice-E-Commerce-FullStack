@@ -79,7 +79,7 @@ services:
       - userservice_master_data:/var/lib/mysql
       - ./conf.d/master/userservice:/etc/mysql/conf.d
       - ./init-scripts/userservice-master:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON "]
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -102,7 +102,7 @@ services:
       - userservice_slave_data:/var/lib/mysql
       - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/userservice-slave:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON"]
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -128,7 +128,7 @@ services:
       - orderservice_master_data:/var/lib/mysql
       - ./conf.d/master/orderservice:/etc/mysql/conf.d
       - ./init-scripts/orderservice-master:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -151,7 +151,7 @@ services:
       - orderservice_slave_data:/var/lib/mysql
       - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/orderservice-slave:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON"]
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
@@ -177,7 +177,7 @@ services:
       - itemservice_master_data:/var/lib/mysql
       - ./conf.d/master/itemservice:/etc/mysql/conf.d
       - ./init-scripts/itemservice-master:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -200,7 +200,7 @@ services:
       - itemservice_slave_data:/var/lib/mysql
       - ./conf.d/slave:/etc/mysql/conf.d
       - ./init-scripts/itemservice-slave:/docker-entrypoint-initdb.d
-    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0"]
+    command: ["/bin/sh", "-c", "chmod 644 /etc/mysql/conf.d/my.cnf && exec docker-entrypoint.sh --bind-address=0.0.0.0 --mysql-native-password=ON"]
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s

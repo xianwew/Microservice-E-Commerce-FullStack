@@ -5,7 +5,7 @@ ALTER USER 'root'@'%' IDENTIFIED BY 'wxwwxw123';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 FLUSH PRIVILEGES;
 
-CREATE USER 'replica'@'%' IDENTIFIED WITH caching_sha2_password BY 'replica_password';
+CREATE USER 'replica'@'%' IDENTIFIED WITH mysql_native_password BY 'replica_password';
 GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%';
 FLUSH PRIVILEGES;
 
