@@ -10,6 +10,10 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "orders")
+@NamedEntityGraph(
+        name = "Order.items",
+        attributeNodes = @NamedAttributeNode("orderItems")
+)
 public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +22,7 @@ public class Order extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(nullable = false)
+    @Column(name = "total_amount", nullable = false)
     private double totalAmount;
 
     @Column(nullable = false)
@@ -34,7 +38,7 @@ public class Order extends BaseEntity {
     @Column(name = "last_four_digit", nullable = false)
     private String lastFourDigit;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     // Getters and setters are inherited from BaseEntity

@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }) => {
             grant_type: 'password'
         }), {
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
             }
         });
 

@@ -31,7 +31,7 @@ public class Address extends BaseEntity {
     @Column(nullable = false)
     private String state;
 
-    @Column(nullable = false)
+    @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
     @Column(nullable = false)

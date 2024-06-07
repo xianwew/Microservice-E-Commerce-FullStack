@@ -25,43 +25,15 @@ public class GatewayApplication {
 		return routeLocatorBuilder.routes()
 				.route(p -> p
 						.path("/api/user/**", "/api/cart/**", "/api/feedback/**", "/api/ratings/**")
-						.filters(f -> f.filter((exchange, chain) -> {
-							String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-							return chain.filter(exchange.mutate().request(
-									exchange.getRequest().mutate()
-											.header("Authorization", authHeader)
-											.build()).build());
-						}))
 						.uri("lb://USER"))
 				.route(p -> p
 						.path("/api/item/**", "/api/categories/**", "/api/admin/**")
-						.filters(f -> f.filter((exchange, chain) -> {
-							String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-							return chain.filter(exchange.mutate().request(
-									exchange.getRequest().mutate()
-											.header("Authorization", authHeader)
-											.build()).build());
-						}))
 						.uri("lb://ITEM"))
 				.route(p -> p
 						.path("/api/orders/**")
-						.filters(f -> f.filter((exchange, chain) -> {
-							String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-							return chain.filter(exchange.mutate().request(
-									exchange.getRequest().mutate()
-											.header("Authorization", authHeader)
-											.build()).build());
-						}))
 						.uri("lb://ORDER"))
 				.route(p -> p
 						.path("/api/payment/**")
-						.filters(f -> f.filter((exchange, chain) -> {
-							String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-							return chain.filter(exchange.mutate().request(
-									exchange.getRequest().mutate()
-											.header("Authorization", authHeader)
-											.build()).build());
-						}))
 						.uri("lb://PAYMENT"))
 				.build();
 	}

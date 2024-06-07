@@ -13,14 +13,14 @@ public class Feedback extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "itemId", nullable = false)
+    @Column(name = "item_id", nullable = false)
     private Long itemId;
 
-    @Column(name = "sellerId", nullable = false)
+    @Column(name = "seller_id", nullable = false)
     private String sellerId;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)

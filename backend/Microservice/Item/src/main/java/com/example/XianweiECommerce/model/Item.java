@@ -29,18 +29,26 @@ public class Item extends BaseEntity {
     private String shortDescription;
 
     @Lob
+    @Column(name = "long_description")
     private String longDescription;
 
     @Column(nullable = false)
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private double price;
 
-    @Column(nullable = false)
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
+    @Column(name = "sub_image_url1")
     private String subImageUrl1;
+
+    @Column(name = "sub_image_url2")
     private String subImageUrl2;
+
+    @Column(name = "sub_image_url3")
     private String subImageUrl3;
+
+    @Column(name = "sub_image_url4")
     private String subImageUrl4;
 
     @Column(nullable = false)
@@ -53,17 +61,17 @@ public class Item extends BaseEntity {
     private String country;
 
     @ManyToOne
-    @JoinColumn(name = "mainCategoryId", nullable = false)
+    @JoinColumn(name = "main_category_id", nullable = false)
     private MainCategory mainCategory;
 
     @ManyToOne
-    @JoinColumn(name = "subCategoryId", nullable = false)
+    @JoinColumn(name = "sub_category_id", nullable = false)
     private SubCategory subCategory;
 
     @Column(name = "rating_id")
     private Long ratingId;
 
-    @Column(nullable = false)
+    @Column(name = "date_listed", nullable = false)
     private LocalDateTime dateListed;
 
     @Column(nullable = false)

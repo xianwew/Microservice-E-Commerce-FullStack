@@ -12,13 +12,9 @@ export const fetchUser = async () => {
 
     const decoded = decodeToken(token);
     const userId = decoded.sub;
-
+    
     try {
-        const response = await axiosInstance.get(`/api/user/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        const response = await axiosInstance.get(`/api/user/${userId}`);
 
         const newUser = response.data.user;
         store.dispatch(setUser({ user: newUser }));

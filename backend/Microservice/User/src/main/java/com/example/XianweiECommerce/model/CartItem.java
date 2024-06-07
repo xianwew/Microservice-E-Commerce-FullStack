@@ -15,10 +15,10 @@ public class CartItem extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cartId", nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @Column(name = "itemId", nullable = false)
+    @Column(name = "item_id", nullable = false)
     private Long itemId;
 
     @Column(nullable = false)

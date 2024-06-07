@@ -22,6 +22,7 @@ public class ShippingMethod extends BaseEntity {
     @Column(nullable = false)
     private double price;
 
+    @Column(name = "estimated_delivery_time")
     private String estimatedDeliveryTime;
 
     // Getters and setters are inherited from BaseEntity
