@@ -219,7 +219,7 @@ services:
       userservice-slave:
         condition: service_healthy
     healthcheck:
-      test: "curl --fail --silent http://localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent http://localhost:8070/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 20
@@ -308,9 +308,9 @@ services:
       file: common-config.yml
       service: microservice-eureka-config
 
-  gateway:
+  gatewayserver:
     image: "xianwei/gatewayserver:v1"
-    container_name: gateway
+    container_name: gatewayserver
     ports:
       - "8080:8080"
     depends_on:
@@ -323,9 +323,10 @@ services:
       payment:
         condition: service_healthy
     environment:
-      SPRING_APPLICATION_NAME: "gateway"
-      OTEL_SERVICE_NAME: "gateway"
+      SPRING_APPLICATION_NAME: "gatewayserver"
+      OTEL_SERVICE_NAME: "gatewayserver"
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:7080/realms/XianweiECommerce/protocol/openid-connect/certs"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8761/eureka/"
     extends:
       file: common-config.yml
       service: microservice-eureka-config

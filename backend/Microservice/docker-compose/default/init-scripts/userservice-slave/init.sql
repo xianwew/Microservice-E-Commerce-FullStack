@@ -6,7 +6,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 FLUSH PRIVILEGES;
 
 CHANGE MASTER TO
-    MASTER_HOST='orderservice-master',
+    MASTER_HOST='userservice-master',
     MASTER_USER='replica',
     MASTER_PASSWORD='replica_password',
     MASTER_LOG_FILE='mysql-bin.000001',
