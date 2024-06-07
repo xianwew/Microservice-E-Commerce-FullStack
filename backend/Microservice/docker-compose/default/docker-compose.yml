@@ -66,6 +66,9 @@ services:
   userservice-master:
     image: mysql:latest
     container_name: userservice-master
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: userservice
@@ -86,6 +89,9 @@ services:
   userservice-slave:
     image: mysql:latest
     container_name: userservice-slave
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
     environment:
       MYSQL_ROOT_PASSWORD: wxwwxw123
       MYSQL_DATABASE: userservice

@@ -1,6 +1,7 @@
 package com.example.XianweiECommerce.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -18,16 +19,41 @@ import java.util.Map;
 @Configuration
 public class DataSourceConfig {
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.master")
+    @Value("${spring.datasource.master.jdbc-url}")
+    private String masterUrl;
+
+    @Value("${spring.datasource.slave.jdbc-url}")
+    private String slaveUrl;
+
+    @Value("${spring.datasource.master.username}")
+    private String dbUsername;
+
+    @Value("${spring.datasource.master.password}")
+    private String dbPassword;
+
+    @Value("${spring.datasource.master.driver-class-name}")
+    private String driverName;
+
+    @Bean(name = "masterDataSource")
+    @Qualifier("masterDataSource")
     public DataSource masterDataSource() {
-        return DataSourceBuilder.create().build();
+        return DataSourceBuilder.create()
+                .url(masterUrl)
+                .username(dbUsername)
+                .password(dbPassword)
+                .driverClassName(driverName)
+                .build();
     }
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.slave")
+    @Bean(name = "slaveDataSource")
+    @Qualifier("slaveDataSource")
     public DataSource slaveDataSource() {
-        return DataSourceBuilder.create().build();
+        return DataSourceBuilder.create()
+                .url(slaveUrl)
+                .username(dbUsername)
+                .password(dbPassword)
+                .driverClassName(driverName)
+                .build();
     }
 
     @Bean
@@ -50,7 +76,8 @@ public class DataSourceConfig {
         em.setPackagesToScan("com.example.XianweiECommerce.model");
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
-        em.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+        em.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        em.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "update");
         return em;
     }
 
