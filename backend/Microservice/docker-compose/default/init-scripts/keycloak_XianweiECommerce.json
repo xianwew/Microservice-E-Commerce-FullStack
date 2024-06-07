@@ -86,6 +86,7 @@
       }
     ],
     "client": {
+      "xianwei-ecommerce": [],
       "realm-management": [
         {
           "id": "f9b8f9b8-dc20-43c3-98b8-f6b177dd4eec",
@@ -298,7 +299,6 @@
           "attributes": {}
         }
       ],
-      "xianwei-ecommerce": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -423,9 +423,9 @@
   "otpPolicyPeriod": 30,
   "otpPolicyCodeReusable": false,
   "otpSupportedApplications": [
+    "totpAppMicrosoftAuthenticatorName",
     "totpAppFreeOTPName",
-    "totpAppGoogleName",
-    "totpAppMicrosoftAuthenticatorName"
+    "totpAppGoogleName"
   ],
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [
@@ -709,9 +709,11 @@
     {
       "id": "d6d91841-65d0-4b13-ade8-9731b02bbef5",
       "clientId": "xianwei-ecommerce",
+      "name": "",
+      "description": "",
       "rootUrl": "http://localhost:3000",
       "adminUrl": "http://localhost:3000",
-      "baseUrl": "/",
+      "baseUrl": "http://localhost:3000",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -734,9 +736,14 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost:3000",
+        "oidc.ciba.grant.enabled": "false",
         "client.secret.creation.time": "1717626467",
-        "contentSecurityPolicy": "frame-src 'self' http://localhost:3000; frame-ancestors 'self' http://localhost:3000; object-src 'none';"
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "http://localhost:3000",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "display.on.consent.screen": "false",
+        "contentSecurityPolicy": "frame-src 'self' http://localhost:3000; frame-ancestors 'self' http://localhost:3000; object-src 'none';",
+        "backchannel.logout.revoke.offline.tokens": "false"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -875,14 +882,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
+            "oidc-usermodel-attribute-mapper",
+            "oidc-usermodel-property-mapper",
             "oidc-address-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
+            "saml-role-list-mapper",
             "saml-user-attribute-mapper",
             "saml-user-property-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-full-name-mapper",
-            "saml-role-list-mapper"
+            "oidc-full-name-mapper"
           ]
         }
       },
@@ -919,13 +926,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper",
-            "saml-role-list-mapper",
             "oidc-full-name-mapper",
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
             "oidc-usermodel-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
             "oidc-address-mapper",
-            "saml-user-attribute-mapper"
+            "oidc-sha256-pairwise-sub-mapper"
           ]
         }
       },

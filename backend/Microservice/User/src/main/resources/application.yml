@@ -20,6 +20,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+          implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
   sql:
     init:
       mode: always
@@ -31,9 +34,6 @@ cloudinary:
   api-key: 145491984531442
   api-secret: 1iZYfLLIkyl9QGDTreYx3r-5Mcc
   avatar-upload-folder: XianweiECommerce/UserAvatar
-
-itemservice:
-  url: http://localhost:8040/api/item
 
 management:
   endpoints:
