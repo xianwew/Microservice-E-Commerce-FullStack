@@ -2,8 +2,8 @@ import Keycloak from 'keycloak-js';
 
 export const KEYCLOAK_URL = 'http://localhost:7080';
 export const KEYCLOAK_REALM = 'XianweiECommerce';
-export const KEYCLOAK_CLIENT_ID = 'xianwei-ecommerce-monolith-client';
-export const KEYCLOAK_CLIENT_SECRET = '4M8WYjvd1HV1WLvMGxZUhV60IKADbIxH';
+export const KEYCLOAK_CLIENT_ID = 'xianwei-ecommerce';
+export const KEYCLOAK_CLIENT_SECRET = 'g5HFcWL6MHBFnrAe9FO0HhlMipOHzFNZ';
 
 let initOptions = {
     url: KEYCLOAK_URL,
