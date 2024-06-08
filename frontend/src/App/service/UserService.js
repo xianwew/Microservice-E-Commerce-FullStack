@@ -12,14 +12,19 @@ export const fetchUser = async () => {
 
     const decoded = decodeToken(token);
     const userId = decoded.sub;
-    
+
     try {
-        const response = await axiosInstance.get(`/api/user/${userId}`);
+        const response = await axiosInstance.get(`/api/user/${userId}`, {
+            headers: {
+                Authorization: ``
+            }
+        });
 
         const newUser = response.data.user;
         store.dispatch(setUser({ user: newUser }));
         return newUser;
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error fetching user data:', error);
         throw error;
     }
