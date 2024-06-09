@@ -18,7 +18,7 @@ services:
     extends:
       service: microservice-configserver-config
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8761/eureka/"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver1:8761/eureka/,http://eurekaserver2:8762/eureka/,http://eurekaserver3:8763/eureka/"
 #      keycloak.auth-server-url: "keycloak:http://keycloak:7080"
 #      keycloak.realm: "XianweiECommerce"
 #      keycloak.client-id: "xianwei-ecommerce"

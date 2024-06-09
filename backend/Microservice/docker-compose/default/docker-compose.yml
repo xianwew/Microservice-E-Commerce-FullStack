@@ -40,9 +40,9 @@ services:
     environment:
       OTEL_SERVICE_NAME: "configserver"
 
-  eurekaserver:
+  eurekaserver1:
     image: "xianwei/eurekaserver:v1"
-    container_name: eurekaserver
+    container_name: eurekaserver1
     ports:
       - "8761:8761"
     depends_on:
@@ -58,10 +58,59 @@ services:
       file: common-config.yml
       service: microservice-configserver-config
     environment:
-      SPRING_APPLICATION_NAME: "eurekaserver"
-      OTEL_SERVICE_NAME: "eurekaserver"
-    networks:
-      - XianweiECommerce
+      SPRING_APPLICATION_NAME: "eurekaserver1"
+      SPRING_PROFILES_ACTIVE: "eurekaserver1"
+      OTEL_SERVICE_NAME: "eurekaserver1"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver1"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver2:8762/eureka/,http://eurekaserver3:8763/eureka/"
+
+  eurekaserver2:
+    image: "xianwei/eurekaserver:v1"
+    container_name: eurekaserver2
+    ports:
+      - "8762:8762"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8762/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver2"
+      SPRING_PROFILES_ACTIVE: "eurekaserver2"
+      OTEL_SERVICE_NAME: "eurekaserver2"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver2"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver1:8761/eureka/,http://eurekaserver3:8763/eureka/"
+
+  eurekaserver3:
+    image: "xianwei/eurekaserver:v1"
+    container_name: eurekaserver3
+    ports:
+      - "8763:8763"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8763/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver3"
+      SPRING_PROFILES_ACTIVE: "eurekaserver3"
+      OTEL_SERVICE_NAME: "eurekaserver3"
+      EUREKA_INSTANCE_HOSTNAME: "eurekaserver3"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver1:8761/eureka/,http://eurekaserver2:8762/eureka/"
 
   userservice-master:
     image: mysql:latest
@@ -218,7 +267,7 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
+      eurekaserver1:
         condition: service_healthy
       userservice-master:
         condition: service_healthy
@@ -245,7 +294,7 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
+      eurekaserver1:
         condition: service_healthy
       itemservice-master:
         condition: service_healthy
@@ -272,7 +321,7 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
+      eurekaserver1:
         condition: service_healthy
       orderservice-master:
         condition: service_healthy
@@ -299,7 +348,7 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
+      eurekaserver1:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent http://localhost:8060/actuator/health/readiness | grep UP || exit 1"
@@ -332,7 +381,6 @@ services:
       SPRING_APPLICATION_NAME: "gatewayserver"
       OTEL_SERVICE_NAME: "gatewayserver"
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:8080/realms/XianweiECommerce/protocol/openid-connect/certs"
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8761/eureka/"
     extends:
       file: common-config.yml
       service: microservice-eureka-config
