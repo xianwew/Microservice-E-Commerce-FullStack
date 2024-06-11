@@ -57,6 +57,14 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
     }
 
+    @PutMapping(value = "/{id}/quantity", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateItemQuantity(@PathVariable Long id, @RequestBody ItemDTO itemDTO) {
+        ItemDTO existingItem = itemService.getItem(id);
+        existingItem.setQuantity(itemDTO.getQuantity());
+        itemService.updateItemQuantity(existingItem);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<ItemDTO> updateItem(@Valid @PathVariable Long id,
                                               @RequestPart("item") String itemJson,

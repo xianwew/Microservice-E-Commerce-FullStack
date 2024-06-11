@@ -2,6 +2,7 @@ package com.example.XianweiECommerce.consumer;
 
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.model.Order;
+import com.example.XianweiECommerce.model.OrderItem;
 import com.example.XianweiECommerce.pojoClass.*;
 import com.example.XianweiECommerce.repository.OrderRepository;
 import com.example.XianweiECommerce.repository.ShippingMethodRepository;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
@@ -46,14 +44,13 @@ public class OrderConsumer {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private ShippingMethodRepository shippingMethodRepository;
-
     @KafkaListener(topics = "paymentResultTopic", groupId = "order-group")
     @Transactional
     public void handlePaymentResult(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
         try {
             PaymentResult paymentResult = objectMapper.readValue(record.value(), PaymentResult.class);
+            log.info("Received payment result for order ID: " + paymentResult.getOrderId());
+
             Order order = orderRepository.findById(paymentResult.getOrderId())
                     .orElseThrow(() -> new ResourceNotFoundException("Order", "id", paymentResult.getOrderId().toString()));
             order.setStatus(paymentResult.isPaymentSuccessful() ? "COMPLETED" : "FAILED");

@@ -15,18 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +84,6 @@ public class OrderService {
         }
     }
 
-    @Transactional
     public Long createOrder(Long cartId, Long shippingMethodId, Long cardId, String token) {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
         try {
@@ -102,6 +97,9 @@ public class OrderService {
             double itemsTotal = cart.getCartItemsOutput().stream()
                     .mapToDouble(cartItem -> {
                         Item item = getItemById(cartItem.getItemId(), token);
+                        if (cartItem.getQuantity() > item.getQuantity()) {
+                            throw new IllegalArgumentException("Insufficient quantity for item: " + item.getId());
+                        }
                         return cartItem.getQuantity() * item.getPrice();
                     })
                     .sum();
@@ -118,7 +116,7 @@ public class OrderService {
             order.setCardType(card.getType());
             order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
 
-            // Convert CartItems to OrderItems
+            // Convert CartItems to OrderItems without updating item quantities yet
             List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
                     .map(cartItem -> {
                         OrderItem orderItem = new OrderItem();
@@ -133,26 +131,50 @@ public class OrderService {
             order.setOrderItems(orderItems);
 
             Order savedOrder = orderRepository.save(order);
+            log.info("Saved order id: " + savedOrder.getId());
 
             // Check broker availability and send payment request to Kafka
             if (kafkaHealthCheck.areMultipleBrokersAvailable()) {
                 try {
                     PaymentRequest paymentRequest = new PaymentRequest(savedOrder.getId(), totalAmount, cartId, token);
                     String paymentRequestJson = objectMapper.writeValueAsString(paymentRequest);
-                    kafkaTemplate.send("payEvent", paymentRequestJson);
+                    kafkaTemplate.send("payEvent", paymentRequestJson).get();
                     log.info("Payment request sent to Kafka for order ID: " + savedOrder.getId() + ", amount: " + totalAmount);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Error serializing message to JSON", e);
+                } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
+                    orderRepository.delete(savedOrder);
+                    throw new RuntimeException("Error sending payment request to Kafka", e);
                 }
             } else {
+                orderRepository.delete(savedOrder);
                 throw new RuntimeException("Not enough brokers available to send the message");
             }
+
+            // Deduct the item quantities after Kafka message is successfully sent
+            orderItems.forEach(orderItem -> {
+                Item item = getItemById(orderItem.getItemId(), token);
+                int newQuantity = item.getQuantity() - orderItem.getQuantity();
+                updateItemQuantity(orderItem.getItemId(), newQuantity);
+            });
 
             return savedOrder.getId();
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
     }
+
+    private void updateItemQuantity(Long itemId, int newQuantity) {
+        String url = String.format("%s/%s/quantity", itemServiceUrl, itemId);
+        HttpHeaders headers = new HttpHeaders();
+        Item item = new Item();
+        item.setId(itemId);
+        item.setQuantity(newQuantity);
+        HttpEntity<Item> requestEntity = new HttpEntity<>(item, headers);
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to update item quantity for item: " + itemId);
+        }
+    }
+
 
     private Cart getCartById(Long cartId, String token) {
         String url = String.format("%s/cartId/%s", cartServiceUrl, cartId);

@@ -17,6 +17,8 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ExecutionException;
+
 @Service
 @Slf4j
 public class PaymentConsumer {
@@ -30,7 +32,7 @@ public class PaymentConsumer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "payEvent", groupId = "payment-group")
+    @KafkaListener(topics = "payEvent", groupId = "payment-group", containerFactory = "kafkaListenerContainerFactory")
     public void consume(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
         try {
             // Deserialize the payment request
@@ -43,8 +45,8 @@ public class PaymentConsumer {
             // Serialize payment result to JSON
             String paymentResultJson = objectMapper.writeValueAsString(paymentResult);
 
-            // Send payment result to Kafka as a JSON string
-            kafkaTemplate.send("paymentResultTopic", paymentResultJson);
+            // Send payment result to Kafka as a JSON string with retry logic
+            sendWithRetry("paymentResultTopic", paymentResultJson);
 
             acknowledgment.acknowledge();
             log.info("Payment result sent to Kafka for order ID: " + paymentRequest.getOrderId() + ", success: " + paymentSuccessful);
@@ -53,16 +55,26 @@ public class PaymentConsumer {
         }
     }
 
-    @Bean
-    public RetryTemplate retryTemplate() {
-        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(1000);
-        backOffPolicy.setMultiplier(2);
-        backOffPolicy.setMaxInterval(10000);
-
-        RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(3));
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-        return retryTemplate;
+    private void sendWithRetry(String topic, String message) {
+        int retryCount = 0;
+        int maxRetries = 5;
+        while (retryCount < maxRetries) {
+            try {
+                kafkaTemplate.send(topic, message).get();
+                return; // If successful, exit the method
+            } catch (InterruptedException | ExecutionException e) {
+                retryCount++;
+                log.error("Error sending payment result to Kafka, attempt: " + retryCount, e);
+                try {
+                    Thread.sleep(1000 * retryCount); // Exponential backoff
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        log.error("Failed to send payment result to Kafka after " + maxRetries + " attempts");
     }
 }
+
+
+

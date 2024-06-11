@@ -151,6 +151,13 @@ public class ItemService {
         }
     }
 
+    public void updateItemQuantity(ItemDTO itemDTO) {
+        Item item = itemRepository.findById(itemDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item", "id", itemDTO.getId().toString()));
+        item.setQuantity(itemDTO.getQuantity());
+        itemRepository.save(item);
+    }
+
     @Transactional
     public ItemDTO updateItem(Long itemId, ItemDTO itemDTO, MultipartFile imageFile, List<MultipartFile> subImageFiles, List<String> subImageFileURLs) throws IOException {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.MASTER);
