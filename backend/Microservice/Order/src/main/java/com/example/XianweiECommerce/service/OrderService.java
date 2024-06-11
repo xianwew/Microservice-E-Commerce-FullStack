@@ -6,11 +6,12 @@ import com.example.XianweiECommerce.dto.OrderDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.OrderMapper;
 import com.example.XianweiECommerce.model.*;
-import com.example.XianweiECommerce.pojoClass.Card;
-import com.example.XianweiECommerce.pojoClass.Cart;
-import com.example.XianweiECommerce.pojoClass.Item;
+import com.example.XianweiECommerce.pojoClass.*;
 import com.example.XianweiECommerce.repository.OrderRepository;
 import com.example.XianweiECommerce.repository.ShippingMethodRepository;
+import com.example.XianweiECommerce.utils.KafkaHealthCheck;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -36,8 +38,11 @@ public class OrderService {
     private final RestTemplate restTemplate;
     private final OrderMapper orderMapper;
 
-    @Value("${payment.service.url}")
-    private String paymentServiceUrl;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Autowired
+    private KafkaHealthCheck kafkaHealthCheck;
 
     @Value("${userservice.url}")
     private String userServiceUrl;
@@ -47,6 +52,9 @@ public class OrderService {
 
     @Value("${cartservice.url}")
     private String cartServiceUrl;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     public OrderService(ShippingMethodRepository shippingMethodsRepository, OrderRepository orderRepository,
@@ -94,7 +102,6 @@ public class OrderService {
             double itemsTotal = cart.getCartItemsOutput().stream()
                     .mapToDouble(cartItem -> {
                         Item item = getItemById(cartItem.getItemId(), token);
-                        log.info("Getting order item by id: " + item.getId());
                         return cartItem.getQuantity() * item.getPrice();
                     })
                     .sum();
@@ -102,44 +109,46 @@ public class OrderService {
             double tax = (itemsTotal + shippingCost) * 0.06;
             double totalAmount = itemsTotal + shippingCost + tax;
 
-            // Simulate payment processing
-            boolean paymentSuccessful = Boolean.TRUE.equals(
-                    restTemplate.postForObject(paymentServiceUrl, totalAmount, Boolean.class)
-            );
+            // Create order with PENDING status
+            Order order = new Order();
+            order.setUserId(cart.getUserId());
+            order.setTotalAmount(totalAmount);
+            order.setStatus("PENDING");
+            order.setShippingMethod(shippingMethod);
+            order.setCardType(card.getType());
+            order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
 
-            if (paymentSuccessful) {
-                log.info("Payment successful!");
-                Order order = new Order();
-                order.setUserId(cart.getUserId());
-                order.setTotalAmount(totalAmount);
-                order.setStatus("COMPLETED");
-                order.setShippingMethod(shippingMethod);
-                order.setCardType(card.getType());
-                order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
+            // Convert CartItems to OrderItems
+            List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
+                    .map(cartItem -> {
+                        OrderItem orderItem = new OrderItem();
+                        orderItem.setOrder(order);
+                        orderItem.setItemId(cartItem.getItemId());
+                        orderItem.setQuantity(cartItem.getQuantity());
+                        Item item = getItemById(cartItem.getItemId(), token);
+                        orderItem.setPrice(item.getPrice());
+                        return orderItem;
+                    })
+                    .collect(Collectors.toList());
+            order.setOrderItems(orderItems);
 
-                // Convert CartItems to OrderItems
-                List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
-                        .map(cartItem -> {
-                            OrderItem orderItem = new OrderItem();
-                            orderItem.setOrder(order);
-                            orderItem.setItemId(cartItem.getItemId());
-                            orderItem.setQuantity(cartItem.getQuantity());
-                            Item item = getItemById(cartItem.getItemId(), token);
-                            orderItem.setPrice(item.getPrice());
-                            return orderItem;
-                        })
-                        .collect(Collectors.toList());
-                order.setOrderItems(orderItems);
+            Order savedOrder = orderRepository.save(order);
 
-                Order savedOrder = orderRepository.save(order);
-
-                // Clear the cart after the order is successfully created
-                clearCart(cartId, token);
-
-                return savedOrder.getId();
+            // Check broker availability and send payment request to Kafka
+            if (kafkaHealthCheck.areMultipleBrokersAvailable()) {
+                try {
+                    PaymentRequest paymentRequest = new PaymentRequest(savedOrder.getId(), totalAmount, cartId, token);
+                    String paymentRequestJson = objectMapper.writeValueAsString(paymentRequest);
+                    kafkaTemplate.send("payEvent", paymentRequestJson);
+                    log.info("Payment request sent to Kafka for order ID: " + savedOrder.getId() + ", amount: " + totalAmount);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("Error serializing message to JSON", e);
+                }
             } else {
-                throw new RuntimeException("Payment failed");
+                throw new RuntimeException("Not enough brokers available to send the message");
             }
+
+            return savedOrder.getId();
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
@@ -189,16 +198,6 @@ public class OrderService {
         }
         log.info("Order item id: " + item.getId());
         return item;
-    }
-
-    private void clearCart(Long cartId, String token) {
-        String url = String.format("%s/clear/%s", cartServiceUrl, cartId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
     }
 }
 
