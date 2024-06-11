@@ -12,7 +12,6 @@ import { createOrder } from '../../service/OrderSerivce';
 import { useNavigate } from 'react-router-dom';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 
-
 const CheckoutPage = () => {
     const user = useSelector((state) => state.auth.user);
     const cart = useSelector((state) => state.cart);
@@ -24,6 +23,7 @@ const CheckoutPage = () => {
     const [selectedShippingCost, setSelectedShippingCost] = useState(0);
     const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (user?.id) {
@@ -73,7 +73,14 @@ const CheckoutPage = () => {
     };
 
     const handleConfirmAndPay = async () => {
+        setIsSubmitting(true);
         try {
+            dispatch(showSnackbar({
+                open: true,
+                message: 'Order submitting...',
+                severity: 'info',
+                autoHideDuration: 5000
+            }));
             const orderId = await createOrder(cart.cartId, selectedShippingMethod, selectedPaymentMethod);
             dispatch(showSnackbar({
                 open: true,
@@ -88,6 +95,8 @@ const CheckoutPage = () => {
                 message: 'Failed to create order. Please try again.',
                 severity: 'error'
             }));
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -122,6 +131,7 @@ const CheckoutPage = () => {
                                 address={user?.address} 
                                 shippingCost={selectedShippingCost} 
                                 onConfirmAndPay={handleConfirmAndPay}
+                                isSubmitting={isSubmitting}
                             />
                         </Grid>
                     </Grid>
