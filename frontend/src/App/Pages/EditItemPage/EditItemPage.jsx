@@ -63,6 +63,7 @@ const EditItemPage = () => {
         try {
             dispatch(showSnackbar({ open: true, message: 'Updating listing...', severity: 'info' }));
             console.log('Additional images updated:', additionalImages);
+            updatedItemData.imageUrl = itemData.imageUrl;
             const updatedListing = await updateItem(itemId, updatedItemData, coverImage, additionalImages);
             console.log('Listing updated:', updatedListing);
             dispatch(showSnackbar({ open: true, message: 'Listing updated successfully!', severity: 'success' }));
@@ -124,7 +125,7 @@ const EditItemPage = () => {
                             initialData={itemData}
                         />
                         <Box display="flex" justifyContent="flex-end" mt={2}>
-                            <Button variant="contained" color="error" onClick={handleOpenDialog} sx={{ marginRight: '120px', height: '42.25px', transform: 'translateY(-58px)' }}>
+                            <Button variant="contained" color="error" onClick={handleOpenDialog} sx={{ marginRight: '158px', height: '42.25px', transform: 'translateY(-58px)' }}>
                                 Delete Listing
                             </Button>
                         </Box>

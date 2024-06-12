@@ -54,7 +54,7 @@ export const updateItem = async (itemId, itemData, coverImage, additionalImages)
     for (let i = 0; i < existingImageUrls.length; i++) {
         itemData[`subImageUrl${i + 1}`] = existingImageUrls[i];
     }
-
+    console.log(itemData);
     formData.append('item', new Blob([JSON.stringify(itemData)], {
         type: 'application/json'
     }));

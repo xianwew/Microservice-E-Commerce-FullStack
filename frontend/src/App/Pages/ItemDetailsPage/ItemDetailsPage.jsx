@@ -90,9 +90,10 @@ const ItemDetailsPage = () => {
         }
     };
 
- 
+
     const handleQuantityChange = (event) => {
-        setQuantity(event.target.value);
+        const value = Math.min(event.target.value, item.quantity);
+        setQuantity(value);
     };
 
     const handleAddToCart = async () => {
@@ -135,7 +136,7 @@ const ItemDetailsPage = () => {
                             <Button onClick={handleSellerClick} sx={{ padding: '10px 0px' }}>
                                 {seller.username}
                             </Button>
-                            <Box display="flex" alignItems="center" sx={{marginLeft: '13px'}}>
+                            <Box display="flex" alignItems="center" sx={{ marginLeft: '13px' }}>
                                 <Rating value={ratingSeller} readOnly precision={0.1} />
                                 {numRatingsSeller > 0 && (
                                     <Typography variant="body2" color="textSecondary" sx={{ ml: 1 }}>
@@ -164,9 +165,16 @@ const ItemDetailsPage = () => {
                                 onChange={handleQuantityChange}
                                 inputProps={{ min: 1, max: item.quantity }}
                                 sx={{ width: '100px' }}
+                                disabled={item.quantity <= 0}
                             />
-                            <Button variant="contained" color="primary" sx={{ height: '55px' }} onClick={handleAddToCart}>
-                                Add to Cart
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                sx={{ height: '55px' }}
+                                onClick={handleAddToCart}
+                                disabled={item.quantity <= 0}
+                            >
+                                {item.quantity > 0? 'Add to Cart': 'Out of stock'}
                             </Button>
                         </Box>
                         <Divider sx={{ my: 2 }} />

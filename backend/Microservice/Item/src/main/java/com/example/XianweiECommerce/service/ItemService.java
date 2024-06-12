@@ -181,8 +181,9 @@ public class ItemService {
                 }
                 Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
                 existingItem.setImageUrl((String) uploadResult.get("url"));
-            } else if (existingItem.getImageUrl() == null || existingItem.getImageUrl().isEmpty()) {
-                throw new IllegalArgumentException("Cover image is required.");
+            }
+            else{
+                existingItem.setImageUrl(itemDTO.getImageUrl());
             }
 
             uploadSubImages(existingItem, subImageFiles, subImageFileURLs);

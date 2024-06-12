@@ -11,6 +11,7 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
     const [country, setCountry] = useState(initialData?.country || '');
     const [quantity, setQuantity] = useState(initialData?.quantity || '');
     const [selectedSubCategory, setSelectedSubCategory] = useState(initialData?.subCategoryId || '');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -32,8 +33,9 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
         }
     }, [selectedMainCategory, initialData]);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        setIsSubmitting(true);
         const itemData = {
             title,
             shortDescription,
@@ -46,7 +48,8 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
             mainCategoryId: selectedMainCategory,
             subCategoryId: selectedSubCategory,
         };
-        onSubmit(itemData);
+        await onSubmit(itemData);
+        setIsSubmitting(false);
     };
 
     return (
@@ -175,8 +178,15 @@ const ListingDetailsForm = ({ mainCategories, subCategories, onMainCategoryChang
 
                 </div>
             </Box>
-            <Button variant="contained" color="primary" size="large" sx={{ mt: 2, alignSelf: 'flex-end' }} type="submit">
-                Submit
+            <Button 
+                variant="contained" 
+                color="primary" 
+                size="large" 
+                sx={{ mt: 2, alignSelf: 'flex-end' }} 
+                type="submit"
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
         </Box>
     );
