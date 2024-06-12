@@ -366,7 +366,6 @@ public class ItemService {
                 log.info("Seller: " + seller.toString());
                 if (seller != null) {
                     itemDTO.setUsername(seller.getUsername());
-                    Rating rating = getRatingById(item.getRatingId());
                 }
                 return itemDTO;
             }).collect(Collectors.toList());
