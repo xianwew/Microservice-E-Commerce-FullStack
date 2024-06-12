@@ -22,20 +22,19 @@ public class Address extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    @Column(nullable = false)
     private String street;
 
-    @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
     private String state;
 
-    @Column(name = "postal_code", nullable = false)
+    @Column(name = "postal_code")
     private String postalCode;
 
-    @Column(nullable = false)
     private String country;
 
+    @Version
+    @Column(name = "version")
+    private Integer version;
     // Getters and setters are inherited from BaseEntity
 }

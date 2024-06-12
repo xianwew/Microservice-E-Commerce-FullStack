@@ -116,6 +116,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-annotations-api</artifactId>
+            <version>8.5.23</version>
+        </dependency>
     </dependencies>
 	<dependencyManagement>
 		<dependencies>

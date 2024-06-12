@@ -13,6 +13,7 @@ import com.example.XianweiECommerce.repository.CardRepository;
 import com.example.XianweiECommerce.repository.RatingRepository;
 import com.example.XianweiECommerce.repository.UserRepository;
 import com.example.XianweiECommerce.jwt.JwtTokenProvider;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,19 +95,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDTO getUserByEmail(String email) {
-        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
-        try {
-            User user = userRepository.findByEmail(email).orElseThrow(
-                    () -> new ResourceNotFoundException("User", "email", email)
-            );
-            return UserMapper.toDTO(user);
-        } finally {
-            ReplicationRoutingDataSourceContext.clearDataSourceType();
-        }
-    }
-
-    @Transactional(readOnly = true)
     public UserDTO getUserById(String id) {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -137,7 +125,6 @@ public class UserService {
             boolean emailChanged = !existingUser.getEmail().equals(userDTO.getEmail());
             boolean usernameChanged = !existingUser.getUsername().equals(userDTO.getUsername());
 
-            // Check if the new email is already used by another user
             if (emailChanged) {
                 Optional<User> userWithEmail = userRepository.findByEmail(userDTO.getEmail());
                 if (userWithEmail.isPresent() && !userWithEmail.get().getId().equals(id)) {
@@ -156,20 +143,21 @@ public class UserService {
                 address.setState(userDTO.getAddress().getState());
                 address.setPostalCode(userDTO.getAddress().getPostalCode());
                 address.setCountry(userDTO.getAddress().getCountry());
+                if (address.getVersion() == null) {
+                    address.setVersion(0);
+                }
                 log.info("Saving address: {}", address);
-                addressRepository.save(address);
+                address = addressRepository.save(address);
                 existingUser.setAddress(address);
             }
 
             if (profilePicture != null && !profilePicture.isEmpty()) {
-                // Delete the old avatar if it exists
                 if (existingUser.getProfilePictureUrl() != null && !existingUser.getProfilePictureUrl().isEmpty()) {
                     log.info("Current profile picture URL: {}", existingUser.getProfilePictureUrl());
                     String publicId = cloudinaryService.extractPublicIdFromUrl(existingUser.getProfilePictureUrl());
                     log.info("Deleting old avatar with public ID: {}", publicId);
                     cloudinaryService.deleteFile(publicId, imageFolder);
                 }
-                // Upload the new avatar
                 Map<String, Object> uploadResult = cloudinaryService.uploadFile(profilePicture.getBytes(), imageFolder);
                 existingUser.setProfilePictureUrl((String) uploadResult.get("url"));
             }
@@ -183,6 +171,9 @@ public class UserService {
             }
 
             return true;
+        } catch (OptimisticLockException ex) {
+            log.error("Optimistic locking failure while updating user with ID: {}", id, ex);
+            throw ex;
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
@@ -264,18 +255,7 @@ public class UserService {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
         }
     }
-
-    @Transactional(readOnly = true)
-    public List<UserDTO> getAllUsers() {
-        ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
-        try {
-            return userRepository.findAll().stream()
-                    .map(UserMapper::toDTO)
-                    .collect(Collectors.toList());
-        } finally {
-            ReplicationRoutingDataSourceContext.clearDataSourceType();
-        }
-    }
 }
+
 
 

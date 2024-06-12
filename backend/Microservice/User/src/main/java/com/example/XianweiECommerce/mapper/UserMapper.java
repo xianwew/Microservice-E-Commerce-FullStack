@@ -59,12 +59,16 @@ public class UserMapper {
         user.setLastName(userDTO.getLastName());
         user.setPhoneNumber(userDTO.getPhoneNumber());
         user.setProfilePictureUrl(userDTO.getProfilePictureUrl());
-        user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
-        user.setRating(RatingMapper.toEntity(userDTO.getRating()));
+        if(AddressMapper.toEntity(userDTO.getAddress()) != null){
+            user.setAddress(AddressMapper.toEntity(userDTO.getAddress()));
+        }
+        if(RatingMapper.toEntity(userDTO.getRating()) != null){
+            user.setRating(RatingMapper.toEntity(userDTO.getRating()));
+        }
         if (userDTO.getCartId() != null) {
             Cart cart = new Cart();
             cart.setId(userDTO.getCartId());
-            user.setCart(cart); // Set this field
+            user.setCart(cart);
         }
     }
 }
