@@ -70,30 +70,33 @@ const CheckoutPage = () => {
     };
 
     const connectWebSocket = () => {
-        closeWebSocket();
-        socketRef.current = new SockJS('http://localhost:8050/api/orders/ws');
-        socketRef.current.onopen = () => {
-            console.log('Connected to WebSocket');
-        };
+        return new Promise((resolve, reject) => {
+            socketRef.current = new SockJS('http://localhost:8080/api/orders/ws');
+            socketRef.current.onopen = () => {
+                console.log('Connected to WebSocket');
+                resolve();
+            };
 
-        socketRef.current.onmessage = (event) => {
-            try {
-                const message = JSON.parse(event.data);
-                console.log('Received WebSocket message:', message);
-                handleOrderStatusUpdate(message.status, message.orderId);
-            } catch (error) {
-                console.error('Error parsing WebSocket message:', error);
-            }
-        };
+            socketRef.current.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    console.log('Received WebSocket message:', message);
+                    handleOrderStatusUpdate(message.status, message.orderId);
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
 
-        socketRef.current.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
+            socketRef.current.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                reject(error);
+            };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket connection closed');
-            socketRef.current = null; 
-        };
+            socketRef.current.onclose = () => {
+                console.log('WebSocket connection closed');
+                socketRef.current = null;
+            };
+        });
     };
 
     const handleOrderStatusUpdate = (status, orderId) => {
@@ -113,7 +116,7 @@ const CheckoutPage = () => {
                 message: 'Payment failed. Please try again.',
                 severity: 'error'
             }));
-            setIsSubmitting(false); 
+            setIsSubmitting(false);
             closeWebSocket();
         }
     };
@@ -143,16 +146,17 @@ const CheckoutPage = () => {
                 severity: 'info',
                 autoHideDuration: 5000
             }));
-            connectWebSocket();
+
+            await connectWebSocket();
             await createOrder(cart.cartId, selectedShippingMethod, selectedPaymentMethod);
         } catch (error) {
-            console.error('Error creating order:', error);
+            console.error('Error initializing WebSocket connection or creating order:', error);
             dispatch(showSnackbar({
                 open: true,
                 message: 'Failed to create order. Please try again.',
                 severity: 'error'
             }));
-            setIsSubmitting(false); 
+            setIsSubmitting(false);
             closeWebSocket();
         }
     };
