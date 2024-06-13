@@ -1,6 +1,7 @@
 package com.example.XianweiECommerce.service;
 
 import com.example.XianweiECommerce.config.DataSourceType;
+import com.example.XianweiECommerce.config.OrderStatusWebSocketHandler;
 import com.example.XianweiECommerce.config.ReplicationRoutingDataSourceContext;
 import com.example.XianweiECommerce.dto.OrderDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -51,6 +51,9 @@ public class OrderService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OrderStatusWebSocketHandler orderStatusWebSocketHandler;
 
     @Autowired
     public OrderService(ShippingMethodRepository shippingMethodsRepository, OrderRepository orderRepository,
@@ -93,7 +96,7 @@ public class OrderService {
             Card card = getCardById(cardId, token);
 
             log.info("Order items length: " + cart.getCartItemsOutput().size());
-            // Calculate the total amount
+
             double itemsTotal = cart.getCartItemsOutput().stream()
                     .mapToDouble(cartItem -> {
                         Item item = getItemById(cartItem.getItemId(), token);
@@ -107,7 +110,6 @@ public class OrderService {
             double tax = (itemsTotal + shippingCost) * 0.06;
             double totalAmount = itemsTotal + shippingCost + tax;
 
-            // Create order with PENDING status
             Order order = new Order();
             order.setUserId(cart.getUserId());
             order.setTotalAmount(totalAmount);
@@ -116,7 +118,6 @@ public class OrderService {
             order.setCardType(card.getType());
             order.setLastFourDigit(card.getCardNumber().substring(card.getCardNumber().length() - 4));
 
-            // Convert CartItems to OrderItems without updating item quantities yet
             List<OrderItem> orderItems = cart.getCartItemsOutput().stream()
                     .map(cartItem -> {
                         OrderItem orderItem = new OrderItem();
@@ -131,9 +132,15 @@ public class OrderService {
             order.setOrderItems(orderItems);
 
             Order savedOrder = orderRepository.save(order);
+            orderStatusWebSocketHandler.notifyOrderStatusChange(savedOrder.getId(), "PENDING");
             log.info("Saved order id: " + savedOrder.getId());
 
-            // Check broker availability and send payment request to Kafka
+            orderItems.forEach(orderItem -> {
+                Item item = getItemById(orderItem.getItemId(), token);
+                int newQuantity = item.getQuantity() - orderItem.getQuantity();
+                updateItemQuantity(orderItem.getItemId(), newQuantity);
+            });
+
             if (kafkaHealthCheck.areMultipleBrokersAvailable()) {
                 try {
                     PaymentRequest paymentRequest = new PaymentRequest(savedOrder.getId(), totalAmount, cartId, token);
@@ -141,20 +148,27 @@ public class OrderService {
                     kafkaTemplate.send("payEvent", paymentRequestJson).get();
                     log.info("Payment request sent to Kafka for order ID: " + savedOrder.getId() + ", amount: " + totalAmount);
                 } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
-                    orderRepository.delete(savedOrder);
+                    savedOrder.setStatus("FAILED");
+                    orderStatusWebSocketHandler.notifyOrderStatusChange(savedOrder.getId(), "FAILED");
+                    orderRepository.save(savedOrder);
+                    orderItems.forEach(orderItem -> {
+                        Item item = getItemById(orderItem.getItemId(), token);
+                        int newQuantity = item.getQuantity() + orderItem.getQuantity();
+                        updateItemQuantity(orderItem.getItemId(), newQuantity);
+                    });
                     throw new RuntimeException("Error sending payment request to Kafka", e);
                 }
             } else {
-                orderRepository.delete(savedOrder);
+                savedOrder.setStatus("FAILED");
+                orderStatusWebSocketHandler.notifyOrderStatusChange(savedOrder.getId(), "FAILED");
+                orderRepository.save(savedOrder);
+                orderItems.forEach(orderItem -> {
+                    Item item = getItemById(orderItem.getItemId(), token);
+                    int newQuantity = item.getQuantity() + orderItem.getQuantity();
+                    updateItemQuantity(orderItem.getItemId(), newQuantity);
+                });
                 throw new RuntimeException("Not enough brokers available to send the message");
             }
-
-            // Deduct the item quantities after Kafka message is successfully sent
-            orderItems.forEach(orderItem -> {
-                Item item = getItemById(orderItem.getItemId(), token);
-                int newQuantity = item.getQuantity() - orderItem.getQuantity();
-                updateItemQuantity(orderItem.getItemId(), newQuantity);
-            });
 
             return savedOrder.getId();
         } finally {

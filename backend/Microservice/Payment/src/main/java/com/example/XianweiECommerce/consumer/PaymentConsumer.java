@@ -35,22 +35,15 @@ public class PaymentConsumer {
     @KafkaListener(topics = "payEvent", groupId = "payment-group", containerFactory = "kafkaListenerContainerFactory")
     public void consume(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
         try {
-            // Deserialize the payment request
             PaymentRequest paymentRequest = objectMapper.readValue(record.value(), PaymentRequest.class);
             boolean paymentSuccessful = paymentService.processPayment(paymentRequest.getTotalAmount());
-
-            // Create payment result
             PaymentResult paymentResult = new PaymentResult(paymentRequest.getOrderId(), paymentSuccessful, paymentRequest.getCartId(), paymentRequest.getToken());
-
-            // Serialize payment result to JSON
             String paymentResultJson = objectMapper.writeValueAsString(paymentResult);
-
-            // Send payment result to Kafka as a JSON string with retry logic
             sendWithRetry("paymentResultTopic", paymentResultJson);
-
             acknowledgment.acknowledge();
             log.info("Payment result sent to Kafka for order ID: " + paymentRequest.getOrderId() + ", success: " + paymentSuccessful);
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             log.error("Error processing payment request or serializing payment result", e);
         }
     }
@@ -61,13 +54,15 @@ public class PaymentConsumer {
         while (retryCount < maxRetries) {
             try {
                 kafkaTemplate.send(topic, message).get();
-                return; // If successful, exit the method
-            } catch (InterruptedException | ExecutionException e) {
+                return;
+            }
+            catch (InterruptedException | ExecutionException e) {
                 retryCount++;
                 log.error("Error sending payment result to Kafka, attempt: " + retryCount, e);
                 try {
-                    Thread.sleep(1000 * retryCount); // Exponential backoff
-                } catch (InterruptedException interruptedException) {
+                    Thread.sleep(1000 * retryCount);
+                }
+                catch (InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();
                 }
             }

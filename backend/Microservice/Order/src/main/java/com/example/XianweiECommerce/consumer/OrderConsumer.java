@@ -1,11 +1,10 @@
 package com.example.XianweiECommerce.consumer;
 
+import com.example.XianweiECommerce.config.OrderStatusWebSocketHandler;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.model.Order;
-import com.example.XianweiECommerce.model.OrderItem;
 import com.example.XianweiECommerce.pojoClass.*;
 import com.example.XianweiECommerce.repository.OrderRepository;
-import com.example.XianweiECommerce.repository.ShippingMethodRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 public class OrderConsumer {
-
-    @Value("${userservice.url}")
-    private String userServiceUrl;
 
     @Value("${cartservice.url}")
     private String cartServiceUrl;
@@ -44,6 +37,9 @@ public class OrderConsumer {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private OrderStatusWebSocketHandler orderStatusWebSocketHandler;
+
     @KafkaListener(topics = "paymentResultTopic", groupId = "order-group")
     @Transactional
     public void handlePaymentResult(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
@@ -53,34 +49,31 @@ public class OrderConsumer {
 
             Order order = orderRepository.findById(paymentResult.getOrderId())
                     .orElseThrow(() -> new ResourceNotFoundException("Order", "id", paymentResult.getOrderId().toString()));
-            order.setStatus(paymentResult.isPaymentSuccessful() ? "COMPLETED" : "FAILED");
+
+            if (paymentResult.isPaymentSuccessful()) {
+                order.setStatus("COMPLETED");
+                clearCart(paymentResult.getCartId(), paymentResult.getToken());
+                log.info("Order status updated for order ID: " + paymentResult.getOrderId() + ", status: " + order.getStatus());
+            }
+            else {
+                order.getOrderItems().forEach(orderItem -> {
+                    Item item = getItemById(orderItem.getItemId(), paymentResult.getToken());
+                    int newQuantity = item.getQuantity() + orderItem.getQuantity();
+                    updateItemQuantity(orderItem.getItemId(), newQuantity);
+                });
+                order.setStatus("FAILED");
+                log.info("Order failed for order ID: " + paymentResult.getOrderId() + " due to failed payment");
+            }
+
             orderRepository.save(order);
-
-            // Clear the cart after processing payment
-            clearCart(paymentResult.getCartId(), paymentResult.getToken());
-
             acknowledgment.acknowledge();
-            log.info("Order status updated for order ID: " + paymentResult.getOrderId() + ", status: " + order.getStatus());
+            log.info("Order consumer: order id = " + order.getId());
+            orderStatusWebSocketHandler.notifyOrderStatusChange(order.getId(), order.getStatus());
         } catch (JsonProcessingException e) {
             log.error("Error deserializing payment result message", e);
         } catch (Exception e) {
             log.error("Exception in handlePaymentResult", e);
         }
-    }
-
-    private Cart getCartById(Long cartId, String token) {
-        String url = String.format("%s/cartId/%s", cartServiceUrl, cartId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<Cart> cartResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Cart.class);
-        Cart cart = cartResponse.getBody();
-        if (cart == null) {
-            throw new ResourceNotFoundException("Cart", "id", cartId.toString());
-        }
-        return cart;
     }
 
     private Item getItemById(Long itemId, String token) {
@@ -99,19 +92,18 @@ public class OrderConsumer {
         return item;
     }
 
-    private Card getCardById(Long cardId, String token) {
-        String url = String.format("%s/card/%s", userServiceUrl, cardId);
-
+    private void updateItemQuantity(Long itemId, int newQuantity) {
+        String url = String.format("%s/%s/quantity", itemServiceUrl, itemId);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<Card> cardResponse = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Card.class);
-        Card card = cardResponse.getBody();
-        if (card == null) {
-            throw new ResourceNotFoundException("Card", "id", cardId.toString());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Item item = new Item();
+        item.setId(itemId);
+        item.setQuantity(newQuantity);
+        HttpEntity<Item> requestEntity = new HttpEntity<>(item, headers);
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to update item quantity for item: " + itemId);
         }
-        return card;
     }
 
     private void clearCart(Long cartId, String token) {

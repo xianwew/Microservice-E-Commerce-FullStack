@@ -3,6 +3,7 @@ import { Box, Card, CardContent, Typography, Grid, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { fetchUserOrders } from '../../service/OrderSerivce';
 import { useSelector } from 'react-redux';
+import emptyBox from '../../assets/images/profilePage/emptyBox.png'
 
 const sampleOrderHistory = [
     {
@@ -33,7 +34,8 @@ const OrderHistory = () => {
             const getUserOrders = async () => {
                 try {
                     const fetchedOrders = await fetchUserOrders(user.id);
-                    setOrders(fetchedOrders);
+                    const filteredOrders = fetchedOrders.filter(order => order.status !== 'FAILED');
+                    setOrders(filteredOrders);
                 } catch (error) {
                     console.error('Error fetching user orders:', error);
                 }
@@ -45,34 +47,43 @@ const OrderHistory = () => {
 
     return (
         <Box p={3}>
-            <Typography variant="h4" gutterBottom>Order History</Typography>
-            <Grid container spacing={2}>
-                {orders.map((order) => (
-                    <Grid item xs={12} key={order.id}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6">Order Date: {new Date(order.createdAt).toLocaleDateString()}</Typography>
-                                {order.orderItems.map((item, index) => (
-                                    <Box key={index} mt={2}>
-                                        <Typography variant="subtitle1">{item.itemName}</Typography>
-                                        <Typography variant="body2" color="textSecondary">Price: ${item.price.toFixed(2)}</Typography>
-                                        <Typography variant="body2" color="textSecondary">Quantity: {item.quantity}</Typography>
+            {
+                orders.length > 0 ? <Grid container spacing={2}>
+                    {orders.map((order) => (
+                        <Grid item xs={12} key={order.id}>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant="h6">Order Date: {new Date(order.createdAt).toLocaleDateString()}</Typography>
+                                    {order.orderItems.map((item, index) => (
+                                        <Box key={index} mt={2}>
+                                            <Typography variant="subtitle1">{item.itemName}</Typography>
+                                            <Typography variant="body2" color="textSecondary">Price: ${item.price.toFixed(2)}</Typography>
+                                            <Typography variant="body2" color="textSecondary">Quantity: {item.quantity}</Typography>
+                                        </Box>
+                                    ))}
+                                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => navigate(`/receipt/${order.id}`)}
+                                        >
+                                            View Receipt
+                                        </Button>
                                     </Box>
-                                ))}
-                                <Box display="flex" justifyContent="flex-end" mt={2}>
-                                    <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        onClick={() => navigate(`/receipt/${order.id}`)}
-                                    >
-                                        View Receipt
-                                    </Button>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+                    :
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', marginTop: '50px' }}>
+                        <img src={emptyBox} alt="" style={{ width: '300px' }} />
+                        <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => navigate('/browse')}>
+                            Order Something
+                        </Button>
+                    </div>
+            }
+
         </Box>
     );
 };

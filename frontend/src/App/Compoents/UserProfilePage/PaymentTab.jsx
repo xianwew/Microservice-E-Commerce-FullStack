@@ -22,6 +22,7 @@ const PaymentTab = () => {
                     ...userCard,
                     tempId: uuidv4(),
                 }));
+
                 setCards(userCards);
             } catch (error) {
                 console.error('Failed to load card:', error);
@@ -44,9 +45,10 @@ const PaymentTab = () => {
         try {
             await createUserCard(decodeToken(token).sub, newCard);
             setCards(cards.map(card => (card.tempId === newCard.tempId ? newCard : card)));
+            dispatch(showSnackbar({ open: true, message: 'Card added successfully.', severity: 'success' }));
         } catch (error) {
             console.error('Failed to add card:', error);
-            const errorMessage = error.response?.data || 'add card.';
+            const errorMessage = error.response?.data || 'Failed to add card.';
             dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
@@ -55,27 +57,32 @@ const PaymentTab = () => {
         try {
             await updateUserCard(decodeToken(token).sub, updatedCard.id, updatedCard);
             setCards(cards.map(card => (card.tempId === updatedCard.tempId ? updatedCard : card)));
+            dispatch(showSnackbar({ open: true, message: 'Card updated successfully.', severity: 'success' }));
         } catch (error) {
             console.error('Failed to update card:', error);
-            const errorMessage = error.response?.data || 'update card.';
+            const errorMessage = error.response?.data || 'Failed to update card.';
             dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
     const handleRemoveCard = async (id, tempId) => {
         try {
-            await deleteUserCard(decodeToken(token).sub, id);
+            if(id){
+                await deleteUserCard(decodeToken(token).sub, id);
+            }
             setCards(cards.filter(card => card.tempId !== tempId));
+            if(id){
+                dispatch(showSnackbar({ open: true, message: 'Card deleted successfully.', severity: 'success' }));
+            }
         } catch (error) {
             console.error('Failed to delete card:', error);
-            const errorMessage = error.response?.data || 'delete card.';
+            const errorMessage = error.response?.data || 'Failed to delete card.';
             dispatch(showSnackbar({ open: true, message: errorMessage, severity: 'error' }));
         }
     };
 
     return (
         <Box component="form" mt={2}>
-            <Typography variant="h6" mb={2}>Payment Information</Typography>
             {cards.map((card) => (
                 <CardInfoCard
                     key={card.tempId}

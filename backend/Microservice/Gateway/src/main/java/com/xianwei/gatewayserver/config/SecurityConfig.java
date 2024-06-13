@@ -32,7 +32,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain publicEndpoints(ServerHttpSecurity http) {
         http
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.GET, "/api/user/**", "/api/feedback/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/user/**", "/api/feedback/**", "/api/orders/ws/**").permitAll()
                         .anyExchange().permitAll()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))

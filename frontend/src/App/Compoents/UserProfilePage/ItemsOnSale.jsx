@@ -105,8 +105,8 @@ function ItemsOnSale() {
 
                     :
                     <div style={{display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', marginTop: '50px'}}>
-                        <img src={emptyBox} alt="" style={{width: '400px'}} />
-                        <Button variant="contained" sx={{marginTop: '50px'}} onClick={() => navigate('/sell')}>
+                        <img src={emptyBox} alt="" style={{width: '300px'}} />
+                        <Button variant="contained" sx={{marginTop: '20px'}} onClick={() => navigate('/sell')}>
                             Post A Listing
                         </Button>
                     </div>

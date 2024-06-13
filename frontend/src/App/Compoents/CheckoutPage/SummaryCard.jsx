@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
 
-const SummuryCard = ({ items, total, cards, address, shippingCost = 0, taxRate = 0.06, onConfirmAndPay, isSubmitting }) => {
+const SummaryCard  = ({ items, total, cards, address, shippingCost = 0, taxRate = 0.06, onConfirmAndPay, isSubmitting }) => {
     const isAddressValid = address && Object.values(address).every(field => field && field !== '');
     const isCardsAvailable = cards && cards.length > 0;
     const isButtonDisabled = !isCardsAvailable || !isAddressValid || isSubmitting;
@@ -51,4 +51,4 @@ const SummuryCard = ({ items, total, cards, address, shippingCost = 0, taxRate =
     );
 };
 
-export default SummuryCard;
+export default SummaryCard ;
