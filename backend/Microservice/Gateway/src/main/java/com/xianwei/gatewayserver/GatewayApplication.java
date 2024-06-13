@@ -2,6 +2,7 @@ package com.xianwei.gatewayserver;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
@@ -15,6 +16,9 @@ import java.time.Duration;
 
 @SpringBootApplication
 public class GatewayApplication {
+
+	@Value("${keycloak.url}")
+	private String keycloakUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayApplication.class, args);
@@ -35,6 +39,9 @@ public class GatewayApplication {
 				.route(p -> p
 						.path("/api/payment/**")
 						.uri("lb://PAYMENT"))
+				.route(p -> p
+						.path("/realms/**", "/protocol/**")
+						.uri(keycloakUrl))
 				.build();
 	}
 

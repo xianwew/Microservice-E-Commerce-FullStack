@@ -39,6 +39,8 @@ management:
     tags:
       application: ${spring.application.name}
 
+
+
 info:
   app:
     name: "gatewayserver"
