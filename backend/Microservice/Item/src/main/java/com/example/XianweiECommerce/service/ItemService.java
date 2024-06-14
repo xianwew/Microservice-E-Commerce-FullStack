@@ -295,6 +295,7 @@ public class ItemService {
     @Transactional(readOnly = true)
     @Cacheable(value = "searchItemsCache", key = "'-' + #query + '-' + #country + '-' + #state + '-' + #minPrice + '-' + #maxPrice + '-' + #mainCategoryId + '-' + #subCategoryId")
     public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
+        log.info("Fetching items from MySQL database...");
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
             Specification<Item> spec = Specification.where((root, query1, criteriaBuilder) ->
