@@ -159,10 +159,6 @@ public class ItemService {
             // Update the item with the rating ID
             savedItem.setRatingId(savedRating.getId());
             itemRepository.save(savedItem);
-
-            // Update Redis cache
-            updateCacheWithNewItem(savedItem);
-
             return ItemMapper.toDTO(savedItem);
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
@@ -206,9 +202,7 @@ public class ItemService {
             uploadSubImages(existingItem, subImageFiles, subImageFileURLs);
             Item updatedItem = itemRepository.save(existingItem);
 
-            // Update Redis cache
-            updateCacheWithNewItem(updatedItem);
-
+            invalidateSearchItemsCache();
             return ItemMapper.toDTO(updatedItem);
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
@@ -251,10 +245,7 @@ public class ItemService {
                 cloudinaryService.deleteFile(publicId4, imageFolder);
             }
 
-            // Invalidate Redis cache
-            invalidateCacheForItem(item.getId());
-
-            // Save the item to persist the deleted flag
+            invalidateSearchItemsCache();
             itemRepository.save(item);
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
@@ -262,7 +253,6 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "itemsCache", key = "'item:' + #itemId")
     public ItemDTO getItem(Long itemId) {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -281,7 +271,6 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "itemsCache", key = "'allItems'")
     public List<ItemDTO> getAllItems() {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -474,19 +463,6 @@ public class ItemService {
         }
     }
 
-    private void updateCacheWithNewItem(Item item) {
-        String cacheKey = "item:" + item.getId();
-        ItemDTO itemDTO = ItemMapper.toDTO(item);
-        redisTemplate.opsForValue().set(cacheKey, itemDTO);
-        log.info("Item cached with key: {}", cacheKey);
-    }
-
-    private void invalidateCacheForItem(Long itemId) {
-        String cacheKey = "item:" + itemId;
-        redisTemplate.delete(cacheKey);
-        log.info("Cache invalidated for key: {}", cacheKey);
-    }
-
     @Scheduled(fixedRateString = "${search.items.cache.refresh.rate}", initialDelayString = "${search.items.cache.initial.delay}")
     public void refreshSearchItemsCache() {
         log.info("Refreshing search items cache...");
@@ -494,7 +470,8 @@ public class ItemService {
         log.info("Search items cache invalidated.");
     }
 
-    private String generateCacheKey(Item item) {
-        return "searchItem:" + item.getId();
+    private void invalidateSearchItemsCache() {
+        cacheManager.getCache("searchItemsCache").clear();
+        log.info("Search items cache invalidated.");
     }
 }

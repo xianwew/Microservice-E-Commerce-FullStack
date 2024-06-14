@@ -2,10 +2,8 @@ package com.example.XianweiECommerce.dto;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-public class ResponseDto implements Serializable {
+public class ResponseDto {
     private String statusCode;
     private String message;
     private String token;

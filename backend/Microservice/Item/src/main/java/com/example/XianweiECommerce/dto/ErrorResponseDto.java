@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data @AllArgsConstructor
-
-public class ErrorResponseDto implements Serializable {
+public class ErrorResponseDto {
 
     private  String apiPath;
 
