@@ -6,22 +6,30 @@ import com.example.XianweiECommerce.dto.ItemDTO;
 import com.example.XianweiECommerce.dto.RatingDTO;
 import com.example.XianweiECommerce.exception.ResourceNotFoundException;
 import com.example.XianweiECommerce.mapper.ItemMapper;
-import com.example.XianweiECommerce.model.*;
-import com.example.XianweiECommerce.pojoClass.Rating;
+import com.example.XianweiECommerce.model.Item;
+import com.example.XianweiECommerce.model.MainCategory;
+import com.example.XianweiECommerce.model.SubCategory;
 import com.example.XianweiECommerce.pojoClass.User;
 import com.example.XianweiECommerce.pojoClass.UserResponse;
-import com.example.XianweiECommerce.repository.*;
+import com.example.XianweiECommerce.repository.ItemRepository;
+import com.example.XianweiECommerce.repository.MainCategoryRepository;
+import com.example.XianweiECommerce.repository.SubCategoryRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +44,7 @@ public class ItemService {
     private final SubCategoryRepository subCategoryRepository;
     private final CloudinaryService cloudinaryService;
     private final RestTemplate restTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${cloudinary.item-upload-folder}")
     private String imageFolder;
@@ -49,17 +58,23 @@ public class ItemService {
     @Value("${ratingservice.url}")
     private String ratingServiceUrl;
 
+    private final CacheManager cacheManager;
+
     @Autowired
     public ItemService(ItemRepository itemRepository,
                        MainCategoryRepository mainCategoryRepository,
                        SubCategoryRepository subCategoryRepository,
                        CloudinaryService cloudinaryService,
-                       RestTemplate restTemplate) {
+                       RestTemplate restTemplate,
+                       RedisTemplate<String, Object> redisTemplate,
+                       CacheManager cacheManager) {
         this.itemRepository = itemRepository;
         this.mainCategoryRepository = mainCategoryRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.cloudinaryService = cloudinaryService;
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
+        this.cacheManager = cacheManager;
     }
 
     @Transactional(readOnly = true)
@@ -145,6 +160,9 @@ public class ItemService {
             savedItem.setRatingId(savedRating.getId());
             itemRepository.save(savedItem);
 
+            // Update Redis cache
+            updateCacheWithNewItem(savedItem);
+
             return ItemMapper.toDTO(savedItem);
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
@@ -181,13 +199,16 @@ public class ItemService {
                 }
                 Map<String, Object> uploadResult = cloudinaryService.uploadFile(imageFile.getBytes(), imageFolder);
                 existingItem.setImageUrl((String) uploadResult.get("url"));
-            }
-            else{
+            } else {
                 existingItem.setImageUrl(itemDTO.getImageUrl());
             }
 
             uploadSubImages(existingItem, subImageFiles, subImageFileURLs);
             Item updatedItem = itemRepository.save(existingItem);
+
+            // Update Redis cache
+            updateCacheWithNewItem(updatedItem);
+
             return ItemMapper.toDTO(updatedItem);
         } finally {
             ReplicationRoutingDataSourceContext.clearDataSourceType();
@@ -230,6 +251,9 @@ public class ItemService {
                 cloudinaryService.deleteFile(publicId4, imageFolder);
             }
 
+            // Invalidate Redis cache
+            invalidateCacheForItem(item.getId());
+
             // Save the item to persist the deleted flag
             itemRepository.save(item);
         } finally {
@@ -238,6 +262,7 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "itemsCache", key = "'item:' + #itemId")
     public ItemDTO getItem(Long itemId) {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -256,6 +281,7 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "itemsCache", key = "'allItems'")
     public List<ItemDTO> getAllItems() {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -267,6 +293,7 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "searchItemsCache", key = "'-' + #query + '-' + #country + '-' + #state + '-' + #minPrice + '-' + #maxPrice + '-' + #mainCategoryId + '-' + #subCategoryId")
     public List<ItemDTO> searchItems(String query, String country, String state, Double minPrice, Double maxPrice, Long mainCategoryId, Long subCategoryId) {
         ReplicationRoutingDataSourceContext.setDataSourceType(DataSourceType.SLAVE);
         try {
@@ -348,8 +375,7 @@ public class ItemService {
                         log.info("seller: " + seller.toString());
                         log.info("Seller's username: " + seller.getUsername());
                         itemDTO.setUsername(seller.getUsername());
-                    }
-                    else{
+                    } else {
                         log.warn("Seller invalid!");
                     }
                     return itemDTO;
@@ -386,17 +412,6 @@ public class ItemService {
         } catch (HttpServerErrorException e) {
             log.error("Error fetching user with id {}: {}", userId, e.getMessage());
             throw new ResourceNotFoundException("User", "id", userId);
-        }
-    }
-
-    private Rating getRatingById(Long ratingId) {
-        try {
-            String url = String.format("%s/%s", ratingServiceUrl, ratingId);
-            ResponseEntity<Rating> ratingResponse = restTemplate.getForEntity(url, Rating.class);
-            return ratingResponse.getBody();
-        } catch (HttpServerErrorException e) {
-            log.error("Error fetching rating with id {}: {}", ratingId, e.getMessage());
-            throw new ResourceNotFoundException("Rating", "id", ratingId.toString());
         }
     }
 
@@ -456,5 +471,29 @@ public class ItemService {
                 index++;
             }
         }
+    }
+
+    private void updateCacheWithNewItem(Item item) {
+        String cacheKey = "item:" + item.getId();
+        ItemDTO itemDTO = ItemMapper.toDTO(item);
+        redisTemplate.opsForValue().set(cacheKey, itemDTO);
+        log.info("Item cached with key: {}", cacheKey);
+    }
+
+    private void invalidateCacheForItem(Long itemId) {
+        String cacheKey = "item:" + itemId;
+        redisTemplate.delete(cacheKey);
+        log.info("Cache invalidated for key: {}", cacheKey);
+    }
+
+    @Scheduled(fixedRateString = "${search.items.cache.refresh.rate}", initialDelayString = "${search.items.cache.initial.delay}")
+    public void refreshSearchItemsCache() {
+        log.info("Refreshing search items cache...");
+        cacheManager.getCache("searchItemsCache").clear();
+        log.info("Search items cache invalidated.");
+    }
+
+    private String generateCacheKey(Item item) {
+        return "searchItem:" + item.getId();
     }
 }

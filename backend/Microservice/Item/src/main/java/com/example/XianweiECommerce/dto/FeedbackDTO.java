@@ -1,13 +1,14 @@
 package com.example.XianweiECommerce.dto;
-import lombok.Data;
+
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class FeedbackDTO {
+public class FeedbackDTO implements Serializable {
     private Long id;
     private Long itemId;
     private String userId;

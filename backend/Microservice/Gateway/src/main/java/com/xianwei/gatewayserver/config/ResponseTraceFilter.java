@@ -17,7 +17,7 @@ public class ResponseTraceFilter {
     public GlobalFilter postGlobalFilter() {
         return (exchange, chain) -> chain.filter(exchange).then(Mono.fromRunnable(() -> {
             addCorsHeadersIfMissing(exchange);
-            log.info("Response headers: {}", exchange.getResponse().getHeaders());
+//            log.info("Response headers: {}", exchange.getResponse().getHeaders());
         }));
     }
 

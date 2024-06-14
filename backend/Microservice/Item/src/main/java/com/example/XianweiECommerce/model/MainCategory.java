@@ -1,15 +1,16 @@
 package com.example.XianweiECommerce.model;
-import jakarta.persistence.Entity;
-import lombok.Data;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "main_categories")
-public class MainCategory extends BaseEntity {
+public class MainCategory extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

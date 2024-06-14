@@ -1,10 +1,12 @@
 package com.example.XianweiECommerce.dto;
+
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
-public class SubCategoryDTO {
+public class SubCategoryDTO implements Serializable {
     private Long id;
     private Long mainCategoryId;
     private String mainCategoryName;

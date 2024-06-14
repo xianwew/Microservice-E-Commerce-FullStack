@@ -1,19 +1,20 @@
 package com.example.XianweiECommerce.dto;
+
 import com.example.XianweiECommerce.annotation.ItemValidInitialQuantity;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @ItemValidInitialQuantity
 @Getter
 @Setter
-public class ItemDTO {
+public class ItemDTO implements Serializable {
     private Long id;
     private String sellerId;
     private String username; // New field for the seller's username
