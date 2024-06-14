@@ -45,7 +45,7 @@ search:
   items:
     cache:
       refresh:
-        rate: 15000
+        rate: 20000
       initial:
         delay: 10000
 
