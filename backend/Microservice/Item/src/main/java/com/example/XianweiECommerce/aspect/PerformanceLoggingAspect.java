@@ -7,23 +7,24 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+
 @Aspect
 @Component
 @Slf4j
 public class PerformanceLoggingAspect {
 
-    @Pointcut("execution(* com.example.XianweiECommerce.service.ItemService.searchItems(..))")
+    @Pointcut("execution(* com.example.XianweiECommerce.controller.ItemController.searchItems(..))")
     public void searchItemsMethod() {}
 
     @Around("searchItemsMethod()")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long startTime = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        log.info("{} executed in {} ms", joinPoint.getSignature(), duration);
-        return result;
+        long start = System.currentTimeMillis();
+        try {
+            return joinPoint.proceed();
+        } finally {
+            long duration = System.currentTimeMillis() - start;
+            log.info("{} executed in {} ms", joinPoint.getSignature(), duration);
+        }
     }
 }
 
