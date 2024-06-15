@@ -149,7 +149,8 @@ const CheckoutPage = () => {
 
             await connectWebSocket();
             await createOrder(cart.cartId, selectedShippingMethod, selectedPaymentMethod);
-        } catch (error) {
+        } 
+        catch (error) {
             console.error('Error initializing WebSocket connection or creating order:', error);
             dispatch(showSnackbar({
                 open: true,
