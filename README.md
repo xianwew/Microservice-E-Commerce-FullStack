@@ -5,17 +5,11 @@
 
 This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXekIgXAmN-qbiTUnPXkqkNjW2xmNdM4BVMloD5GGGiw1iZFniz7Ks0yq-YTNXJ9UaS8I0BgtYOuyGwqdeDpOoru9ggwuaRbrXdXyuJXbAE5RABTsU7k1d5RiqeZVu-X1Fb79pQItz3a2tofovwXzYtxc0Eh?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf6KcwgdnvgYP0QwC5VAgMfzhBGh0Dyh0VUvxnrLrDtjzi7pZOhfIduMs6v2ijm10oHpfQMoD9CbaougDf4ZeUtwKdvZWQhIcpv-U6VGyAeDH1vK0hzkkkXvS2QwguywDVEjI2Pn3KK4_KXsp1BhZ8EN_Nu?key=It25FaNN3Hk2ogZbUXQYcg)
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXd3y1t6epsZ8q3HCZtfniVp1ueETSQ4LnuCafOUmyE7BeStUQWYM7hExowFlmwt8b9UkNN15vcmHAdqkEfWHkDc82_c1TYCfSa8cPV-H--ANyQfrKPIbTEMRQsYDUMRaAu-vZHHIsbpWrc0OKHh9_3xskS1?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfbdiOZE8s_pEu5xJQ251yNc42h9dH4DIBN3Mn38Xzim6wz6zSav3rn6c519cz_Zs6LkV4W6rqkhy71KMFhM5LdMvDmE-Yt5_-HkHdQvnV9hHlUbsC9XciX3i_3UCBJq9wWLSraAWNO9xRmngnCN8QYyOyz?key=It25FaNN3Hk2ogZbUXQYcg)
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXelxJweUs4FQWI9RTp4b187JCOkfv4Pa_5P3r0tnwG0CgGkBsFI5NjUwpQ_zkOoDr1YaXtzWx0EEdtEc2YBMQE20pqmr7_3DtQitOtN52Wxbg5GzbeofC17C1PTXwAs_WHEUROXCMkboX5q5pUs3havRfIe?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfUaPuA6ltmWywQRG7l_gl-iGhrascVerl9rhb7foEN4RURfdPQ1IFxeoxMmC0J069UJItyqLFMvUH4Rs57qv8UFMaesJfu3EiNBnifSOjW-wbbITIbM-xkCSeofOodmmGmNMyCIbMHpQInx4BRpphms43p?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcjbydCAb9l5mdJP-ifoXUtAya1Bgd00iVVcGe0aJ0Nd1JAA6EEB-8yvifS2f6YQ1svckRCLIerQqcdckza5L22AZrTab0IZBfxibm3ytLtn9DibGjqE4ySq4nVKZUjE_6CYEfGsLrgqu7pVUCzgWK2TagT?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXczSJSlP3t3Bb-kpqGjadbvue5g4W2HcLcOxApyHmk2vMXyrWYXNyekLBQvkyvBQlOpMn-Pr9EnA0mLq3jgcLaepJd1V_-FnvTwZkVMq_czDarMZxD9Fmuj1aSuA5doW--ous6XvbsTQSWE_hp1IhXm8bI?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXezLqmESm-og237k91Uyj6MEUOLiPul3RCIWHTwvUYgQ8Wqp2XL_OERw6Bj5TMdt6BrYV1Sku2LPzagN7gRTSWcep1TPxr4Kwwhw3Q1qOdyzVLAOp0ZaWiI7fk3Sl9PTne85yPlpn4AZ6zEgs6H-tmxZ1cc?key=It25FaNN3Hk2ogZbUXQYcg)
 
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfIFoaBOa9PXg6tZjW2RpKuAYJlAlClw66mYfdmx4o7Tc_X1b2615BpF2YQUg6ZvR81rbHmcUVAzZi_4rK3TF2j0FdvvKTZeoUp8gA-L7gRsEAvxe3Bdffy9A4L-UOh3ZyOBG5fqhuh2dM0oU5C2u0GhjU?key=It25FaNN3Hk2ogZbUXQYcg)
 
