@@ -217,7 +217,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
 
 - **Message Categorization**:
 
-  - Messages are categorized based on their recoverability. Recoverable messages are retried, and if the maximum retries (set to five) are exceeded, they are stored in a MySQL database for manual inspection. If the message is uncoverable, it will be directly stored in the database for further inspection.
+  - Messages are categorized based on their recoverability. Recoverable messages are retried, and if the maximum retries (set to five) are exceeded, they are stored in a MySQL database for manual inspection. If the message is unrecoverable, it will be directly stored in the database for further inspection.
 
 - **Health Checks and Lease Expiration**:
 
