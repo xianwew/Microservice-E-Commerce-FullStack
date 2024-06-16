@@ -17,25 +17,25 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 # Quick Link
 
-1. [****Components Summary****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.v0l6nddnqzmn)
+1. [****Components Summary****](#Components-Summary)
 
-2. [****Spring Netflix Eureka Cluster****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yoovqx9cgy86)
+2. [****Spring Netflix Eureka Cluster****](#Spring-Netflix-Eureka-Cluster)
 
-3. [****Kafka Cluster for Asynchronous Processing****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yg9paq20rmhk)
+3. [****Kafka Cluster for Asynchronous Processing****](#Kafka-Cluster-for-Asynchronous-Processing)
 
-4. [****SAGA Pattern and Fallback****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.blbz4vd5iyhc)
+4. [****SAGA Pattern and Fallback****](#SAGA-Pattern-and-Fallback)
 
-5. [****MySQL Master-Slave Setup and Optimistic Locking****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.3kwbwb4zurjl)
+5. [****MySQL Master-Slave Setup and Optimistic Locking****](#MySQL-Master-Slave-Setup-and-Optimistic-Locking)
 
-6. [****Redis Sentinel Setup and AOP Performance Measurement****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.21ssdbbyqgt)
+6. [****Redis Sentinel Setup and AOP Performance Measurement****](#Redis-Sentinel-Setup-and-AOP-Performance-Measurement)
 
-7. [****NGINX as Reverse Proxy****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.olwn20aav9a6)
+7. [****NGINX as Reverse Proxy****](#NGINX-as-Reverse-Proxy)
 
-8. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.nbnd21qmhxrk)
+8. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](#Keycloak-OAuth2-Server-Authentication-and-Authorization-with-Spring-Security)
 
-9. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yqfw5jyopyaa)
+9. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](#Resilience4J-Circuit-Breaker-Redis-Rate-Limiter-and-Fallback-API)
 
-10.  [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#heading=h.3rlchalq1em5)
+10.  [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
 
 
 # Sample App Screenshots
