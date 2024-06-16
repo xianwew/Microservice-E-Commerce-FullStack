@@ -12,7 +12,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfQ5nVG9cr49ZRrknTjph8Ggbt2vYvuk0lfPSy0Yj3iDOmV01ZJsIhyZY6fCHyPlu4zdUSUfuVErSROBgRDx5dylpBw9D-ybXtmMq-qp2A3O8DqxpYjTXQwi4oVz7x__l8V-YpkaEakJyH7v5bf7huJ6-w?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
-# Quick Link
+# Quick Links
 
 1. [****Components Summary****](#Components-Summary)
 
