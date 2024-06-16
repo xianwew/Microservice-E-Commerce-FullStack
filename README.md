@@ -281,9 +281,9 @@ This setup significantly enhances the overall stability and efficiency of the ap
 
 
 
-# SAGA Pattern, Fallback, and WebSocket Notification
+#  Pattern, Fallback, and WebSocket Notification
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdiuo3wcAV3-xDJGS6LDSID55uDIJBoyj-2dbkCF9NFDgYUrXciZP-lacPW7Hb1ypHo8USP_SSVVILZJOgRHAfF-x3nCT3a43oLlH2Dx3xsYdW54kOmLvkb741UQ6Vx1RBsw4_V_dL5yEjKd0p6xAGimYQ?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXccVLrWeM9IJ4zWUOwqtijxez8tsWxitm56sOKwQCQIjb2lCZRAdWmhSMMJO_LAUWaCuD5mWoyBANGcwqatzTSMMNjkLFIqxpwDBdyiCg71htC7M5UpleyjZ34efFpTGP2ZP8CGn1SsxU8qSBhy-a42Hpg?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview
