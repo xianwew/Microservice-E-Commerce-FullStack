@@ -23,7 +23,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 3. [****Kafka Cluster for Asynchronous Processing****](#Kafka-Cluster-for-Asynchronous-Processing)
 
-4. [****SAGA Pattern and Fallback****](#SAGA-Pattern-and-Fallback)
+4. [****SAGA Pattern, Fallback, and WebSocket Notification****](#SAGA-Pattern-Fallback-and-WebSocket-Notification)
 
 5. [****MySQL Master-Slave Setup and Optimistic Locking****](#MySQL-Master-Slave-Setup-and-Optimistic-Locking)
 
@@ -210,7 +210,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
 The Kafka cluster is a vital component of the e-commerce microservice architecture, providing essential capabilities for high availability, performance, and reliability. Its configuration with three brokers and robust message handling mechanisms ensures that the system can efficiently process a large volume of messages while maintaining data integrity and service continuity. This setup significantly enhances the overall stability and efficiency of the application.
 
 
-# SAGA Pattern and Fallback
+# SAGA Pattern, Fallback, and WebSocket Notification
 
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdiuo3wcAV3-xDJGS6LDSID55uDIJBoyj-2dbkCF9NFDgYUrXciZP-lacPW7Hb1ypHo8USP_SSVVILZJOgRHAfF-x3nCT3a43oLlH2Dx3xsYdW54kOmLvkb741UQ6Vx1RBsw4_V_dL5yEjKd0p6xAGimYQ?key=It25FaNN3Hk2ogZbUXQYcg)
 
