@@ -466,15 +466,16 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
 # Redis Sentinel Setup and AOP Performance Measurement
 
-#### ****![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe1jlkg5zwV03IG4A-bs3WR3KzpVqeHxhZEUmIUTYfyIa5yLFWiUATWvtD6ElqF-2sgLO9jXZeX1sW3sSXtGY1SAqEk4NO-pz2eE-GIx0hJByKwFX-5_NzGB3POqgYNpO3e0TIxU-4MyvGjJdV2CjkSOfc3?key=It25FaNN3Hk2ogZbUXQYcg)****
+#### ****![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe1jlkg5zwV03IG4A-bs3WR3KzpVqeHxhZEUmIUTYfyIa5yLFWiUATWvtD6ElqF-2sgLO9jXZeX1sW3sSXtGY1SAqEk4NO-pz2eE-GIx0hJByKwFX-5_NzGB3POqgYNpO3e0TIxU-4MyvGjJdV2CjkSOfc3?key=It25FaNN3Hk2ogZbUXQYcg)
 
-#### **Overview**
+#### Overview
 
-# **The Redis Sentinel setup in the e-commerce microservice architecture ensures high availability, performance, and reliability for the caching layer. Redis is used for caching frequently accessed data to reduce load on the database and improve response times. Redis Sentinel provides automatic failover, monitoring, and notification capabilities to ensure the Redis service remains available even in the event of failures.**
+The Redis Sentinel setup in the e-commerce microservice architecture ensures high availability, performance, and reliability for the caching layer. Redis is used for caching frequently accessed data to reduce load on the database and improve response times. Redis Sentinel provides automatic failover, monitoring, and notification capabilities to ensure the Redis service remains available even in the event of failures.
 
-#### **Configuration and Features**
 
-# **- **Redis Sentinel Setup**:
+#### Configuration and Features
+
+- **Redis Sentinel Setup**:
 
   - **Components**:
 
@@ -502,11 +503,12 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
     - Each sentinel instance runs with its own configuration file, specifying the master to monitor.
 
-    - Sentinels monitor the master server and perform automatic failover by promoting a slave to master if the current master fails.**
+    - Sentinels monitor the master server and perform automatic failover by promoting a slave to master if the current master fails.
 
-#### **Performance and Reliability**
 
-# **- **High Availability**:
+#### Performance and Reliability
+
+- **High Availability**:
 
   - **Automatic Failover**: Redis Sentinel provides automatic failover, ensuring that if the master fails, one of the slaves is promoted to master, maintaining service availability without manual intervention.
 
@@ -522,11 +524,12 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
     - Using Aspect-Oriented Programming (AOP) for performance logging, the execution time of critical functions has been measured.
 
-    - The function execution time for searching items has been reduced from `12ms` ****to `2ms`, demonstrating significant performance improvement.**
+    - The function execution time for searching items has been reduced from `12ms` ****to `2ms`, demonstrating significant performance improvement.
 
-#### **Implementation Details**
 
-# **- **Data Caching**:
+#### Implementation Details
+
+- **Data Caching**:
 
   - The primary use case for Redis caching in this setup is for caching search query results. This ensures that repeated searches with the same parameters return results quickly without repeatedly querying the database.
 
@@ -544,11 +547,12 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
   - AOP is used to log the execution time of critical functions, providing insights into performance bottlenecks.
 
-  - The `PerformanceLoggingAspect` measures the execution time of the `searchItems` method, helping to optimize performance.**
+  - The `PerformanceLoggingAspect` measures the execution time of the `searchItems` method, helping to optimize performance.
 
-#### **Reasons for Using Redis Sentinel over Standard Master-Slave Setup**
 
-# **- **Read-Heavy Operations**:
+#### Reasons for Using Redis Sentinel over Standard Master-Slave Setup
+
+- **Read-Heavy Operations**:
 
   - Caching item search queries can be a read-heavy operation. Redis Sentinel allows for load balancing across multiple slave instances, ensuring that read operations do not overwhelm a single instance.
 
@@ -562,17 +566,22 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
 - **Scalability**:
 
-  - With Redis Sentinel, the architecture can easily scale to accommodate additional read replicas, further distributing the load and improving performance.**
+  - With Redis Sentinel, the architecture can easily scale to accommodate additional read replicas, further distributing the load and improving performance.
 
-#### **Summary**
 
-# The Redis Sentinel setup provides a robust and high-performing caching solution for the e-commerce application. Key benefits include:* **High Availability**: Automatic failover and continuous monitoring ensure that the Redis service remains available even during failures.
+#### Summary
 
-* **Improved Performance**: Caching frequently accessed data, especially search query results, reduces database load and speeds up response times, with critical function execution time reduced from 12ms to 2ms.
+The Redis Sentinel setup provides a robust and high-performing caching solution for the e-commerce application. Key benefits include:
 
-* **Reliability**: The use of Redis Sentinels for monitoring and failover enhances the reliability of the caching layer.
+- **High Availability**: Automatic failover and continuous monitoring ensure that the Redis service remains available even during failures.
 
-* **Efficient Read and Write Operations**: Load balancing between master and slave instances ensures efficient handling of read and write operations.These features collectively enhance the stability, performance, and reliability of the e-commerce application, providing a seamless and efficient user experience.
+- **Improved Performance**: Caching frequently accessed data, especially search query results, reduces database load and speeds up response times, with critical function execution time reduced from 12ms to 2ms.
+
+- **Reliability**: The use of Redis Sentinels for monitoring and failover enhances the reliability of the caching layer.
+
+- **Efficient Read and Write Operations**: Load balancing between master and slave instances ensures efficient handling of read and write operations.
+
+These features collectively enhance the stability, performance, and reliability of the e-commerce application, providing a seamless and efficient user experience.
 
 
 # NGINX as Reverse Proxy
