@@ -1,6 +1,3 @@
-**Xianwei’s ECommerce Microservice React / Spring Full Stack Application**
-
-
 # Hello and welcome to my GitHub repository!
 
 This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
