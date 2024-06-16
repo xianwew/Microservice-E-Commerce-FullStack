@@ -466,7 +466,7 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
 # Redis Sentinel Setup and AOP Performance Measurement
 
-#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXetgMIxCV7ZYnFR5e0EYPl4VZSeBdFZ-wDJ6VWs-Efq1M1WrMu2WmUncoJfPx_DHJvd4QXtX-IZ--RO_zDOO8z_WKQQgAAb8RZ_YZh0eLPYHnvD46GLMKdM-1EPcT3lWgPl3KwyCzUZDhnHz5BiS75rmStv?key=It25FaNN3Hk2ogZbUXQYcg)
+#### ****![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe1jlkg5zwV03IG4A-bs3WR3KzpVqeHxhZEUmIUTYfyIa5yLFWiUATWvtD6ElqF-2sgLO9jXZeX1sW3sSXtGY1SAqEk4NO-pz2eE-GIx0hJByKwFX-5_NzGB3POqgYNpO3e0TIxU-4MyvGjJdV2CjkSOfc3?key=It25FaNN3Hk2ogZbUXQYcg)
 
 #### Overview
 
