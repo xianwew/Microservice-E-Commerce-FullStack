@@ -5,14 +5,6 @@
 
 This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf6KcwgdnvgYP0QwC5VAgMfzhBGh0Dyh0VUvxnrLrDtjzi7pZOhfIduMs6v2ijm10oHpfQMoD9CbaougDf4ZeUtwKdvZWQhIcpv-U6VGyAeDH1vK0hzkkkXvS2QwguywDVEjI2Pn3KK4_KXsp1BhZ8EN_Nu?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfbdiOZE8s_pEu5xJQ251yNc42h9dH4DIBN3Mn38Xzim6wz6zSav3rn6c519cz_Zs6LkV4W6rqkhy71KMFhM5LdMvDmE-Yt5_-HkHdQvnV9hHlUbsC9XciX3i_3UCBJq9wWLSraAWNO9xRmngnCN8QYyOyz?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXezLqmESm-og237k91Uyj6MEUOLiPul3RCIWHTwvUYgQ8Wqp2XL_OERw6Bj5TMdt6BrYV1Sku2LPzagN7gRTSWcep1TPxr4Kwwhw3Q1qOdyzVLAOp0ZaWiI7fk3Sl9PTne85yPlpn4AZ6zEgs6H-tmxZ1cc?key=It25FaNN3Hk2ogZbUXQYcg)
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfIFoaBOa9PXg6tZjW2RpKuAYJlAlClw66mYfdmx4o7Tc_X1b2615BpF2YQUg6ZvR81rbHmcUVAzZi_4rK3TF2j0FdvvKTZeoUp8gA-L7gRsEAvxe3Bdffy9A4L-UOh3ZyOBG5fqhuh2dM0oU5C2u0GhjU?key=It25FaNN3Hk2ogZbUXQYcg)
-
 Feel free to explore the code, and don't hesitate to reach out if you have any questions or feedback!
 
 Thank you for visiting, and I hope you find this project as exciting and educational as I did while building it.
@@ -25,25 +17,36 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 # Quick Link
 
-1. [****Components Summary****](#Components-Summary)
+1. [****Components Summary****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.v0l6nddnqzmn)
 
-2. [****Spring Netflix Eureka Cluster****](#Spring-Netflix-Eureka-Cluster)
+2. [****Spring Netflix Eureka Cluster****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yoovqx9cgy86)
 
-3. [****Kafka Cluster for Asynchronous Processing****](#Kafka-Cluster-for-Asynchronous-Processing)
+3. [****Kafka Cluster for Asynchronous Processing****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yg9paq20rmhk)
 
-4. [****SAGA Pattern and Fallback****](#SAGA-Pattern-and-Fallback)
+4. [****SAGA Pattern and Fallback****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.blbz4vd5iyhc)
 
-5. [****MySQL Master-Slave Setup and Optimistic Locking****](#MySQL-Master-Slave-Setup-and-Optimistic-Locking)
+5. [****MySQL Master-Slave Setup and Optimistic Locking****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.3kwbwb4zurjl)
 
-6. [****Redis Sentinel Setup and AOP Performance Measurement****](#Redis-Sentinel-Setup-and-AOP-Performance-Measurement)
+6. [****Redis Sentinel Setup and AOP Performance Measurement****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.21ssdbbyqgt)
 
-7. [****NGINX as Reverse Proxy****](#NGINX-as-Reverse-Proxy)
+7. [****NGINX as Reverse Proxy****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.olwn20aav9a6)
 
-8. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](#Keycloak-OAuth2-Server-Authentication-and-Authorization-with-Spring-Security)
+8. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.nbnd21qmhxrk)
 
-9. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](#Resilience4J-Circuit-Breaker-Redis-Rate-Limiter-and-Fallback-API)
+9. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#bookmark=id.yqfw5jyopyaa)
 
-10.  [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
+10.  [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](https://docs.google.com/document/d/1EXIbFpxAa--Hd1ItvC96s3_3TGZE2K4Se792132_ewo/edit#heading=h.3rlchalq1em5)
+
+
+# Sample App Screenshots
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf6KcwgdnvgYP0QwC5VAgMfzhBGh0Dyh0VUvxnrLrDtjzi7pZOhfIduMs6v2ijm10oHpfQMoD9CbaougDf4ZeUtwKdvZWQhIcpv-U6VGyAeDH1vK0hzkkkXvS2QwguywDVEjI2Pn3KK4_KXsp1BhZ8EN_Nu?key=It25FaNN3Hk2ogZbUXQYcg)
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfbdiOZE8s_pEu5xJQ251yNc42h9dH4DIBN3Mn38Xzim6wz6zSav3rn6c519cz_Zs6LkV4W6rqkhy71KMFhM5LdMvDmE-Yt5_-HkHdQvnV9hHlUbsC9XciX3i_3UCBJq9wWLSraAWNO9xRmngnCN8QYyOyz?key=It25FaNN3Hk2ogZbUXQYcg)
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXezLqmESm-og237k91Uyj6MEUOLiPul3RCIWHTwvUYgQ8Wqp2XL_OERw6Bj5TMdt6BrYV1Sku2LPzagN7gRTSWcep1TPxr4Kwwhw3Q1qOdyzVLAOp0ZaWiI7fk3Sl9PTne85yPlpn4AZ6zEgs6H-tmxZ1cc?key=It25FaNN3Hk2ogZbUXQYcg)
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfIFoaBOa9PXg6tZjW2RpKuAYJlAlClw66mYfdmx4o7Tc_X1b2615BpF2YQUg6ZvR81rbHmcUVAzZi_4rK3TF2j0FdvvKTZeoUp8gA-L7gRsEAvxe3Bdffy9A4L-UOh3ZyOBG5fqhuh2dM0oU5C2u0GhjU?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 # Components Summary
