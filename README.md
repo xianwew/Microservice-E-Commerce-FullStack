@@ -801,10 +801,6 @@ Keycloak is used as the OAuth2 server in the e-commerce microservice architectur
 
     - RBAC ensures that only users with the appropriate roles can access certain endpoints, enhancing security and preventing unauthorized access.
 
-  - **SSL Encryption**:
-
-    - All communication between clients and the Keycloak server, as well as between microservices, is encrypted using SSL, protecting data in transit.
-
 - **Reliability**:
 
   - **Health Checks**:
