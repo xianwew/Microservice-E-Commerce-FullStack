@@ -92,7 +92,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 #### Redis Sentinel
 
-- Enhances performance through distributed caching and session management, with a master-slave setup for high availability and reliability.
+- Enhances performance through distributed caching, with a master-slave setup for high availability and reliability.
 
 
 #### Databases (Order, User, Item)
