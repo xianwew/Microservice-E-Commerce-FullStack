@@ -485,7 +485,7 @@ services:
       EUREKA_SERVER_CIRCUITBREAKER_ENABLED: "true"
 
   userservice-master:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: userservice-master
     extends:
       file: common-config.yml
@@ -508,7 +508,7 @@ services:
       retries: 10
 
   userservice-slave:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: userservice-slave
     extends:
       file: common-config.yml
@@ -534,7 +534,7 @@ services:
         condition: service_healthy
 
   orderservice-master:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: orderservice-master
     extends:
       file: common-config.yml
@@ -557,7 +557,7 @@ services:
       retries: 10
 
   orderservice-slave:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: orderservice-slave
     extends:
       file: common-config.yml
@@ -583,7 +583,7 @@ services:
         condition: service_healthy
 
   itemservice-master:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: itemservice-master
     extends:
       file: common-config.yml
@@ -606,7 +606,7 @@ services:
       retries: 10
 
   itemservice-slave:
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: itemservice-slave
     extends:
       file: common-config.yml
@@ -635,7 +635,7 @@ services:
     extends:
       file: common-config.yml
       service: microservice-base-config
-    image: mysql:latest
+    image: mysql:8.4.0
     container_name: paymentservice-failed-messages
     ports:
       - "3313:3306"

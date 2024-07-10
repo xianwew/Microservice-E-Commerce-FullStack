@@ -75,6 +75,7 @@ public class RedisConfig {
                 .build();
 
         HostAndPort currentHostMaster = jedisSentinelPool.getCurrentHostMaster();
+        log.info("Current Host Master: {}:{}", currentHostMaster.getHost(), currentHostMaster.getPort());
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(currentHostMaster.getHost(), currentHostMaster.getPort());
         redisConfig.setPassword(redisPassword);
 
