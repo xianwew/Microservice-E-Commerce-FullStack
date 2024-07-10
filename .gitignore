@@ -10,7 +10,6 @@
 
 # production
 /build
-/backend/Microservice/docker-compose/default/.data
 
 # misc
 .DS_Store
