@@ -13,7 +13,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 # Overview of Deployment and System Components
 
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXexYnK1GJNbgZSNmtnIQGuY7q7ZGQla4nX6rEJiD1bs-ENYuqtWcwcaLPsFiySaAkItRZsZUfz2KmZYeudBFqdggM6oZx8FU3RQT1ZEQMKh9AUoqxZcjVuGb07MajVVkJUkEMxtZYzdrgX63AoMUcvoiM8?key=It25FaNN3Hk2ogZbUXQYcg)
-
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf2TKhwdKnXux6hpvSc3YBA8Xn_PpFPCUDQg4d3UFFyLAREgKy2ilGOifzrv63AbRWZ1FfLmxv35pQJOT6-4AQeP5OxxMEFZsQ2Bl27ZEFpY_uesj6UgOc0_ccC008OImWOZzWN8FEPnwAZpz0GMOpNHcg7?key=It25FaNN3Hk2ogZbUXQYcg)
 
 # Quick Links
 
