@@ -25,11 +25,11 @@ public class Item extends BaseEntity implements Serializable {
     private String title;
 
     @Lob
-    @Column(name = "short_description", nullable = false)
+    @Column(name = "short_description", nullable = false, length = 500)
     private String shortDescription;
 
     @Lob
-    @Column(name = "long_description")
+    @Column(name = "long_description", nullable = false, length = 65535)
     private String longDescription;
 
     @Column(nullable = false)

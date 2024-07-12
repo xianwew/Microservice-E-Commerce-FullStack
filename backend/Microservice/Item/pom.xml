@@ -18,7 +18,7 @@
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
 		<otelVersion>1.32.0</otelVersion>
 		<spring.data.redis>1.2.1.RELEASE</spring.data.redis>
-		<jedis>4.3.2</jedis>
+		<jedis>5.1.2</jedis>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -135,9 +135,9 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis}</version>
+			<groupId>io.lettuce</groupId>
+			<artifactId>lettuce-core</artifactId>
+			<version>6.3.2.RELEASE</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

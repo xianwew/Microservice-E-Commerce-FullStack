@@ -165,16 +165,16 @@ const ItemDetailsPage = () => {
                                 onChange={handleQuantityChange}
                                 inputProps={{ min: 1, max: item.quantity }}
                                 sx={{ width: '100px' }}
-                                disabled={item.quantity <= 0}
+                                disabled={item.quantity <= 0 || !currentUserId}
                             />
                             <Button
                                 variant="contained"
                                 color="primary"
                                 sx={{ height: '55px' }}
                                 onClick={handleAddToCart}
-                                disabled={item.quantity <= 0}
+                                disabled={item.quantity <= 0 || !currentUserId}
                             >
-                                {item.quantity > 0? 'Add to Cart': 'Out of stock'}
+                                {item.quantity > 0 ? 'Add to Cart' : 'Out of stock'}
                             </Button>
                         </Box>
                         <Divider sx={{ my: 2 }} />

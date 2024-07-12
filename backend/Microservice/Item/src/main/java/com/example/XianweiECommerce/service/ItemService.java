@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -44,16 +43,12 @@ public class ItemService {
     private final SubCategoryRepository subCategoryRepository;
     private final CloudinaryService cloudinaryService;
     private final RestTemplate restTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${cloudinary.item-upload-folder}")
     private String imageFolder;
 
     @Value("${userservice.url}")
     private String userServiceUrl;
-
-    @Value("${orderservice.url}")
-    private String orderServiceUrl;
 
     @Value("${ratingservice.url}")
     private String ratingServiceUrl;
@@ -66,14 +61,12 @@ public class ItemService {
                        SubCategoryRepository subCategoryRepository,
                        CloudinaryService cloudinaryService,
                        RestTemplate restTemplate,
-                       RedisTemplate<String, Object> redisTemplate,
                        CacheManager cacheManager) {
         this.itemRepository = itemRepository;
         this.mainCategoryRepository = mainCategoryRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.cloudinaryService = cloudinaryService;
         this.restTemplate = restTemplate;
-        this.redisTemplate = redisTemplate;
         this.cacheManager = cacheManager;
     }
 

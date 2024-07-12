@@ -4,89 +4,45 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisSentinelPool;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Configuration
-@Slf4j
 public class RedisConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
 
     @Value("${spring.data.redis.password}")
     private String redisPassword;
 
-    @Value("${spring.data.redis.sentinel.master}")
-    private String master;
-
-    @Value("#{'${spring.data.redis.sentinel.nodes}'.split(',')}")
-    private String[] sentinelNodes;
-
-    @Value("${spring.data.redis.jedis.pool.max-active}")
-    private int maxTotal;
-
-    @Value("${spring.data.redis.jedis.pool.max-idle}")
-    private int maxIdle;
-
-    @Value("${spring.data.redis.jedis.pool.min-idle}")
-    private int minIdle;
-
-    @Value("${spring.data.redis.jedis.pool.test-on-borrow}")
-    private boolean testOnBorrow;
-
     @Bean
-    public JedisPoolConfig jedisPoolConfig() {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(maxTotal);
-        poolConfig.setMaxIdle(maxIdle);
-        poolConfig.setMinIdle(minIdle);
-        poolConfig.setTestOnBorrow(testOnBorrow);
-        return poolConfig;
+    public LettuceConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
+        config.setPassword(redisPassword);
+        logger.info("LettuceConnectionFactory created with Host: {}, Port: {}, Password: {}", redisHost, redisPort, redisPassword);
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
-    public JedisSentinelPool jedisSentinelPool(JedisPoolConfig jedisPoolConfig) {
-        Set<String> sentinels = new HashSet<>();
-        for (String node : sentinelNodes) {
-            log.info("Connecting: " + node);
-            sentinels.add(node);
-        }
-        return new JedisSentinelPool(master, sentinels, jedisPoolConfig, redisPassword);
-    }
-
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory(JedisSentinelPool jedisSentinelPool, JedisPoolConfig jedisPoolConfig) {
-        JedisClientConfiguration clientConfig = JedisClientConfiguration.builder()
-                .usePooling()
-                .poolConfig(jedisPoolConfig)
-                .build();
-
-        HostAndPort currentHostMaster = jedisSentinelPool.getCurrentHostMaster();
-        log.info("Current Host Master: {}:{}", currentHostMaster.getHost(), currentHostMaster.getPort());
-        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(currentHostMaster.getHost(), currentHostMaster.getPort());
-        redisConfig.setPassword(redisPassword);
-
-        return new JedisConnectionFactory(redisConfig, clientConfig);
-    }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
+
         ObjectMapper objectMapper = new ObjectMapper();
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Object.class)
@@ -97,3 +53,107 @@ public class RedisConfig {
         return redisTemplate;
     }
 }
+
+
+
+//@Configuration
+//public class RedisConfig {
+//
+//    private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
+//
+//    @Value("${spring.data.redis.password}")
+//    private String redisPassword;
+//
+//    @Value("${spring.data.redis.sentinel.master}")
+//    private String master;
+//
+//    @Value("${spring.data.redis.sentinel.nodes}")
+//    private String sentinelNodes;
+//
+//    @Bean(destroyMethod = "shutdown")
+//    public ClientResources clientResources() {
+//        return DefaultClientResources.create();
+//    }
+//
+//    @Bean
+//    public RedisSentinelConfiguration redisSentinelConfiguration() {
+//        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration();
+//        sentinelConfig.master(master);
+//        Arrays.stream(sentinelNodes.split(",")).forEach(node -> {
+//            String[] parts = node.split(":");
+//            String host = parts[0];
+//            int port = Integer.parseInt(parts[1]);
+//            sentinelConfig.sentinel(host, port);
+//        });
+//        sentinelConfig.setPassword(RedisPassword.of(redisPassword));
+//
+//        // Log configuration details
+//        logger.info("Redis Sentinel Configuration: master={}, nodes={}, password={}", master, sentinelNodes, redisPassword);
+//
+//        return sentinelConfig;
+//    }
+//
+//    @Bean
+//    public LettuceConnectionFactory redisConnectionFactory(RedisSentinelConfiguration sentinelConfig) {
+//        LettuceConnectionFactory factory = new LettuceConnectionFactory(sentinelConfig);
+//        logger.info("LettuceConnectionFactory created with Sentinel Configuration: {}", sentinelConfig);
+//        return factory;
+//    }
+//
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+//                .allowIfSubType(Object.class)
+//                .build();
+//        objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+//
+//        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+//        return redisTemplate;
+//    }
+//
+//    @Bean
+//    public RedisURI redisUri() {
+//        RedisURI.Builder builder = RedisURI.Builder.sentinel(getHost(sentinelNodes.split(",")[0]), getPort(sentinelNodes.split(",")[0]), master)
+//                .withPassword(redisPassword.toCharArray())
+//                .withTimeout(Duration.ofSeconds(10));
+//
+//        Arrays.stream(sentinelNodes.split(",")).skip(1).forEach(node -> {
+//            builder.withSentinel(getHost(node), getPort(node));
+//        });
+//
+//        RedisURI redisUri = builder.build();
+//
+//        // Log Redis URI
+//        logger.info("Redis URI: {}", redisUri);
+//
+//        return redisUri;
+//    }
+//
+//    @Bean
+//    public RedisClient redisClient(ClientResources clientResources, RedisURI redisUri) {
+//        RedisClient redisClient = RedisClient.create(clientResources, redisUri);
+//        logger.info("Created RedisClient with URI: {}", redisUri);
+//        return redisClient;
+//    }
+//
+//    @Bean
+//    public StatefulRedisConnection<String, String> redisConnection(RedisClient redisClient) {
+//        logger.info("Attempting to connect to Redis...");
+//        StatefulRedisConnection<String, String> connection = redisClient.connect();
+//        logger.info("Successfully connected to Redis");
+//        return connection;
+//    }
+//
+//    private String getHost(String node) {
+//        return node.split(":")[0];
+//    }
+//
+//    private int getPort(String node) {
+//        return Integer.parseInt(node.split(":")[1]);
+//    }
+//}
