@@ -71,7 +71,7 @@ const CheckoutPage = () => {
 
     const connectWebSocket = () => {
         return new Promise((resolve, reject) => {
-            socketRef.current = new SockJS('http://localhost:8080/api/orders/ws');
+            socketRef.current = new SockJS('http://www.xianwei-e-commerce.com/api/orders/ws');
             socketRef.current.onopen = () => {
                 console.log('Connected to WebSocket');
                 resolve();
