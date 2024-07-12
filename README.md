@@ -10,7 +10,7 @@ Feel free to explore the code, and don't hesitate to reach out if you have any q
 Thank you for visiting, and I hope you find this project as exciting and educational as I did while building it.
 
 
-# Overview of Deployment Structure
+# Overview of AWS Deployment with EKS Structure
 
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcBCLhQDu5RKoRwNdF6dF6VOuz4dsaCiI92CI7WBvNCAfjXYAxX1Ezu6Cq5u5BCHXKL6tuiCFgmSb3z5niwcQ_QEys76QBAcTNeMFXvOT3g9MXX037th7LiwjFfJd-NUtnoREL58INPB6ZyE2eKLUHbzQwx?key=It25FaNN3Hk2ogZbUXQYcg)
 
