@@ -1,15 +1,18 @@
+**Xianwei’s ECommerce Microservice React / Spring Full Stack Application**
+
+
 # Hello and welcome to my GitHub repository!
 
-This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience.
+This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
 
 Feel free to explore the code, and don't hesitate to reach out if you have any questions or feedback!
 
 Thank you for visiting, and I hope you find this project as exciting and educational as I did while building it.
 
 
-# Overview of System Components
+# Overview of Deployment and System Components
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfQ5nVG9cr49ZRrknTjph8Ggbt2vYvuk0lfPSy0Yj3iDOmV01ZJsIhyZY6fCHyPlu4zdUSUfuVErSROBgRDx5dylpBw9D-ybXtmMq-qp2A3O8DqxpYjTXQwi4oVz7x__l8V-YpkaEakJyH7v5bf7huJ6-w?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXexYnK1GJNbgZSNmtnIQGuY7q7ZGQla4nX6rEJiD1bs-ENYuqtWcwcaLPsFiySaAkItRZsZUfz2KmZYeudBFqdggM6oZx8FU3RQT1ZEQMKh9AUoqxZcjVuGb07MajVVkJUkEMxtZYzdrgX63AoMUcvoiM8?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 # Quick Links
@@ -26,24 +29,24 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 6. [****Redis Sentinel Setup and AOP Performance Measurement****](#Redis-Sentinel-Setup-and-AOP-Performance-Measurement)
 
-7. [****NGINX as Reverse Proxy****](#NGINX-as-Reverse-Proxy)
+7. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](#Keycloak-OAuth2-Server-Authentication-and-Authorization-with-Spring-Security)
 
-8. [****Keycloak OAuth2 Server Authentication and Authorization with Spring Security****](#Keycloak-OAuth2-Server-Authentication-and-Authorization-with-Spring-Security)
+8. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](#Resilience4J-Circuit-Breaker-Redis-Rate-Limiter-and-Fallback-API)
 
-9. [****Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API****](#Resilience4J-Circuit-Breaker-Redis-Rate-Limiter-and-Fallback-API)
+9. [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
 
-10.  [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
+10. [****Deployment Summary of Microservices Application to AWS with EKS****](#Deployment-Summary-of-Microservices-Application-to-AWS-with-EKS)
 
 
 # Sample App Screenshots
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf6KcwgdnvgYP0QwC5VAgMfzhBGh0Dyh0VUvxnrLrDtjzi7pZOhfIduMs6v2ijm10oHpfQMoD9CbaougDf4ZeUtwKdvZWQhIcpv-U6VGyAeDH1vK0hzkkkXvS2QwguywDVEjI2Pn3KK4_KXsp1BhZ8EN_Nu?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXd4x-JaXfzy5b_xTRfiJ4azMJGatSdko3e-reJ2M9HS3AyR_QfU9DwD4MzqFSWYJKx2ElWMncvlB4NQBOc5hVtD4zH5293WTFyAbsgLyqgT1F4kI13n1sEDk3IpmsRHuJI8TD86HaR-l34WXUOBq0NBDDRX?key=It25FaNN3Hk2ogZbUXQYcg)
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfbdiOZE8s_pEu5xJQ251yNc42h9dH4DIBN3Mn38Xzim6wz6zSav3rn6c519cz_Zs6LkV4W6rqkhy71KMFhM5LdMvDmE-Yt5_-HkHdQvnV9hHlUbsC9XciX3i_3UCBJq9wWLSraAWNO9xRmngnCN8QYyOyz?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXezaoQ6VDIZm6QzzYT9UUekld9RKVarFnZrOwDX7hrhlUur_2VbULaoum9lynChC9oYUSXYj6KBE4alv_tabzWYzWo9IQz8SAX5CJXierO2qFC2upYj2-2H8dzAmUvkFB4RTiOFllJLjaDM30VxUMkbccpR?key=It25FaNN3Hk2ogZbUXQYcg)
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXezLqmESm-og237k91Uyj6MEUOLiPul3RCIWHTwvUYgQ8Wqp2XL_OERw6Bj5TMdt6BrYV1Sku2LPzagN7gRTSWcep1TPxr4Kwwhw3Q1qOdyzVLAOp0ZaWiI7fk3Sl9PTne85yPlpn4AZ6zEgs6H-tmxZ1cc?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfuwLJYoPGXuBVFqk-TrfxBJ1kQrbQV_T56pL2qDqWeVYNtor0AbVFNsibEJQLkda4tm7lmfFwaOuJqKENVIRAhGCKw8H5_pyzyl9-XLYfnyvXX99IVwj9fFynj48CEgL51qPKu2fZJ0JcJXxKTfW_pQf9a?key=It25FaNN3Hk2ogZbUXQYcg)
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfIFoaBOa9PXg6tZjW2RpKuAYJlAlClw66mYfdmx4o7Tc_X1b2615BpF2YQUg6ZvR81rbHmcUVAzZi_4rK3TF2j0FdvvKTZeoUp8gA-L7gRsEAvxe3Bdffy9A4L-UOh3ZyOBG5fqhuh2dM0oU5C2u0GhjU?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf6fUdoH7Ew7YMjmncKXgsnUe9gmLw5aROYnQ4sVZO8uuZ-Sp40lswFYDBk2WITWDuv3SaHtcbEyUY4m7zcUau9HmAmtKgpMKvPUcxkH1heBkzGUk9-tr5bIMB9CnjB4ym5yi4RuMh4JtswTcNCmDrPa7U?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 # Components Summary
@@ -92,7 +95,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 #### Redis Sentinel
 
-- Enhances performance through distributed caching, with a master-slave setup for high availability and reliability.
+- Enhances performance through distributed caching and session management, with a master-slave setup for high availability and reliability.
 
 
 #### Databases (Order, User, Item)
@@ -119,7 +122,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 # Spring Netflix Eureka Cluster
 
-#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdImkO9juLgMoVTcBdZWJIMVz8LaearI5ZWMNYu-mwdqLpbt9Y7dEUqJ3j48So8u2yxuBTpan1UDANz0ZHHCF-jcPvSAPEpPkN15PqNDQKcFvoSMzIB1JrzXCuBwn_pZSZM9T3hbZYcy_8QSlzCW7Pmmspu?key=It25FaNN3Hk2ogZbUXQYcg)
+#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcW9rjiDJbZ93hWPTTykcT5d8_b7OTfIlgR3eDS1qsGsbkQjxs-RAjniWZYLLobsKvXXKxhlQ53H1peTLm3QOScVP8I79eItq0fhbFnXaBExSR4nnnBwFHbKWr4dPICWEKMbBS8vzm_9LvR77q8OxSSKXXW?key=It25FaNN3Hk2ogZbUXQYcg)
 
 #### Overview
 
@@ -166,16 +169,16 @@ The Eureka cluster is a vital component of the e-commerce microservice architect
 
 # Kafka Cluster for Asynchronous Processing
 
-#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeSGqeQAJQSHIA2iRgvi-UPcBbhgTEwht5Kjva4WXPtpMLgZ-VYFjYfVUEOsFUAWU2gyZlG5MKZ7SRnOYmjUrlz4tWiKcHLwzRYJKtc07fXooQUgTJmi9PT18jPG7C0j_J0WPGS2MrLJdoJ6IUIDfWsDvw?key=It25FaNN3Hk2ogZbUXQYcg)
+#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfMuAA5qdIWurGBSmN3ltomKCP5i-KM2DpTYgYfCVFl1J0Mc7IflZUI0u_p4ghn6ekUfnQY0r24hFiERhEay-pCohvijSwxW-5v5EjS8yUCf4IjEWSDVAZfOwvt9ZtKYkdoKzfjtB2F_IKu63AEzDAwQHw?key=It25FaNN3Hk2ogZbUXQYcg)
 
-#### Overview<a id="overview"></a>
+#### Overview
 
 The Kafka cluster in the e-commerce microservice architecture is designed to facilitate asynchronous communication between services. It is a key component that ensures high availability, performance, and reliability, supporting the overall event-driven architecture of the system.
 
 
-#### Configuration and Features<a id="configuration-and-features"></a>
+#### Configuration and Features
 
-##### High Availability<a id="high-availability"></a>
+##### High Availability
 
 - **Cluster Composition**:
 
@@ -190,7 +193,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
   - These checks ensure that brokers are healthy and available, enhancing the resilience of the cluster.
 
 
-##### Performance<a id="performance"></a>
+##### Performance
 
 - **Asynchronous Message Pushing**:
 
@@ -209,7 +212,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
   - This setting ensures timely replication of messages across brokers, maintaining data consistency and durability.
 
 
-##### Reliability<a id="reliability"></a>
+##### Reliability
 
 - **Message Delivery**:
 
@@ -230,7 +233,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
   - Configurations such as `ENABLE_IDEMPOTENCE_CONFIG` ensure that messages are not duplicated during retries, maintaining data integrity.
 
 
-#### Implementation Details<a id="implementation-details"></a>
+#### Implementation Details
 
 - **ZooKeeper Coordination**:
 
@@ -267,7 +270,7 @@ The Kafka cluster in the e-commerce microservice architecture is designed to fac
   - These checks help in early detection of issues, allowing for timely intervention and maintaining the overall health of the system.
 
 
-#### Summary<a id="summary"></a>
+#### Summary
 
 The Kafka cluster is a vital component of the e-commerce microservice architecture, providing essential capabilities for high availability, performance, and reliability. Its configuration with three brokers and robust message handling mechanisms ensures that the system can efficiently process a large volume of messages while maintaining data integrity and service continuity. Key aspects include:
 
@@ -280,10 +283,9 @@ The Kafka cluster is a vital component of the e-commerce microservice architectu
 This setup significantly enhances the overall stability and efficiency of the application, supporting the dynamic and scalable nature of the microservice architecture.
 
 
-
 # SAGA Pattern, Fallback, and WebSocket Notification
 
-#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXccVLrWeM9IJ4zWUOwqtijxez8tsWxitm56sOKwQCQIjb2lCZRAdWmhSMMJO_LAUWaCuD5mWoyBANGcwqatzTSMMNjkLFIqxpwDBdyiCg71htC7M5UpleyjZ34efFpTGP2ZP8CGn1SsxU8qSBhy-a42Hpg?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeCIYBnOIpzNo88R3K8qBK0K22T-2SFSG_kBXQxuILGGmBvKmZUnLZGcYPAzDw7JkLDz7gUseBuQu2gcO-saZlahcZSM22BjAWVciOxdxMCXL9uGPTj1EaP27l238x0Tw2KUBAj49PHDjWGi4oYDA0AUek?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview
@@ -337,7 +339,7 @@ The SAGA pattern ensures data consistency and reliable transaction management ac
 
 # MySQL Master-Slave Setup and Optimistic Locking
 
-#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeNDO-H90xqvvqfqmmbunN9ZCbGLvz65A0dhv6-H3WwO5wky_tomy_8wHkT2X5LNdDE5ttJOOCNrsHVQh8gOHDZ0ExDV3U2YMY67Ge8IMjdQQfIo1CBaS6V9dd7dKh0WPJbJc6ilA5h4P1K4_JF_vLwoGs2?key=It25FaNN3Hk2ogZbUXQYcg)
+#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcNWs4Kp3U-hyhb42FfS1ttCtX5CCpz1GULC41n63uvmGAZ32gTcuPX0NJbR2u8FHjdOKitvbv20EOCkbDtEDRrycQ6w4Qe0iOwu1tOC8NSDSXFcbL2FHfxww3tTV1kcyU-BD_tGSPQFEra6jpXQ8uZ_oje?key=It25FaNN3Hk2ogZbUXQYcg)
 
 #### Overview
 
@@ -466,7 +468,7 @@ These strategies collectively enhance the stability, performance, and reliabilit
 
 # Redis Sentinel Setup and AOP Performance Measurement
 
-#### ****![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe1jlkg5zwV03IG4A-bs3WR3KzpVqeHxhZEUmIUTYfyIa5yLFWiUATWvtD6ElqF-2sgLO9jXZeX1sW3sSXtGY1SAqEk4NO-pz2eE-GIx0hJByKwFX-5_NzGB3POqgYNpO3e0TIxU-4MyvGjJdV2CjkSOfc3?key=It25FaNN3Hk2ogZbUXQYcg)
+#### ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf7b6JraTONpKinZWRCCBpFLbz-z5bYtYYNhxoZKPYh3dZbQD8mRPHGieWPPtDk52aQ4gQ4WBrWRFspoocoRp-2j_fFCReMzVW3NaRaLEnGO9GAUxAhez4QXIgCLb8cXz02sUDED9vbjt_bvlxvWnR7Ww9_?key=It25FaNN3Hk2ogZbUXQYcg)
 
 #### Overview
 
@@ -584,121 +586,9 @@ The Redis Sentinel setup provides a robust and high-performing caching solution 
 These features collectively enhance the stability, performance, and reliability of the e-commerce application, providing a seamless and efficient user experience.
 
 
-# NGINX as Reverse Proxy
-
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdJGsu5yv1lUJefCn0pJksBgtklgeDwnaK3npAoZ9XHM1EKIZnAnxRLpn0GOr57YmyQ9FICLD4jej4LBLnC4DaJc3Sdph94N62njC4Vu_6l9_LctTYqdnwdNHt9ak5eDWYvxXwjtd0jpZbw7s82GqpNbEw?key=It25FaNN3Hk2ogZbUXQYcg)
-
-
-#### Overview
-
-NGINX is used as a reverse proxy in the e-commerce microservice architecture to enhance performance, security, and scalability. By acting as an intermediary between client requests and backend services, NGINX helps distribute load, manage SSL termination, and serve static content efficiently.
-
-
-#### Configuration and Features
-
-- **NGINX Configuration**:
-
-  - **Container Setup**:
-
-    - The NGINX container is configured to listen on ports 80 (HTTP) and 443 (HTTPS).
-
-    - SSL certificates are provided for secure communication.
-
-    - Static files from the frontend build are served directly from the NGINX container.
-
-  - **Worker Processes**:
-
-    - Configured with one worker process and a maximum of 1024 connections per worker.
-
-  - **HTTP Settings**:
-
-    - `sendfile` is enabled for efficient file transfer.
-
-    - `keepalive_timeout` is set to 65 seconds to maintain open connections for a duration, reducing the overhead of establishing new connections.
-
-- **Server Configuration**:
-
-  - **SSL Termination**:
-
-    - SSL certificates (`nginx.crt` and `nginx.key`) are used for secure communication.
-
-    - SSL session caching and timeout are configured to improve performance and security.
-
-  - **Proxy Settings**:
-
-    - Requests to the root path (`/`) are proxied to the gateway server on port 8080.
-
-    - Various headers (`Host`, `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`) are set to pass client information to the backend services.
-
-  - **Static Content Handling**:
-
-    - Static files under the `/static/` path are served directly from the NGINX container, with caching enabled for one hour.
-
-    - The `index.html` file is also served with caching and specific cache-control headers to ensure efficient content delivery.
-
-
-#### Performance and Reliability
-
-- **Performance**:
-
-  - **SSL Termination**: By handling SSL termination, NGINX offloads the encryption and decryption process from the backend services, improving overall performance.
-
-  - **Static Content Serving**: Serving static files directly from NGINX reduces the load on backend services and speeds up content delivery.
-
-  - **Caching**: Enabling SSL session caching and setting cache-control headers for static files and `index.html` reduces load times and improves user experience.
-
-  - **Performance Measurement**: Using the Lighthouse plugin in Chrome, the loading time has been reduced from `320ms` ****to `200ms`, demonstrating a significant performance improvement.
-
-- **Security**:
-
-  - **SSL Encryption**: Ensures secure communication between clients and the server.
-
-  - **Header Management**: Properly set headers help in maintaining security and passing crucial client information to backend services.
-
-- **Availability**:
-
-  - **Reverse Proxy**: Acts as a single entry point for client requests, managing traffic and improving the availability of backend services.
-
-  - **Health Checks and Failover**: NGINX can be configured to perform health checks and reroute traffic in case of backend service failures, ensuring high availability.
-
-
-#### Implementation Details
-
-- **Reverse Proxy**:
-
-  - NGINX is configured to forward incoming requests to the gateway server, acting as an intermediary that manages traffic efficiently.
-
-  - This setup provides a layer of abstraction and allows for easier scaling and management of backend services.
-
-- **SSL Session Caching**:
-
-  - SSL session caching is enabled to reuse SSL session parameters, reducing the overhead of establishing new SSL connections and improving performance.
-
-- **Static Content Serving**:
-
-  - Static assets are served directly from NGINX, leveraging caching mechanisms to enhance performance and reduce load times.
-
-- **Cache-Control Headers**:
-
-  - Specific cache-control headers are set for static content to ensure efficient caching and faster load times for returning users.
-
-
-#### Summary
-
-NGINX as a reverse proxy significantly enhances the performance, security, and availability of the e-commerce application. Key benefits include:
-
-- **Improved Performance**: Load balancing, SSL termination, and efficient static content serving reduce load times from 320ms to 200ms.
-
-- **Enhanced Security**: SSL encryption and proper header management ensure secure communication and maintain data integrity.
-
-- **High Availability**: Acting as a reverse proxy, NGINX distributes traffic and provides failover capabilities, ensuring the continuous availability of backend services.
-
-These features collectively contribute to a robust and efficient infrastructure, providing a seamless and secure user experience for the e-commerce application.
-
-
 # Keycloak OAuth2 server authentication and authorization with Spring Security
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdV9croEHXx4u92CA7bD6J888L906Bay20ZbdxepHHm2_vhxPKWh9pvWXCqKbJOxO1i1pNfen9u38n6QBXY0HVM-RZjtXJfVCMX_pDlDe5pjGGQYU1FG0OeaydEpbmO2z2kw9aMlaDOc5v2Zi0kTWmPbRA?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdL5vQJdASFt8GCK-Eb30fgtVmKu3w--dBKrli9zYB7P5XclFgu4OQzNywqmR0cB7CphS-67j1tIpAuKRKPgMiD4wDqvJXgZjilQy9UNWUsmUVxoolK_5sO45jHnOV492y_35EYsDB0GGgpR_OZX4CdkeQ?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview
@@ -801,6 +691,10 @@ Keycloak is used as the OAuth2 server in the e-commerce microservice architectur
 
     - RBAC ensures that only users with the appropriate roles can access certain endpoints, enhancing security and preventing unauthorized access.
 
+  - **SSL Encryption**:
+
+    - All communication between clients and the Keycloak server, as well as between microservices, is encrypted using SSL, protecting data in transit.
+
 - **Reliability**:
 
   - **Health Checks**:
@@ -833,7 +727,7 @@ These features collectively enhance the security, reliability, and performance o
 
 # Resilience4J Circuit Breaker, Redis Rate Limiter, and Fallback API
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcwwrfBpQwNdoQiPSa5xaEDAqoZM2jycfpzC3EmS-tvXTtP_LyLfCec-njGT0jbXy8n3lHfuqjOIJNMRKJ0ZFfbtWeJp6QLi-dmdl8XfAzURtJE9XjXZLjUoWd6nTJaOgV8qZoWnyPqQzXlMilaPmGxt5Q?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeIY-vmFQpFcffV6b8Z8BsAaeu7XzDtvDve9s_OtkBajFP8ytVl7Dlb6lHsIC7WXwV6GPEbAFqeaoVg_RdMHdhoJ3vrHkCp9IfvXWB3ibO6QRodHa733RQnxjWJICe1FyT98cD9GQXCYjQmqOgrmE6SYf8?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview
@@ -960,7 +854,7 @@ These features are essential for maintaining the reliability and performance of 
 
 # Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdAuqpW16bTexH_FvcOQvWe6vvqb18nKpfOEKjm4YF81Ac23GtKJ529x-lsCpQrp-HVQp0MJMNtwoQLB5rYBbyP2aH_ZZN8zN0O2Vxhg8PsIOXlitnnql5JyBq5UeBXnEXbi6F5E5dQhJALS23GNpRoPSf0?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXev8pO0Yb3ILrtpPXt1dPoAs0F94CYsN1sQgIQjZxRn1YCk9qdRXA-OP7T2vM5n27SuhY7OWlBa55VQCRRFqFIr2CY7Dc0Nq3_gr3repNtHPY1WHAEiVCPLIgPtN5CuSARy16ndRMPJq_LW2Uq0kS69VZEO?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview
@@ -1123,3 +1017,146 @@ The integration of Promtail, Loki, Prometheus, Grafana, MinIO, and NGINX provide
 - **Reliable Storage**: MinIO provides durable and highly available storage for log data, ensuring that logs are securely stored and easily retrievable.
 
 These tools collectively enhance the stability, performance, and reliability of the e-commerce application, ensuring a seamless and efficient user experience.
+
+
+# Deployment Summary of Microservices Application to AWS with EKS
+
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeYI0P5c9hn0VlbgKjZyDnjpLhN08sEGlJkD5DkcWGPcDzcYskX67whDyMeww0bfpt_59zyw-u0PCfCDAxhGsuax8zrvjOeLuGbXBDN_VuY8-toZf8UEMn1xrtBXDtj08JisC6VdjdEuz72woiF6qlCCnD0?key=It25FaNN3Hk2ogZbUXQYcg)
+
+
+#### Overview 
+
+The e-commerce microservices application is deployed on AWS using Elastic Kubernetes Service (EKS), leveraging a robust and scalable infrastructure. This deployment utilizes various AWS components such as VPC, subnets, NAT gateway, ingress controller, services, ConfigMaps, EC2 instances, and a bastion host to ensure high availability, security, and efficient resource management.
+
+
+### Cloud Security
+
+#### Elastic Kubernetes Service (EKS)
+
+- **Managed Service Security:** EKS integrates seamlessly with AWS Identity and Access Management (IAM), enhancing security through role-based access control. This integration ensures that only authorized users can manage the Kubernetes clusters and associated resources.
+
+- **Security Groups:** Applied to EKS nodes to control inbound and outbound traffic, allowing only trusted sources to interact with the cluster.
+
+
+#### Virtual Private Cloud (VPC)
+
+- **Network Isolation:** The VPC provides a logically isolated network environment, segregating the Kubernetes cluster from other AWS resources. This setup enhances security by preventing unauthorized access to the Kubernetes resources.
+
+- **Traffic Control:** Security groups and network access control lists (NACLs) are used to control inbound and outbound traffic, ensuring that only approved traffic is allowed to reach the resources.
+
+
+#### Subnets
+
+- **Public Subnet:** The public subnet hosts the bastion host, which provides a secure entry point for accessing resources in the private subnet. This bastion host allows SSH access to private instances through a single, monitored entry point.
+
+- **Private Subnet:** The private subnet houses critical components such as EKS worker nodes and middleware services, which do not require direct internet access. This configuration keeps sensitive data and services protected, enhancing overall security.
+
+
+#### NAT Gateway
+
+- **Secure Internet Access:** The NAT gateway, deployed in the public subnet, enables instances in the private subnet to connect to the internet securely. This setup prevents inbound internet traffic from reaching the private instances, ensuring a secure environment.
+
+
+#### Ingress Controller
+
+- **Traffic Management:** The NGINX ingress controller efficiently manages inbound traffic to the Kubernetes cluster. It routes traffic based on request paths and hostnames, directing it either to NGINX servers for serving static content or to the gateway server for handling dynamic requests. This ensures that traffic is handled appropriately and securely.
+
+- **CORS Configurations:** The ingress controller is configured with annotations to handle CORS settings, ensuring flexibility and security in managing cross-origin requests.
+
+  - `nginx.ingress.kubernetes.io/cors-allow-credentials: "true"`
+
+  - `nginx.ingress.kubernetes.io/cors-allow-headers: '*`
+
+  - `nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS`
+
+  - `nginx.ingress.kubernetes.io/cors-allow-origin: '*'`
+
+  - `nginx.ingress.kubernetes.io/enable-cors: "true"`
+
+  - `nginx.ingress.kubernetes.io/use-regex: "true"`
+
+
+### Reliability
+
+#### Elastic Kubernetes Service (EKS)
+
+- **High Availability:** EKS ensures the control plane is highly available, automatically replacing unhealthy nodes to maintain service continuity. This minimizes downtime and ensures that the application remains available to users.
+
+
+#### Auto Scaling and Health Checks
+
+- **Auto Scaling:**
+
+  - Desired size: 1
+
+  - Minimum size: 1
+
+  - Maximum size: 2
+
+- **Health Checks:** Regular health checks monitor the state of pods, replacing unhealthy instances to maintain service availability. This proactive monitoring ensures that issues are detected and resolved quickly.
+
+  - `readinessProbe:`
+
+    - `failureThreshold: 3`
+
+    - `httpGet:`
+
+      - `path: /`
+
+      - `port: 80`
+
+      - `scheme: HTTP`
+
+    - `periodSeconds: 10`
+
+    - `successThreshold: 1`
+
+    - `timeoutSeconds: 1`
+
+
+#### Services and ConfigMaps
+
+- **Stable Endpoints:** Kubernetes services expose applications running on pods as network services, providing stable endpoints for communication. This ensures reliable communication within the cluster and with external clients.
+
+- **Dynamic Configuration:** ConfigMaps manage configuration data separately from the application code, allowing dynamic reconfiguration of applications without altering the code. This flexibility enhances reliability by enabling quick adjustments to configuration settings.
+
+  - `terminationGracePeriodSeconds: 30`
+
+
+### Scalability
+
+#### Elastic Kubernetes Service (EKS)
+
+- **Automatic Scaling:** EKS automatically scales the infrastructure based on load, ensuring optimal performance during varying demand levels. This capability allows the application to handle increased traffic without manual intervention.
+
+  - `strategy: RollingUpdate`
+
+    - `maxSurge: 25%`
+
+    - `maxUnavailable: 25%`
+
+
+#### Virtual Private Cloud (VPC)
+
+- **Customizability:** The VPC supports custom IP address ranges and subnet configurations, facilitating scalability. This flexibility allows the deployment to adapt to changing requirements and scale as needed.
+
+
+#### Subnets
+
+- **Resource Allocation:** The use of public and private subnets optimizes resource allocation, allowing scalable deployment of components. This setup ensures that resources are used efficiently and can be scaled up or down as required.
+
+
+#### Ingress Controller
+
+- **Efficient Routing:** The ingress controller routes traffic efficiently based on request paths and hostnames, managing load distribution effectively. This ensures that the application can handle varying traffic loads without performance degradation.
+
+
+#### EC2 Instances
+
+- **Flexible Computing:** EC2 instances provide scalable computing capacity, supporting various instance types and configurations to optimize performance and cost. This flexibility ensures that the deployment can handle increased demand without compromising performance.
+
+
+### Summary
+
+Deploying the e-commerce microservices application to AWS with EKS provides a robust and scalable architecture that ensures high availability, security, and efficient resource management. By integrating EKS, VPC, subnets, NAT gateway, ingress controller, services, ConfigMaps, EC2 instances, and a bastion host, the application benefits from a resilient infrastructure capable of handling failures gracefully, delivering a reliable and seamless user experience.
+
