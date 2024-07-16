@@ -39,6 +39,8 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 9. [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
 
 10. [****Deployment Summary of Microservices Application to AWS with EKS****](#Deployment-Summary-of-Microservices-Application-to-AWS-with-EKS)
+  
+11. [****Future Work****](#Future-Work)
 
 
 # Sample App Screenshots
@@ -59,11 +61,6 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 #### React Frontend
 
 - Provides a dynamic and responsive user interface utilizing React, Redux, and Material UI.
-
-
-#### NGINX
-
-- Acts as a reverse proxy, improving SSL session caching and static file caching to reduce load times and enhance performance.
 
 
 #### Spring Cloud Gateway
@@ -1162,4 +1159,28 @@ The e-commerce microservices application is deployed on AWS using Elastic Kubern
 ### Summary
 
 Deploying the e-commerce microservices application to AWS with EKS provides a robust and scalable architecture that ensures high availability, security, and efficient resource management. By integrating EKS, VPC, subnets, NAT gateway, ingress controller, services, ConfigMaps, EC2 instances, and a bastion host, the application benefits from a resilient infrastructure capable of handling failures gracefully, delivering a reliable and seamless user experience.
+
+# Future Work
+
+**Payment Service Integration**:
+
+- Currently, the payment service does not connect to an actual payment gateway like Stripe. The current setup is hard-coded to be successful in payment. Future work includes integrating a real payment gateway to handle transactions securely.
+
+**HTTPS Implementation**:
+
+- The platform currently uses HTTP for demonstration purposes. Implementing HTTPS is necessary for securing data transmission, although it is costly. Future work involves securing the platform with HTTPS for production environments.
+
+**Migration to AWS S3**:
+
+- Currently, Cloudinary is used for image storage. While Cloudinary is a good solution, future work includes migrating to AWS S3 for image storage, with a Lambda function to automatically compress large images for storage optimization.
+
+**Recommendation System**:
+
+- The current setup does not include a recommendation system. Featured items on the homepage are fetched randomly. Future work includes developing a recommendation service that analyzes popular products and provides personalized recommendations for users based on their browsing and purchase history.
+
+**Notification Service**:
+
+- The current setup lacks a notification service. Future work includes implementing a notification service to send alerts and updates to users about their orders, promotions, and other relevant information.
+
+By addressing these future work items and limitations, the e-commerce application can be further enhanced to provide a more secure, reliable, and feature-rich experience for users.
 
