@@ -13,7 +13,7 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 
 # Overview of AWS Deployment with EKS Structure
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdpGkC7KaDUjxx3O2dCWONVQgYdfYjCs1fuaG72OYDtcUGEWM_bpZzWLQzQ-GTIl5Z6VMkaa8bcnzr3tnDwtramxqAwT81qkAwarHSRn-GdjXl8QjBKkfWegQTMcIceOtrzx-Ka66wdYcRAuHeac1iyMe0q?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcGIBXGRmdmIli1dJzUnWhfiS_VQiZU4DQPltex0Uh-vDsJG8seonu8R8CfX2BDwJ1EFLCc1EIscTaCJLoQXFqtui7kdfiZzRujQEsAJeXKuFmueQ2rt_v7NR9f8XINudYwqu6mI0MoZBnpoSdCUGSq3zI?key=It25FaNN3Hk2ogZbUXQYcg)
 
 # Overview of System Components
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf2TKhwdKnXux6hpvSc3YBA8Xn_PpFPCUDQg4d3UFFyLAREgKy2ilGOifzrv63AbRWZ1FfLmxv35pQJOT6-4AQeP5OxxMEFZsQ2Bl27ZEFpY_uesj6UgOc0_ccC008OImWOZzWN8FEPnwAZpz0GMOpNHcg7?key=It25FaNN3Hk2ogZbUXQYcg)
@@ -1024,7 +1024,7 @@ These tools collectively enhance the stability, performance, and reliability of 
 
 # Deployment Summary of Microservices Application to AWS with EKS
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdpGkC7KaDUjxx3O2dCWONVQgYdfYjCs1fuaG72OYDtcUGEWM_bpZzWLQzQ-GTIl5Z6VMkaa8bcnzr3tnDwtramxqAwT81qkAwarHSRn-GdjXl8QjBKkfWegQTMcIceOtrzx-Ka66wdYcRAuHeac1iyMe0q?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcGIBXGRmdmIli1dJzUnWhfiS_VQiZU4DQPltex0Uh-vDsJG8seonu8R8CfX2BDwJ1EFLCc1EIscTaCJLoQXFqtui7kdfiZzRujQEsAJeXKuFmueQ2rt_v7NR9f8XINudYwqu6mI0MoZBnpoSdCUGSq3zI?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview 
