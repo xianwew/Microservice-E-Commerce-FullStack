@@ -1180,6 +1180,8 @@ Some functionalities are simplified in the current setup to focus on demonstrati
 
 3. **Implementation of a Notification Service**: The platform currently lacks a notification service. Future work involves implementing a notification service to send alerts and updates to users about their orders, promotions, and other relevant information, improving user engagement and satisfaction.
 
+4. **Responsive React Frontend**: Although the React frontend leverages Material UI for better visual effects, it is simplified to be non-responsive for the purpose of demonstrating the microservice architecture. Future work includes making the frontend fully responsive to enhance usability across various devices and screen sizes.
+
 **Conclusion**
 
 By addressing these future work items and limitations, the e-commerce application can be significantly enhanced to provide a more secure, reliable, and feature-rich experience for users.
