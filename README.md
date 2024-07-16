@@ -1162,25 +1162,24 @@ Deploying the e-commerce microservices application to AWS with EKS provides a ro
 
 # Future Work
 
-**Payment Service Integration**:
+**HTTPS Implementation**
 
-- Currently, the payment service does not connect to an actual payment gateway like Stripe. The current setup is hard-coded to be successful in payment. Future work includes integrating a real payment gateway to handle transactions securely.
+The platform currently uses HTTP for demonstration purposes, which is not secure for production use. Implementing HTTPS is essential for securing data transmission. Future work includes securing the platform with HTTPS to protect user data and enhance security, despite the associated costs.
 
-**HTTPS Implementation**:
+**Migration to AWS S3 for Image Storage**
 
-- The platform currently uses HTTP for demonstration purposes. Implementing HTTPS is necessary for securing data transmission, although it is costly. Future work involves securing the platform with HTTPS for production environments.
+While Cloudinary is currently used for image storage, migrating to AWS S3 is planned for better integration with the existing AWS infrastructure. This migration will include using a Lambda function to automatically compress large images, optimizing storage and performance.
 
-**Migration to AWS S3**:
+**Addressing Simplified Functionalities**
 
-- Currently, Cloudinary is used for image storage. While Cloudinary is a good solution, future work includes migrating to AWS S3 for image storage, with a Lambda function to automatically compress large images for storage optimization.
+Some functionalities are simplified in the current setup to focus on demonstrating core microservice architecture and integration. Future work includes:
 
-**Recommendation System**:
+1. **Payment Service Integration**: The payment service is currently hard-coded to always be successful, which is not suitable for a production environment. Future work involves integrating a real payment gateway like Stripe to handle transactions securely, ensuring reliable and secure payment processing.
 
-- The current setup does not include a recommendation system. Featured items on the homepage are fetched randomly. Future work includes developing a recommendation service that analyzes popular products and provides personalized recommendations for users based on their browsing and purchase history.
+2. **Development of a Recommendation System**: The current setup fetches featured items on the homepage randomly. Future work involves developing a recommendation service that analyzes popular products and provides personalized recommendations based on user browsing and purchase history, enhancing the user experience.
 
-**Notification Service**:
+3. **Implementation of a Notification Service**: The platform currently lacks a notification service. Future work involves implementing a notification service to send alerts and updates to users about their orders, promotions, and other relevant information, improving user engagement and satisfaction.
 
-- The current setup lacks a notification service. Future work includes implementing a notification service to send alerts and updates to users about their orders, promotions, and other relevant information.
+**Conclusion**
 
-By addressing these future work items and limitations, the e-commerce application can be further enhanced to provide a more secure, reliable, and feature-rich experience for users.
-
+By addressing these future work items and limitations, the e-commerce application can be significantly enhanced to provide a more secure, reliable, and feature-rich experience for users.
