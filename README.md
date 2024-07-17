@@ -8,8 +8,8 @@ This project is a react / spring full-stack e-commerce application built using a
 Feel free to explore the code, and don't hesitate to reach out if you have any questions or feedback!
 
 Thank you for visiting, and I hope you find this project as exciting and educational as I did while building it.
-## Website URI (I stop EC2 instances sometimes, as EC2 and EKS are too expensive!): http://www.xianwei-e-commerce.com/
-
+## Website URI (I stop EC2 instances sometimes, as EC2 and EKS are too expensive!)
+## http://www.xianwei-e-commerce.com/
 
 # Overview of AWS Deployment with EKS Structure
 
