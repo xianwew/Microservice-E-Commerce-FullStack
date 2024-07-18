@@ -3,17 +3,16 @@
 
 # Hello and welcome to my GitHub repository!
 
-This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 25 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
+This project is a react / spring full-stack e-commerce application built using a microservice architecture. Over the course of 30 days, I have implemented a robust, scalable, and reliable system using cutting-edge technologies. The application includes services for users, items, orders, and payments, all orchestrated to provide a seamless e-commerce experience. Below are some screenshots of the app.
 
 Feel free to explore the code, and don't hesitate to reach out if you have any questions or feedback!
 
 Thank you for visiting, and I hope you find this project as exciting and educational as I did while building it.
-## Website URI: http://www.xianwei-e-commerce.com/
-
+## Website URI (I stop EC2 instances sometimes, as EC2 and EKS are too expensive!) http://www.xianwei-e-commerce.com/
 
 # Overview of AWS Deployment with EKS Structure
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcBCLhQDu5RKoRwNdF6dF6VOuz4dsaCiI92CI7WBvNCAfjXYAxX1Ezu6Cq5u5BCHXKL6tuiCFgmSb3z5niwcQ_QEys76QBAcTNeMFXvOT3g9MXX037th7LiwjFfJd-NUtnoREL58INPB6ZyE2eKLUHbzQwx?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcGIBXGRmdmIli1dJzUnWhfiS_VQiZU4DQPltex0Uh-vDsJG8seonu8R8CfX2BDwJ1EFLCc1EIscTaCJLoQXFqtui7kdfiZzRujQEsAJeXKuFmueQ2rt_v7NR9f8XINudYwqu6mI0MoZBnpoSdCUGSq3zI?key=It25FaNN3Hk2ogZbUXQYcg)
 
 # Overview of System Components
 ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXf2TKhwdKnXux6hpvSc3YBA8Xn_PpFPCUDQg4d3UFFyLAREgKy2ilGOifzrv63AbRWZ1FfLmxv35pQJOT6-4AQeP5OxxMEFZsQ2Bl27ZEFpY_uesj6UgOc0_ccC008OImWOZzWN8FEPnwAZpz0GMOpNHcg7?key=It25FaNN3Hk2ogZbUXQYcg)
@@ -39,6 +38,8 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 9. [****Monitoring and Observability with Promtail, Loki, Prometheus, and Grafana****](#Monitoring-and-Observability-with-Promtail-Loki-Prometheus-and-Grafana)
 
 10. [****Deployment Summary of Microservices Application to AWS with EKS****](#Deployment-Summary-of-Microservices-Application-to-AWS-with-EKS)
+  
+11. [****Future Work****](#Future-Work)
 
 
 # Sample App Screenshots
@@ -59,11 +60,6 @@ Thank you for visiting, and I hope you find this project as exciting and educati
 #### React Frontend
 
 - Provides a dynamic and responsive user interface utilizing React, Redux, and Material UI.
-
-
-#### NGINX
-
-- Acts as a reverse proxy, improving SSL session caching and static file caching to reduce load times and enhance performance.
 
 
 #### Spring Cloud Gateway
@@ -1024,7 +1020,7 @@ These tools collectively enhance the stability, performance, and reliability of 
 
 # Deployment Summary of Microservices Application to AWS with EKS
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcBCLhQDu5RKoRwNdF6dF6VOuz4dsaCiI92CI7WBvNCAfjXYAxX1Ezu6Cq5u5BCHXKL6tuiCFgmSb3z5niwcQ_QEys76QBAcTNeMFXvOT3g9MXX037th7LiwjFfJd-NUtnoREL58INPB6ZyE2eKLUHbzQwx?key=It25FaNN3Hk2ogZbUXQYcg)
+![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcGIBXGRmdmIli1dJzUnWhfiS_VQiZU4DQPltex0Uh-vDsJG8seonu8R8CfX2BDwJ1EFLCc1EIscTaCJLoQXFqtui7kdfiZzRujQEsAJeXKuFmueQ2rt_v7NR9f8XINudYwqu6mI0MoZBnpoSdCUGSq3zI?key=It25FaNN3Hk2ogZbUXQYcg)
 
 
 #### Overview 
@@ -1052,7 +1048,7 @@ The e-commerce microservices application is deployed on AWS using Elastic Kubern
 
 - **Public Subnet:** The public subnet hosts the bastion host, which provides a secure entry point for accessing resources in the private subnet. This bastion host allows SSH access to private instances through a single, monitored entry point.
 
-- **Private Subnet:** The private subnet houses critical components such as EKS worker nodes and middleware services, which do not require direct internet access. This configuration keeps sensitive data and services protected, enhancing overall security.
+- **Private Subnet:** The private subnet houses critical components such as EKS worker nodes, which do not require direct internet access. This configuration keeps sensitive data and services protected, enhancing overall security.
 
 
 #### NAT Gateway
@@ -1163,3 +1159,28 @@ The e-commerce microservices application is deployed on AWS using Elastic Kubern
 
 Deploying the e-commerce microservices application to AWS with EKS provides a robust and scalable architecture that ensures high availability, security, and efficient resource management. By integrating EKS, VPC, subnets, NAT gateway, ingress controller, services, ConfigMaps, EC2 instances, and a bastion host, the application benefits from a resilient infrastructure capable of handling failures gracefully, delivering a reliable and seamless user experience.
 
+# Future Work
+
+**HTTPS Implementation**
+
+The platform currently uses HTTP for demonstration purposes, which is not secure for production use. Implementing HTTPS is essential for securing data transmission. Future work includes securing the platform with HTTPS to protect user data and enhance security, despite the associated costs.
+
+**Migration to AWS S3 for Image Storage**
+
+While Cloudinary is currently used for image storage, migrating to AWS S3 is planned for better integration with the existing AWS infrastructure. This migration will include using a Lambda function to automatically compress large images, optimizing storage and performance.
+
+**Addressing Simplified Functionalities**
+
+Some functionalities are simplified in the current setup to focus on demonstrating core microservice architecture and integration. Future work includes:
+
+1. **Payment Service Integration**: The payment service is currently hard-coded to always be successful, which is not suitable for a production environment. Future work involves integrating a real payment gateway like Stripe to handle transactions securely, ensuring reliable and secure payment processing.
+
+2. **Development of a Recommendation System**: The current setup fetches featured items on the homepage randomly. Future work involves developing a recommendation service that analyzes popular products and provides personalized recommendations based on user browsing and purchase history, enhancing the user experience.
+
+3. **Implementation of a Notification Service**: The platform currently lacks a notification service. Future work involves implementing a notification service to send alerts and updates to users about their orders, promotions, and other relevant information, improving user engagement and satisfaction.
+
+4. **Responsive React Frontend**: Although the React frontend leverages Material UI for better visual effects, it is simplified to be non-responsive for the purpose of demonstrating the microservice architecture. Future work includes making the frontend fully responsive to enhance usability across various devices and screen sizes.
+
+**Conclusion**
+
+By addressing these future work items and limitations, the e-commerce application can be significantly enhanced to provide a more secure, reliable, and feature-rich experience for users.
